@@ -1,0 +1,72 @@
+Tổng quan 5 hướng đề tài
+1 Mô hình hóa & Kiểm chứng hình thức (Kripke + BMC)
+2 Kiểm toán an toàn bộ nhớ C (Memory Safety Audit)
+3 Kiểm chứng thuộc tính số học/alignment bằng SMT
+4 Dự án Fuzzing (Black-box vs White-box)
+5 Quy trình end-to-end tích hợp cả 4 chương
+Sinh viên có thể chọn 1 trong 5 hướng, hoặc đề xuất hướng khác (cần trao đổi trước với giảng
+viên).
+8 / 27
+Chủ đề 1: Mô hình hóa & Kiểm chứng hình thức
+Mô tả: Chọn một hệ thống trạng thái đơn giản (máy ATM, hệ thống đăng nhập, đèn giao
+thông thông minh, máy bán hàng tự động, cửa cuốn tự động...)
+Yêu cầu: Xây dựng Kripke structure đầy đủ, viết ít nhất 3 thuộc tính LTL/CTL (safety +
+liveness), chạy BMC (dùng ch3_staticsat.bounded_checker) tìm completeness threshold
+Độ khó: Trung bình – phù hợp sinh viên thích tư duy hình thức/toán học
+9 / 27
+Chủ đề 1: Ví dụ cụ thể (gợi ý mở rộng)
+Hệ thống khóa cửa thông minh với các trạng thái: locked, unlocking, unlocked, alarm.
+Thuộc tính safety: ”Không bao giờ ở trạng thái unlocked mà không qua unlocking”
+Thuộc tính liveness: ”Sau khi nhập đúng mã, cuối cùng sẽ mở khóa”
+Thử nghiệm: cố tình thiết kế sai (bỏ qua bước xác thực) để BMC tìm ra counterexample, sau
+đó sửa và xác nhận lại
+10 / 27
+Chủ đề 2: Kiểm toán an toàn bộ nhớ C
+Mô tả: Chọn một chương trình C nhỏ có sẵn (tự viết hoặc từ mã nguồn mở nhỏ) xử lý input
+từ file/mạng
+Yêu cầu: Chạy ch2_memsafe.pattern_scanner, cppcheck, biên dịch với ASan/UBSan; phát
+hiện tối thiểu 2 lỗi bộ nhớ thực sự (có thể tự chèn nếu chương trình quá sạch); sửa và xác
+nhận lại
+Độ khó: Trung bình-Thấp – phù hợp sinh viên thích lập trình C thực hành
+11 / 27
+Chủ đề 2: Ví dụ cụ thể (gợi ý mở rộng)
+Chương trình phân tích file cấu hình dạng key=value đơn giản.
+Cố ý cài lỗi: dùng strcpy không giới hạn khi đọc value, quên kiểm tra NULL sau malloc
+Chạy static analysis phát hiện; xác nhận bằng cách chạy chương trình với input dài gây
+crash thực tế
+Sửa bằng snprintf, kiểm tra NULL; tính lại kích thước struct với alignment tối ưu nếu có
+dùng struct
+12 / 27
+Chủ đề 3: Kiểm chứng bằng SMT
+Mô tả: Chọn 2-3 hàm C nhỏ có phép toán số học hoặc truy cập bộ nhớ qua con trỏ ép kiểu
+Yêu cầu: Dùng ch3_staticsat.smt_wrapper viết ràng buộc Z3 chứng minh/tìm phản ví dụ
+cho: tràn số nguyên, vi phạm alignment, hoặc điều kiện an toàn tùy chỉnh
+Độ khó: Cao – phù hợp sinh viên thích toán học/logic hình thức
+13 / 27
+Chủ đề 3: Ví dụ cụ thể (gợi ý mở rộng)
+Hàm tính chỉ số mảng từ 2 tham số đầu vào: index = base + offset * stride.
+Chứng minh (hoặc tìm phản ví dụ): với mọi base, offset, stride trong khoảng hợp lệ đã
+định nghĩa, index luôn nằm trong phạm vi mảng
+Nếu tìm được phản ví dụ (SAT), đề xuất ràng buộc bổ sung ở tầng input validation để loại trừ
+trường hợp đó
+14 / 27
+Chủ đề 4: Dự án Fuzzing
+Mô tả: Chọn một hàm/chương trình phân tích cú pháp (parser) có ít nhất một điều kiện dạng
+”magic byte” hoặc checksum
+Yêu cầu: Dùng ch4_dynafuzz chạy cả black-box và white-box fuzzing, so sánh định lượng
+(số lần thử, thời gian) để tìm ra cùng một lỗi/nhánh mục tiêu
+Độ khó: Trung bình-Cao – phù hợp sinh viên thích thực nghiệm định lượng
+15 / 27
+Chủ đề 4: Ví dụ cụ thể (gợi ý mở rộng)
+Parser cho định dạng file tự thiết kế: 4 byte magic number + 4 byte độ dài + payload.
+Black-box fuzzing: đo số lần thử trung bình để tìm đúng magic number
+White-box fuzzing: dùng Z3 giải trực tiếp ra magic number, đo thời gian
+So sánh và giải thích khác biệt bằng lý thuyết đã học (Chương 4, mục 4.6)
+16 / 27
+Chủ đề 5: Quy trình End-to-end tích hợp
+Mô tả: Chọn MỘT chương trình duy nhất, áp dụng tuần tự cả 4 module của toolkit lên
+chương trình đó
+Yêu cầu: Mô hình hóa (ch1) → static analysis + sửa lỗi bộ nhớ (ch2) → kiểm chứng SMT/BMC
+cho 1 thuộc tính quan trọng (ch3) → fuzzing xác nhận (ch4)
+Độ khó: Cao nhất (khối lượng công việc lớn hơn) nhưng thể hiện rõ nhất tư duy tổng hợp
+toàn học phần – khuyến nghị cho sinh viên muốn đạt điểm cao

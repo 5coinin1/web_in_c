@@ -1,0 +1,21 @@
+# Build output
+/build/
+/build-asan/
+
+# Server / client data
+/server_data/
+/client_data/
+**/server_data/
+**/client_data/
+
+# Generated PoC files
+/pocs/
+
+# Editor / OS
+.vscode/
+.idea/
+*.o
+*.exe
+*.log
+server.out
+server.err
