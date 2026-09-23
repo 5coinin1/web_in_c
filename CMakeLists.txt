@@ -36,6 +36,7 @@ set(SERVER_SOURCES
     src/json_util.c
     src/log.c
     src/tui.c
+    src/state_machine.c
 )
 
 # ---------------------------------------------------------------------------
@@ -136,3 +137,25 @@ if(WCHAT_SANITIZE)
         OpenSSL::Crypto
     )
 endif()
+# ---------------------------------------------------------------------------
+# Chapter 1 - Shared State Machine + Kripke / BMC
+# ---------------------------------------------------------------------------
+
+add_executable(wschat_ch1_kripke
+    test/ch1_kripke.c
+    src/state_machine.c
+    src/kripke.c
+)
+
+target_include_directories(
+    wschat_ch1_kripke
+    PRIVATE
+    src
+)
+
+enable_testing()
+
+add_test(
+    NAME chapter1_kripke
+    COMMAND wschat_ch1_kripke 8
+)

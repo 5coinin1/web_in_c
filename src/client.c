@@ -5,6 +5,7 @@
 #include "session.h"
 #include "json_util.h"
 #include <stdlib.h>
+#include "state_machine.h"
 
 // Leave the current room (if any): notify the others and clear room state.
 static void client_leave_room(client_t *client);
@@ -25,7 +26,7 @@ client_t *client_create(int fd) {
     client_t *c = (client_t *)calloc(1, sizeof(client_t));
     if (!c) return NULL;
     c->fd = fd;
-    c->state = STATE_HTTP_HANDSHAKE;
+    c->state = client_state_initial();
     return c;
 }
 
@@ -68,7 +69,13 @@ static void client_leave_room(client_t *client) {
     room_leave(client->room, client->nickname);
     LOG_INFO("'%s' left room '%s'", client->nickname, client->room);
     client->room[0] = '\0';
-    client->state = STATE_AUTHENTICATED;
+
+    // Ch1 foundation: every runtime state change goes through the
+    // shared transition relation used by the Kripke model/BMC.
+    if (!client_state_apply(&client->state, CLIENT_EVENT_LEAVE_OK)) {
+        LOG_ERR("Illegal state transition on LEAVE: %s",
+                client_state_name(client->state));
+    }
 }
 
 static void send_joined(client_t *client, const char *room) {
@@ -105,9 +112,15 @@ static int handle_http_handshake(client_t *client) {
     // Clear read buffer
     client->read_len = 0;
     client->read_buf[0] = '\0';
-    client->state = STATE_WS_CONNECTED;
 
-    LOG_INFO("Client fd=%d upgraded to WebSocket", client->fd);
+    if (!client_state_apply(&client->state, CLIENT_EVENT_HTTP_UPGRADE_OK)) {
+        LOG_ERR("Illegal state transition after WebSocket upgrade: %s",
+                client_state_name(client->state));
+        return -1;
+    }
+
+    LOG_INFO("Client fd=%d upgraded to WebSocket (%s)",
+             client->fd, client_state_name(client->state));
     return 1;
 }
 
@@ -202,7 +215,19 @@ static int handle_ws_message(client_t *client, ws_frame_t *frame) {
                 return 0;
             }
             snprintf(client->nickname, sizeof(client->nickname), "%s", username);
-            client->state = STATE_AUTHENTICATED;
+
+            if (!client_state_apply(&client->state, CLIENT_EVENT_LOGIN_OK)) {
+                // Keep session bookkeeping consistent if the transition is rejected.
+                session_remove(username);
+                client->nickname[0] = '\0';
+                client_send_ws_text(client,
+                    "{\"type\":\"LOGIN_FAIL\",\"msg\":\"Invalid connection state\"}");
+                LOG_ERR("Illegal LOGIN transition for '%s' (fd=%d)",
+                        username, client->fd);
+                free(msg);
+                return 0;
+            }
+
             char resp[256];
             snprintf(resp, sizeof(resp),
                      "{\"type\":\"LOGIN_OK\",\"username\":\"%s\"}", username);
@@ -321,7 +346,19 @@ static int handle_ws_message(client_t *client, ws_frame_t *frame) {
         int jr = room_join(room_name, nickname, client, code);
         if (jr == ROOM_JOIN_OK) {
             snprintf(client->room, sizeof(client->room), "%s", room_name);
-            client->state = STATE_IN_ROOM;
+
+            if (!client_state_apply(&client->state, CLIENT_EVENT_JOIN_OK)) {
+                // Roll back room membership if the formal transition rejects JOIN.
+                room_leave(room_name, nickname);
+                client->room[0] = '\0';
+                client_send_ws_text(client,
+                    "{\"type\":\"JOIN_FAIL\",\"msg\":\"Invalid connection state\"}");
+                LOG_ERR("Illegal JOIN transition for '%s' -> room '%s'",
+                        nickname, room_name);
+                free(msg);
+                return 0;
+            }
+
             send_joined(client, room_name);
 
             // Notify others
