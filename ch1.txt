@@ -1,0 +1,21 @@
+Chương 1 xây dựng state machine dùng chung cho luồng kết nối:
+
+HTTP_HANDSHAKE
+-> WS_CONNECTED
+-> AUTHENTICATED
+-> IN_ROOM
+
+Server thật sử dụng state_machine.c, còn kripke.c dùng cùng state machine đó để kiểm chứng bằng Kripke Structure và Bounded Model Checking.
+
+Các file chính:
+src/state_machine.c
+src/state_machine.h
+src/kripke.c
+src/kripke.h
+test/ch1_kripke.c
+
+
+
+Chạy test Chapter 1:
+
+./build/wschat_ch1_kripke.exe
