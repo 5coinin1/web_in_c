@@ -19,15 +19,17 @@ static void signal_handler(int sig) {
     g_running = 0;
 }
 
-static void cleanup_all_clients(void) {
+// On shutdown, do NOT free clients here: each client is owned by its own
+// thread, which is still running (parked in recv()). Freeing it from this
+// thread would be a double-free / use-after-free, because the client thread
+// also destroys its client when it exits. Instead, just wake every reader by
+// shutting its socket down; each thread then tears down its own client through
+// the normal path. main() waits for the count to reach 0.
+static void shutdown_all_clients(void) {
     pthread_mutex_lock(&g_clients_lock);
-    client_t *c = g_clients;
-    while (c) {
-        client_t *next = c->next;
-        client_destroy(c);
-        c = next;
+    for (client_t *c = g_clients; c; c = c->next) {
+        SHUTDOWN_BOTH(c->fd);
     }
-    g_clients = NULL;
     pthread_mutex_unlock(&g_clients_lock);
 }
 
@@ -543,7 +545,16 @@ int main(int argc, char *argv[]) {
     }
 
     LOG_INFO("Server shutting down...");
-    cleanup_all_clients();
+    // Wake every client thread; each frees its own client. Wait (bounded) for
+    // them to finish so no thread is still touching a client after main exits.
+    shutdown_all_clients();
+    for (int i = 0; i < 50 && g_client_count > 0; i++) {
+#ifdef _WIN32
+        Sleep(100);
+#else
+        usleep(100 * 1000);
+#endif
+    }
     if (g_server_fd >= 0) { CLOSE_SOCKET(g_server_fd); g_server_fd = -1; }
 
 #ifdef _WIN32

@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdarg.h>
+#include <time.h>
 #include <pthread.h>
 
 #include "common.h"      // platform/socket helpers, constants, logging
@@ -368,16 +369,22 @@ static void render_room_list(const room_info_t *rooms, int n, const char *userna
 
 // Interactively pick a room and join it. On success writes the room name to
 // joined. Returns 0 on joined, -1 if the user gave up.
-static int await_response(char *out, size_t n);
+// Event-queue helpers for the room-selection flow (defined further below).
+static char *ev_wait_any(const char *const *types, int n, int timeout_ms);
+static void  ev_flush(void);
 
 // Fetch the room list into rooms[]. Returns 0 on success, -1 on error.
 static int fetch_rooms(int fd, room_info_t *rooms, int *n_out) {
-    char resp[16384];
+    const char *want[] = { "ROOM_LIST", "DISCONNECTED" };
+    ev_flush();                                 // drop any stale control reply
     if (ws_send_json(fd, "{\"type\":\"ROOMS\"}") < 0) return -1;
-    if (await_response(resp, sizeof(resp)) != 0) return -1;
-    if (strstr(resp, "\"DISCONNECTED\"")) return -1;
-    *n_out = parse_room_list(resp, rooms, 32);
-    return 0;
+    char *resp = ev_wait_any(want, 2, 5000);
+    if (!resp) return -1;                        // timeout
+    int rc = 0;
+    if (strstr(resp, "\"DISCONNECTED\"")) rc = -1;
+    else *n_out = parse_room_list(resp, rooms, 32);
+    free(resp);
+    return rc;
 }
 
 // Returns 0 = joined, 1 = user quit, -1 = disconnected/error.
@@ -418,16 +425,20 @@ static int select_room(int fd, char *joined, size_t joined_size) {
         snprintf(join, sizeof(join),
                  "{\"type\":\"JOIN\",\"room\":\"%s\",\"code\":\"%s\"}",
                  rooms[idx].name, code);
+        const char *jw[] = { "JOINED", "JOIN_FAIL", "DISCONNECTED" };
+        ev_flush();
         if (ws_send_json(fd, join) < 0) return -1;
 
-        char jresp[4096];
-        if (await_response(jresp, sizeof(jresp)) != 0) return -1;
-        if (strstr(jresp, "\"DISCONNECTED\"")) return -1;
+        char *jresp = ev_wait_any(jw, 3, 5000);
+        if (!jresp) return -1;
+        if (strstr(jresp, "\"DISCONNECTED\"")) { free(jresp); return -1; }
         display_message(jresp);
 
         char type[32] = {0};
         json_get_string(jresp, "type", type, sizeof(type));
-        if (strcmp(type, "JOINED") == 0) {
+        int joined_ok = (strcmp(type, "JOINED") == 0);
+        free(jresp);
+        if (joined_ok) {
             snprintf(joined, joined_size, "%s", rooms[idx].name);
             return 0;
         }
@@ -534,7 +545,16 @@ static int auth_flow(int fd, char *username, size_t usize,
 // =====================================================================
 
 #define CHAT_MAX_LINES 2000
-#define CHAT_LINE_LEN  1024
+// Long enough for the "[room] from: " prefix plus a full MAX_MSG_LEN payload,
+// so the client never silently truncates a message the server accepted.
+#define CHAT_LINE_LEN  (MAX_MSG_LEN + 256)
+// The server reads MESSAGE content into a MAX_MSG_LEN buffer, so sending more
+// than MAX_MSG_LEN-1 characters would be silently truncated there. Cap the
+// input to match, so the client never sends what the server would cut.
+#define CHAT_INPUT_MAX (MAX_MSG_LEN - 1)
+// The input box wraps onto at most this many rows; typing is capped so it can
+// never overflow the box (and the cap is also bounded by CHAT_INPUT_MAX).
+#define INPUT_MAX_ROWS 6
 #define CHAT_MAX_USERS 64
 
 #define CHAT_RESULT_LEAVE   0
@@ -565,31 +585,102 @@ typedef struct {
 static chat_state_t   g_chat;
 static pthread_mutex_t g_chat_lock = PTHREAD_MUTEX_INITIALIZER;
 
-// ---- response slot used while picking rooms ----
-static char            g_resp[16384];
-static volatile int    g_resp_ready = 0;
-static pthread_mutex_t g_resp_lock = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t  g_resp_cond = PTHREAD_COND_INITIALIZER;
+// ---- inbound event queue -------------------------------------------------
+//
+// The receive thread is the single producer. It decodes a frame, applies it
+// to the shared UI state via on_frame(), and - for the control replies the
+// room-selection flow waits on - pushes the raw JSON here. The selection flow
+// is the consumer and matches by message type.
+//
+// Unlike the old single "response slot", a queue means two replies can never
+// overwrite each other, and because the consumer matches on type it can never
+// mistake an unrelated frame for the reply it is waiting for. The queue is
+// bounded: on overflow the oldest entry is dropped, so it can never grow
+// without bound.
+#define EV_QUEUE_CAP 64
 
-static void deliver_response(const char *json) {
-    pthread_mutex_lock(&g_resp_lock);
-    snprintf(g_resp, sizeof(g_resp), "%s", json);
-    g_resp_ready = 1;
-    pthread_cond_signal(&g_resp_cond);
-    pthread_mutex_unlock(&g_resp_lock);
+static char           *g_ev[EV_QUEUE_CAP];
+static int             g_ev_head = 0;
+static int             g_ev_count = 0;
+static pthread_mutex_t g_ev_lock = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t  g_ev_cond = PTHREAD_COND_INITIALIZER;
+
+static char *ev_dup(const char *s) {
+    size_t n = strlen(s) + 1;
+    char *p = (char *)malloc(n);
+    if (p) memcpy(p, s, n);
+    return p;
 }
 
-static int await_response(char *out, size_t n) {
-    pthread_mutex_lock(&g_resp_lock);
-    while (!g_resp_ready) pthread_cond_wait(&g_resp_cond, &g_resp_lock);
-    int cap = (n > 0) ? (int)n - 1 : 0;
-    snprintf(out, n, "%.*s", cap, g_resp);
-    g_resp_ready = 0;
-    pthread_mutex_unlock(&g_resp_lock);
-    return 0;
+static void ev_deadline(struct timespec *ts, int ms) {
+    struct timespec now;
+    clock_gettime(CLOCK_REALTIME, &now);
+    ts->tv_sec  = now.tv_sec + ms / 1000;
+    ts->tv_nsec = now.tv_nsec + (long)(ms % 1000) * 1000000L;
+    if (ts->tv_nsec >= 1000000000L) { ts->tv_sec++; ts->tv_nsec -= 1000000000L; }
+}
+
+static void ev_push(const char *json) {
+    pthread_mutex_lock(&g_ev_lock);
+    if (g_ev_count == EV_QUEUE_CAP) {          // drop the oldest, never grow
+        free(g_ev[g_ev_head]);
+        g_ev_head = (g_ev_head + 1) % EV_QUEUE_CAP;
+        g_ev_count--;
+    }
+    g_ev[(g_ev_head + g_ev_count) % EV_QUEUE_CAP] = ev_dup(json);
+    g_ev_count++;
+    pthread_cond_signal(&g_ev_cond);
+    pthread_mutex_unlock(&g_ev_lock);
+}
+
+static void ev_flush(void) {
+    pthread_mutex_lock(&g_ev_lock);
+    while (g_ev_count > 0) {
+        free(g_ev[g_ev_head]);
+        g_ev_head = (g_ev_head + 1) % EV_QUEUE_CAP;
+        g_ev_count--;
+    }
+    pthread_mutex_unlock(&g_ev_lock);
+}
+
+// Pop the next queued event whose "type" is one of type[0..n-1]. Entries whose
+// type does not match are stale replies (already applied by on_frame) and are
+// dropped. Returns a malloc'd string the caller frees, or NULL on timeout.
+static char *ev_wait_any(const char *const *types, int n, int timeout_ms) {
+    struct timespec deadline;
+    ev_deadline(&deadline, timeout_ms);
+
+    pthread_mutex_lock(&g_ev_lock);
+    for (;;) {
+        if (g_ev_count > 0) {
+            char *raw = g_ev[g_ev_head];
+            g_ev_head = (g_ev_head + 1) % EV_QUEUE_CAP;
+            g_ev_count--;
+
+            char type[32] = {0};
+            json_get_string(raw, "type", type, sizeof(type));
+            for (int i = 0; i < n; i++) {
+                if (types[i] && strcmp(type, types[i]) == 0) {
+                    pthread_mutex_unlock(&g_ev_lock);
+                    return raw;                 // caller frees
+                }
+            }
+            free(raw);                          // stale / unrelated: drop
+            continue;
+        }
+        if (pthread_cond_timedwait(&g_ev_cond, &g_ev_lock, &deadline) != 0) {
+            pthread_mutex_unlock(&g_ev_lock);
+            return NULL;                        // timeout
+        }
+    }
 }
 
 // ---- chat log ----
+// Dirty flag: set whenever the message area / user panel changes. The chat TUI
+// redraws that area only when this is set, so an idle screen (and the input
+// cursor) is never repainted on a timer.
+static volatile int g_redraw = 1;
+
 static void chat_log(int kind, const char *line) {
     pthread_mutex_lock(&g_chat_lock);
     int idx = g_chat.line_count % CHAT_MAX_LINES;
@@ -599,6 +690,7 @@ static void chat_log(int kind, const char *line) {
     g_chat.lines[idx][n] = '\0';
     g_chat.kinds[idx] = kind;
     g_chat.line_count++;
+    g_redraw = 1;
     if (g_chat.mode == 1 && !tui_is_tty()) {
         printf("\r%s\n> ", line);
         fflush(stdout);
@@ -632,6 +724,7 @@ static void chat_add_user(const char *name) {
     if (g_chat.user_count < CHAT_MAX_USERS && chat_find_user(name) < 0) {
         snprintf(g_chat.users[g_chat.user_count], 64, "%s", name);
         g_chat.user_count++;
+        g_redraw = 1;
     }
     pthread_mutex_unlock(&g_chat_lock);
 }
@@ -643,6 +736,7 @@ static void chat_remove_user(const char *name) {
         for (int j = i; j < g_chat.user_count - 1; j++)
             strcpy(g_chat.users[j], g_chat.users[j + 1]);
         g_chat.user_count--;
+        g_redraw = 1;
     }
     pthread_mutex_unlock(&g_chat_lock);
 }
@@ -666,19 +760,21 @@ static void chat_set_users(const char *arr) {
         }
         p = e + 1;
     }
+    g_redraw = 1;
     pthread_mutex_unlock(&g_chat_lock);
 }
 
 // ---- server frame dispatch ----
 static void render_chat(void);
-static void chat_notify(void);   // redraw if a chat TUI is active
 
 static void on_frame(const char *json) {
     char type[32] = {0};
     if (json_get_string(json, "type", type, sizeof(type)) != 0) return;
 
+    // Control replies the room-selection flow may be waiting for are queued
+    // (matched by type there); everything else is applied to the chat state.
     if (strcmp(type, "ROOM_LIST") == 0 || strcmp(type, "JOIN_FAIL") == 0) {
-        deliver_response(json);
+        ev_push(json);
         return;
     }
     if (strcmp(type, "JOINED") == 0) {
@@ -689,13 +785,13 @@ static void on_frame(const char *json) {
         snprintf(g_chat.room, sizeof(g_chat.room), "%s", room);
         pthread_mutex_unlock(&g_chat_lock);
         chat_set_users(users);
-        deliver_response(json);
+        ev_push(json);
         return;
     }
 
     char line[CHAT_LINE_LEN];
     if (strcmp(type, "MESSAGE") == 0) {
-        char from[64] = {0}, room[64] = {0}, content[512] = {0};
+        char from[64] = {0}, room[64] = {0}, content[MAX_MSG_LEN] = {0};
         json_get_string(json, "from", from, sizeof(from));
         json_get_string(json, "room", room, sizeof(room));
         json_get_string(json, "content", content, sizeof(content));
@@ -742,8 +838,8 @@ static void on_frame(const char *json) {
         chat_log(CHAT_KIND_NORMAL, line);
     }
 
-    // Push an immediate redraw so incoming events appear without user input.
-    chat_notify();
+    // No cross-thread redraw here: the UI thread owns the terminal and redraws
+    // on its own tick (see chat_run_tty), so only one thread ever writes it.
 }
 
 static int          g_fd = -1;
@@ -777,7 +873,7 @@ static void *recv_loop(void *arg) {
         if (carry > 0 && pos > 0) memmove(buf, buf + pos, carry);
     }
     g_disconnected = 1;
-    deliver_response("{\"type\":\"DISCONNECTED\"}");
+    ev_push("{\"type\":\"DISCONNECTED\"}");
     return NULL;
 }
 
@@ -855,34 +951,155 @@ static void fb_field(const char *text, int width, const char *color) {
 }
 
 // Full-screen redraw of the chat view. Holds no lock on entry.
-static void render_chat(void) {
+static void chat_layout(int *cols, int *rows, int *P, int *L) {
+    tui_size(cols, rows);
+    if (*cols < 44) *cols = 44;
+    if (*rows < 9) *rows = 9;
+    *P = 22;                         // user panel width
+    if (*P > *cols / 3) *P = *cols / 3;
+    if (*P < 8) *P = 8;
+    *L = *cols - 3 - *P;             // message area width
+    if (*L < 12) { *L = 12; *P = *cols - 3 - *L; if (*P < 8) *P = 8; }
+}
+
+// Number of screen rows a string occupies when wrapped at `width` columns.
+// ---- word wrapping -------------------------------------------------------
+// Break at spaces. A single word longer than the width is cut at the limit and
+// continued on the next row ("từ bị cắt tại giới hạn sẽ xuống dòng").
+typedef struct { const char *s; int width; int pos; } wrap_iter_t;
+
+static void wrap_begin(wrap_iter_t *it, const char *s, int width) {
+    it->s = s;
+    it->width = (width < 1) ? 1 : width;
+    it->pos = 0;
+}
+
+// Produce the next wrapped segment into seg (NUL-terminated). Returns the
+// segment's start index in the source, or -1 when exhausted. Leading spaces of
+// a row are skipped so a row never begins with blanks.
+static int wrap_next(wrap_iter_t *it, char *seg, int seg_size) {
+    const char *s = it->s;
+    int len = (int)strlen(s);
+    int width = it->width;
+    int pos = it->pos;
+
+    while (pos < len && s[pos] == ' ') pos++;
+    if (pos >= len) { it->pos = pos; return -1; }
+
+    int start = pos;
+    int n;
+    if (len - pos <= width) {
+        n = len - pos;
+        pos = len;
+    } else {
+        int brk = -1;
+        for (int i = pos + width; i > pos; i--)
+            if (s[i] == ' ') { brk = i; break; }
+        if (brk > pos) { n = brk - pos; pos = brk; }    // break at the space
+        else           { n = width;     pos += width; } // long word: cut
+    }
+    if (n > seg_size - 1) n = seg_size - 1;
+    memcpy(seg, s + start, n);
+    seg[n] = '\0';
+    it->pos = pos;
+    return start;
+}
+
+// Number of rows a string needs when word-wrapped at `width`.
+static int wrap_count(const char *s, int width) {
+    wrap_iter_t it;
+    wrap_begin(&it, s, width);
+    char tmp[4];
+    int c = 0;
+    while (wrap_next(&it, tmp, sizeof(tmp)) >= 0) c++;
+    return c < 1 ? 1 : c;
+}
+
+// Input area height for ""> " + input" (capped at INPUT_MAX_ROWS).
+static int input_rows_of(const char *input, int in_width) {
+    char stream[CHAT_LINE_LEN + 4];
+    snprintf(stream, sizeof(stream), "> %s", input ? input : "");
+    int c = wrap_count(stream, in_width);
+    if (c > INPUT_MAX_ROWS) c = INPUT_MAX_ROWS;
+    if (c < 1) c = 1;
+    return c;
+}
+
+// Input rows for the current state (same clamp as the renderers).
+static int current_input_rows(void) {
+    int cols, rows, P, L;
+    chat_layout(&cols, &rows, &P, &L);
+    pthread_mutex_lock(&g_chat_lock);
+    int ir = input_rows_of(g_chat.input, L + 1 + P);
+    pthread_mutex_unlock(&g_chat_lock);
+    if (ir > rows - 5) ir = rows - 5;
+    if (ir < 1) ir = 1;
+    return ir;
+}
+
+// Cursor cell at the end of the word-wrapped input, as (row-in-input-area,
+// column-in-field). The column is the number of characters before the cursor.
+static void input_cursor_of(const char *input, int in_width, int *out_row, int *out_col) {
+    char stream[CHAT_LINE_LEN + 4];
+    snprintf(stream, sizeof(stream), "> %s", input ? input : "");
+    wrap_iter_t it; wrap_begin(&it, stream, in_width);
+    char seg[CHAT_LINE_LEN + 4];
+    int k = 0, last = 0;
+    while (wrap_next(&it, seg, sizeof(seg)) >= 0) {
+        last = (int)strlen(seg);
+        if (++k >= INPUT_MAX_ROWS) break;
+    }
+    if (k < 1) { k = 1; last = 0; }
+    if (last > in_width - 1) last = in_width - 1;
+    *out_row = k - 1;
+    *out_col = last;
+}
+
+static void input_cursor_pos(int rows, int ir, int in_width, const char *input,
+                             int *out_row, int *out_col) {
+    int irr, c;
+    input_cursor_of(input, in_width, &irr, &c);
+    if (irr > ir - 1) irr = ir - 1;
+    *out_row = (rows - ir + 1) + irr;
+    *out_col = 2 + c;                        // field starts at column 2
+}
+
+// Everything above the input area: header, wrapped message list, user panel,
+// separator. Does not draw the input rows.
+static void render_chat_body(void) {
     if (!tui_is_tty()) return;
 
-    int cols, rows;
-    tui_size(&cols, &rows);
-    if (cols < 44) cols = 44;
-    if (rows < 9) rows = 9;
-
-    int P = 22;                      // user panel width
-    if (P > cols / 3) P = cols / 3;
-    if (P < 8) P = 8;
-    int L = cols - 3 - P;            // message area width
-    if (L < 12) { L = 12; P = cols - 3 - L; if (P < 8) P = 8; }
-
-    int body_top = 4;
-    int body_h = rows - 5;           // rows 4..rows-2
-    if (body_h < 1) body_h = 1;
+    int cols, rows, P, L;
+    chat_layout(&cols, &rows, &P, &L);
+    int in_width = L + 1 + P;
 
     pthread_mutex_lock(&g_chat_lock);
 
+    int ir = input_rows_of(g_chat.input, in_width);
+    if (ir > rows - 5) ir = rows - 5;
+    if (ir < 1) ir = 1;
+
+    int body_top = 4;
+    int body_h = rows - ir - 4;               // rows 4 .. rows-ir-1
+    if (body_h < 1) body_h = 1;
+
+    // Total wrapped display rows, and clamped scroll (counted in display rows).
+    int total = 0;
+    for (int i = 0; i < g_chat.line_count; i++)
+        total += wrap_count(g_chat.lines[i % CHAT_MAX_LINES], L);
+    int maxs = total - body_h;
+    if (maxs < 0) maxs = 0;
+    if (g_chat.msg_scroll > maxs) g_chat.msg_scroll = maxs;
+    if (g_chat.msg_scroll < 0) g_chat.msg_scroll = 0;
+    int start = total - body_h - g_chat.msg_scroll;
+    if (start < 0) start = 0;
+
     g_frame_len = 0;
+    fb_puts("\033[?25l");            // hide cursor while repainting
     fb_puts("\033[H");
 
-    // Row 1: top border
-    fb_printf("\033[1;1H\033[2K");
-    fb_hline(L, P);
-
-    // Row 2: title bar
+    // Rows 1..3: header
+    fb_printf("\033[1;1H\033[2K"); fb_hline(L, P);
     fb_printf("\033[2;1H\033[2K");
     fb_puts(TUI_BLUE "|" TUI_RESET);
     char t1[256];
@@ -893,38 +1110,50 @@ static void render_chat(void) {
     snprintf(t2, sizeof(t2), " USERS (%d)", g_chat.user_count);
     fb_field(t2, P, g_chat.focus == 1 ? TUI_YELLOW TUI_BOLD : TUI_CYAN TUI_BOLD);
     fb_puts(TUI_BLUE "|" TUI_RESET);
+    fb_printf("\033[3;1H\033[2K"); fb_hline(L, P);
 
-    // Row 3: separator
-    fb_printf("\033[3;1H\033[2K");
-    fb_hline(L, P);
-
-    // Body rows
-    int total = g_chat.line_count;
-    int bottom_idx = total - 1 - g_chat.msg_scroll;
-    int top_idx = bottom_idx - (body_h - 1);
-    if (top_idx < 0) top_idx = 0;
-
-    for (int r = 0; r < body_h; r++) {
-        fb_printf("\033[%d;1H\033[2K", body_top + r);
-        fb_puts(TUI_BLUE "|" TUI_RESET);
-
-        const char *lt = "";
+    // Body: walk lines, emit word-wrapped segments, honour [start, start+body_h).
+    int disp = 0, srow = 0;
+    for (int i = 0; i < g_chat.line_count && srow < body_h; i++) {
+        const char *s = g_chat.lines[i % CHAT_MAX_LINES];
         const char *lc = NULL;
-        int mi = top_idx + r;
-        if (mi >= 0 && mi < total) {
-            int slot = mi % CHAT_MAX_LINES;
-            lt = g_chat.lines[slot];
-            switch (g_chat.kinds[slot]) {
-                case CHAT_KIND_SYSTEM: lc = TUI_YELLOW; break;
-                case CHAT_KIND_OWN:    lc = TUI_GREEN;  break;
-                case CHAT_KIND_ERROR:  lc = TUI_RED;    break;
-                default:               lc = NULL;       break;
-            }
+        switch (g_chat.kinds[i % CHAT_MAX_LINES]) {
+            case CHAT_KIND_SYSTEM: lc = TUI_YELLOW; break;
+            case CHAT_KIND_OWN:    lc = TUI_GREEN;  break;
+            case CHAT_KIND_ERROR:  lc = TUI_RED;    break;
+            default:               lc = NULL;       break;
         }
-        fb_field(lt, L, lc);
-        fb_puts(TUI_BLUE "|" TUI_RESET);
+        wrap_iter_t it; wrap_begin(&it, s, L);
+        char seg[CHAT_LINE_LEN];
+        while (srow < body_h && wrap_next(&it, seg, sizeof(seg)) >= 0) {
+            if (disp < start) { disp++; continue; }
 
-        int ui = g_chat.user_scroll + r;
+            fb_printf("\033[%d;1H\033[2K", body_top + srow);
+            fb_puts(TUI_BLUE "|" TUI_RESET);
+            fb_field(seg, L, lc);
+            fb_puts(TUI_BLUE "|" TUI_RESET);
+
+            int ui = g_chat.user_scroll + srow;
+            if (ui >= 0 && ui < g_chat.user_count) {
+                int own = (strcmp(g_chat.users[ui], g_nickname) == 0);
+                char ubuf[96];
+                snprintf(ubuf, sizeof(ubuf), " %s%s", own ? "* " : "- ", g_chat.users[ui]);
+                fb_field(ubuf, P, own ? TUI_GREEN : TUI_CYAN);
+            } else {
+                fb_field("", P, NULL);
+            }
+            fb_puts(TUI_BLUE "|" TUI_RESET);
+            srow++;
+            disp++;
+        }
+    }
+    // Clear any body rows left below the content.
+    for (; srow < body_h; srow++) {
+        fb_printf("\033[%d;1H\033[2K", body_top + srow);
+        fb_puts(TUI_BLUE "|" TUI_RESET);
+        fb_field("", L, NULL);
+        fb_puts(TUI_BLUE "|" TUI_RESET);
+        int ui = g_chat.user_scroll + srow;
         if (ui >= 0 && ui < g_chat.user_count) {
             int own = (strcmp(g_chat.users[ui], g_nickname) == 0);
             char ubuf[96];
@@ -936,28 +1165,57 @@ static void render_chat(void) {
         fb_puts(TUI_BLUE "|" TUI_RESET);
     }
 
-    // Bottom separator
-    fb_printf("\033[%d;1H\033[2K", rows - 1);
+    // Separator right above the input area.
+    fb_printf("\033[%d;1H\033[2K", rows - ir);
     fb_hline(L, P);
 
-    // Input row
-    fb_printf("\033[%d;1H\033[2K", rows);
-    fb_puts(TUI_BLUE "|" TUI_RESET);
-    char in[CHAT_LINE_LEN + 8];
-    snprintf(in, sizeof(in), "> %s", g_chat.input);
-    fb_field(in, L + 1 + P, g_chat.focus == 1 ? TUI_DIM : TUI_BOLD);
-    fb_puts(TUI_BLUE "|" TUI_RESET);
-
-    // Cursor at the end of the typed text
-    fb_printf("\033[%d;%dH", rows, 4 + g_chat.input_len);
+    // Park the cursor back on the input line (this repaint moved it), then show.
+    int cr, cc;
+    input_cursor_pos(rows, ir, in_width, g_chat.input, &cr, &cc);
+    fb_printf("\033[%d;%dH", cr, cc);
+    fb_puts("\033[?25h");
 
     fb_flush();
     pthread_mutex_unlock(&g_chat_lock);
 }
 
-// Redraw the chat TUI if it is currently active (called from the recv thread).
-static void chat_notify(void) {
-    if (g_chat.mode == 1 && tui_is_tty()) render_chat();
+// Only the input area (wrapped), with the cursor at the end of the typed text.
+static void render_chat_input(void) {
+    if (!tui_is_tty()) return;
+
+    int cols, rows, P, L;
+    chat_layout(&cols, &rows, &P, &L);
+    int in_width = L + 1 + P;
+
+    pthread_mutex_lock(&g_chat_lock);
+    int ir = input_rows_of(g_chat.input, in_width);
+    if (ir > rows - 5) ir = rows - 5;
+    if (ir < 1) ir = 1;
+
+    char stream[CHAT_LINE_LEN + 4];
+    snprintf(stream, sizeof(stream), "> %s", g_chat.input);
+
+    g_frame_len = 0;
+    wrap_iter_t it; wrap_begin(&it, stream, in_width);
+    char seg[CHAT_LINE_LEN + 4];
+    for (int k = 0; k < ir && wrap_next(&it, seg, sizeof(seg)) >= 0; k++) {
+        int sr = (rows - ir + 1) + k;
+        fb_printf("\033[%d;1H\033[2K", sr);
+        fb_puts(TUI_BLUE "|" TUI_RESET);
+        fb_field(seg, in_width, g_chat.focus == 1 ? TUI_DIM : TUI_BOLD);
+        fb_puts(TUI_BLUE "|" TUI_RESET);
+    }
+    int cr, cc;
+    input_cursor_pos(rows, ir, in_width, g_chat.input, &cr, &cc);
+    fb_printf("\033[%d;%dH", cr, cc);
+    fb_flush();
+    pthread_mutex_unlock(&g_chat_lock);
+}
+
+// Full repaint (body + input + cursor). Used on entry and on resize.
+static void render_chat(void) {
+    render_chat_body();
+    render_chat_input();
 }
 
 static void send_json_str(const char *json) {
@@ -968,11 +1226,28 @@ static void send_json_str(const char *json) {
 static int chat_run_tty(void) {
     tui_raw_enable();
 
+    render_chat();                 // initial full paint
+    int last_cols = 0, last_rows = 0;
+    int last_ir = current_input_rows();
+
     for (;;) {
-        render_chat();
+        // The input row is owned by the keystroke path (render_chat_input below)
+        // and is never touched here, so typing never repaints the screen and
+        // the cursor stays put. This side only refreshes the message area, and
+        // only when something changed (g_redraw) or the window was resized.
+        int cols, rows;
+        tui_size(&cols, &rows);
+        if (cols != last_cols || rows != last_rows) {
+            last_cols = cols; last_rows = rows;
+            g_redraw = 0;
+            render_chat();         // full repaint on resize
+        } else if (g_redraw) {
+            g_redraw = 0;
+            render_chat_body();
+        }
 
         char ch = 0;
-        int key = tui_read_key(&ch);
+        int key = tui_read_key_timeout(&ch, 50);   // TUI_KEY_NONE on timeout
 
         if (g_disconnected) {
             tui_raw_disable();
@@ -985,9 +1260,7 @@ static int chat_run_tty(void) {
             return CHAT_RESULT_LEAVE;
         }
 
-        int cols, rows;
-        tui_size(&cols, &rows);
-        int body_h = (rows - 1) - 2 + 1;
+        int body_h = rows - current_input_rows() - 4;   // matches render layout
         if (body_h < 1) body_h = 1;
 
         if (key == TUI_KEY_CTRL_C || key == TUI_KEY_EOF) {
@@ -999,6 +1272,7 @@ static int chat_run_tty(void) {
             pthread_mutex_lock(&g_chat_lock);
             g_chat.focus = !g_chat.focus;
             pthread_mutex_unlock(&g_chat_lock);
+            g_redraw = 1;
             continue;
         }
         if (key == TUI_KEY_PGUP || key == TUI_KEY_WHEEL_UP) {
@@ -1007,6 +1281,7 @@ static int chat_run_tty(void) {
             if (g_chat.focus == 0) g_chat.msg_scroll += step;
             else if (g_chat.user_scroll > 0) { g_chat.user_scroll -= step; if (g_chat.user_scroll < 0) g_chat.user_scroll = 0; }
             pthread_mutex_unlock(&g_chat_lock);
+            g_redraw = 1;
             continue;
         }
         if (key == TUI_KEY_PGDN || key == TUI_KEY_WHEEL_DOWN) {
@@ -1021,6 +1296,7 @@ static int chat_run_tty(void) {
                 if (g_chat.user_scroll > maxs) g_chat.user_scroll = maxs < 0 ? 0 : maxs;
             }
             pthread_mutex_unlock(&g_chat_lock);
+            g_redraw = 1;
             continue;
         }
         if (key == TUI_KEY_UP) {
@@ -1028,6 +1304,7 @@ static int chat_run_tty(void) {
             if (g_chat.focus == 0) g_chat.msg_scroll++;
             else if (g_chat.user_scroll > 0) g_chat.user_scroll--;
             pthread_mutex_unlock(&g_chat_lock);
+            g_redraw = 1;
             continue;
         }
         if (key == TUI_KEY_DOWN) {
@@ -1038,6 +1315,7 @@ static int chat_run_tty(void) {
                 g_chat.user_scroll++;
             }
             pthread_mutex_unlock(&g_chat_lock);
+            g_redraw = 1;
             continue;
         }
         if (key == TUI_KEY_BACKSPACE) {
@@ -1046,6 +1324,9 @@ static int chat_run_tty(void) {
                 g_chat.input[--g_chat.input_len] = '\0';
             }
             pthread_mutex_unlock(&g_chat_lock);
+            int ir = current_input_rows();
+            if (ir != last_ir) { last_ir = ir; render_chat(); }
+            else render_chat_input();
             continue;
         }
         if (key == TUI_KEY_ENTER) {
@@ -1055,6 +1336,9 @@ static int chat_run_tty(void) {
             g_chat.input_len = 0;
             g_chat.input[0] = '\0';
             pthread_mutex_unlock(&g_chat_lock);
+            int ir = current_input_rows();
+            if (ir != last_ir) { last_ir = ir; render_chat(); }
+            else render_chat_input();     // clear the input box
 
             if (line[0] == '/') {
                 if (strcmp(line, "/quit") == 0 || strcmp(line, "/leave") == 0) {
@@ -1088,12 +1372,22 @@ static int chat_run_tty(void) {
             continue;
         }
         if (key == TUI_KEY_CHAR) {
+            int lc2, lr2, lP2, lL2;
+            chat_layout(&lc2, &lr2, &lP2, &lL2);
+            int inw = lL2 + 1 + lP2;
             pthread_mutex_lock(&g_chat_lock);
-            if (g_chat.input_len < CHAT_LINE_LEN - 1 && ch >= 32) {
-                g_chat.input[g_chat.input_len++] = ch;
-                g_chat.input[g_chat.input_len] = '\0';
+            if (ch >= 32 && g_chat.input_len < CHAT_INPUT_MAX) {
+                g_chat.input[g_chat.input_len] = ch;
+                g_chat.input[g_chat.input_len + 1] = '\0';
+                if (input_rows_of(g_chat.input, inw) <= INPUT_MAX_ROWS)
+                    g_chat.input_len++;                       // fits: keep it
+                else
+                    g_chat.input[g_chat.input_len] = '\0';    // box full: revert
             }
             pthread_mutex_unlock(&g_chat_lock);
+            int ir = current_input_rows();
+            if (ir != last_ir) { last_ir = ir; render_chat(); }
+            else render_chat_input();     // only the input box changed
             continue;
         }
     }
@@ -1108,6 +1402,7 @@ static int chat_run_plain(void) {
         if (g_disconnected) { printf("\nDisconnected from server.\n"); return CHAT_RESULT_DISCONN; }
         if (g_room_closed) { printf("\nRoom was closed by the server.\n"); return CHAT_RESULT_LEAVE; }
         line[strcspn(line, "\r\n")] = '\0';
+        if (strlen(line) > CHAT_INPUT_MAX) line[CHAT_INPUT_MAX] = '\0';
         if (line[0] == '\0') { printf("> "); fflush(stdout); continue; }
         if (line[0] == '/') {
             if (strcmp(line, "/quit") == 0 || strcmp(line, "/leave") == 0) {
@@ -1285,18 +1580,30 @@ int main(int argc, char *argv[]) {
                 char join[MAX_MSG_LEN];
                 snprintf(join, sizeof(join),
                          "{\"type\":\"JOIN\",\"room\":\"%s\",\"code\":\"%s\"}", room, code);
+                const char *jw[] = { "JOINED", "JOIN_FAIL", "DISCONNECTED" };
+                ev_flush();
                 ws_send_json(fd, join);
-                char jresp[8192];
-                await_response(jresp, sizeof(jresp));
+                char *jresp = ev_wait_any(jw, 3, 5000);
+                if (!jresp) { printf("Join timed out.\n"); exit_all = 1; break; }
                 display_message(jresp);
                 char type[32] = {0};
                 json_get_string(jresp, "type", type, sizeof(type));
-                if (strcmp(type, "JOINED") != 0) {
-                    printf("Join failed.\n");
+                int joined_ok = (strcmp(type, "JOINED") == 0);
+                int disconnected = (strstr(jresp, "DISCONNECTED") != NULL);
+                free(jresp);
+                if (joined_ok) {
+                    direct = 0;
+                } else if (disconnected) {
                     exit_all = 1;
                     break;
+                } else {
+                    // The requested room could not be joined (missing, wrong
+                    // code, full, ...). Do NOT quit: fall back to the room menu
+                    // so the user can pick another, exactly like the TTY path.
+                    printf("Could not join '%s'; choose another room.\n", room);
+                    direct = 0;
+                    continue;               // restart the loop -> select_room
                 }
-                direct = 0;
             } else {
                 int sr = select_room(fd, room, sizeof(room));
                 if (sr == 1) { exit_all = 1; break; }   // user quit
