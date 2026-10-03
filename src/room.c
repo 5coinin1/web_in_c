@@ -1,7 +1,9 @@
 #include "room.h"
-#include "client.h"
+#include "connection.h"
+#include "state_machine.h"
 #include "bytes.h"
 #include "path_util.h"
+#include "json_util.h"
 #include <ctype.h>
 #include <pthread.h>
 
@@ -144,6 +146,39 @@ int room_delete(const char *name) {
         pthread_mutex_unlock(&room_lock);
         return ROOM_DELETE_NOTFOUND;
     }
+
+    // Evict members: tell them the room is closed and move them back to
+    // STATE_AUTHENTICATED so they can pick another room (single shared
+    // transition relation - same event the Kripke model uses).
+    char notice[160];
+    snprintf(notice, sizeof(notice),
+             "{\"type\":\"ROOM_CLOSED\",\"room\":\"%s\"}", name);
+    for (int i = 0; i < r->num_clients; i++) {
+        client_t *c = r->clients[i];
+        if (!c) continue;
+
+        /* Every member in this array is STATE_IN_ROOM: room_join_commit()
+         * sets membership and state together under room_lock, and room_leave()
+         * removes the member before changing state. The guard is therefore a
+         * defensive invariant check, not a case that is expected to trigger -
+         * ROOM_CLOSED is only legal from STATE_IN_ROOM. */
+        if (c->state == STATE_IN_ROOM) {
+            client_send_ws_text(c, notice);
+            if (!client_state_apply(&c->state, CLIENT_EVENT_ROOM_CLOSED)) {
+                // Membership implies STATE_IN_ROOM, so the model says this
+                // cannot fail. If it ever did, clearing c->room alone would
+                // strand the client: JOIN needs STATE_AUTHENTICATED and
+                // LEAVE returns early on an empty room name, so it could
+                // never recover.
+                LOG_ERR("Evict '%s' from room '%s': unexpected state %s",
+                        c->nickname, name, client_state_name(c->state));
+                c->state = STATE_AUTHENTICATED;
+            }
+        }
+        c->room[0] = '\0';
+    }
+    r->num_clients = 0;
+
     if (prev) prev->next = r->next;
     else room_list = r->next;
     free(r);
@@ -152,36 +187,6 @@ int room_delete(const char *name) {
     pthread_mutex_unlock(&room_lock);
     LOG_INFO("Room '%s' deleted and persisted", name);
     return ROOM_DELETE_OK;
-}
-
-int room_join(const char *room_name, const char *nickname, struct client *client,
-              const char *code) {
-    if (!room_name || !nickname || !client) return ROOM_JOIN_NOTFOUND;
-
-    pthread_mutex_lock(&room_lock);
-
-    room_t *room = find_room(room_name);
-    if (!room) {
-        pthread_mutex_unlock(&room_lock);
-        return ROOM_JOIN_NOTFOUND;
-    }
-
-    if (room->code[0] != '\0') {
-        if (!code || strcmp(code, room->code) != 0) {
-            pthread_mutex_unlock(&room_lock);
-            return ROOM_JOIN_BADCODE;
-        }
-    }
-
-    if (room->num_clients >= MAX_CLIENTS_PER_ROOM) {
-        pthread_mutex_unlock(&room_lock);
-        return ROOM_JOIN_FULL;
-    }
-
-    room->clients[room->num_clients++] = client;
-
-    pthread_mutex_unlock(&room_lock);
-    return ROOM_JOIN_OK;
 }
 
 int room_leave(const char *room_name, const char *nickname) {
@@ -206,6 +211,55 @@ int room_leave(const char *room_name, const char *nickname) {
 
     pthread_mutex_unlock(&room_lock);
     return 0;
+}
+
+int room_join_commit(const char *room_name, const char *nickname,
+                     struct client *client, const char *code) {
+    if (!room_name || !nickname || !client) return ROOM_JOIN_NOTFOUND;
+
+    pthread_mutex_lock(&room_lock);
+
+    // Everything that can reject the join is checked while holding the lock,
+    // so nothing can change between the checks, the membership update and the
+    // state transition.
+    if (client->state != STATE_AUTHENTICATED) {
+        pthread_mutex_unlock(&room_lock);
+        return ROOM_JOIN_BADSTATE;
+    }
+
+    room_t *room = find_room(room_name);
+    if (!room) {
+        pthread_mutex_unlock(&room_lock);
+        return ROOM_JOIN_NOTFOUND;
+    }
+
+    if (room->code[0] != '\0') {
+        if (!code || strcmp(code, room->code) != 0) {
+            pthread_mutex_unlock(&room_lock);
+            return ROOM_JOIN_BADCODE;
+        }
+    }
+
+    if (room->num_clients >= MAX_CLIENTS_PER_ROOM) {
+        pthread_mutex_unlock(&room_lock);
+        return ROOM_JOIN_FULL;
+    }
+
+    // Commit: membership and state move together under the same lock, so no
+    // observer (broadcast, delete, list) can ever see a half-joined client.
+    room->clients[room->num_clients++] = client;
+    snprintf(client->room, sizeof(client->room), "%s", room_name);
+    if (!client_state_apply(&client->state, CLIENT_EVENT_JOIN_OK)) {
+        // Unreachable: the state was checked under this same lock. Roll the
+        // membership back anyway so the client is never left half-joined.
+        room->num_clients--;
+        client->room[0] = '\0';
+        pthread_mutex_unlock(&room_lock);
+        return ROOM_JOIN_BADSTATE;
+    }
+
+    pthread_mutex_unlock(&room_lock);
+    return ROOM_JOIN_OK;
 }
 
 void room_broadcast(const char *room_name, const char *exclude_nick,
@@ -242,15 +296,18 @@ void room_get_users(const char *room_name, char *out_buf, size_t out_buf_size) {
     out_buf[0] = '[';
     size_t pos = 1;
     for (int i = 0; i < room->num_clients; i++) {
-        if (i > 0 && pos < out_buf_size - 1) {
-            out_buf[pos++] = ',';
-        }
-        int written = snprintf(out_buf + pos, out_buf_size - pos,
-                               "\"%s\"", room->clients[i]->nickname);
-        if (written > 0) pos += (size_t)written;
+        // Nicknames are validated (alnum/_) so they need no JSON escaping.
+        char item[MAX_ROOM_NAME + 8];
+        int w = snprintf(item, sizeof(item), "%s\"%s\"",
+                         i > 0 ? "," : "", room->clients[i]->nickname);
+        if (w <= 0) continue;
+        // Keep room for the closing ']' and the NUL terminator.
+        if (pos + (size_t)w + 2 > out_buf_size) break;
+        memcpy(out_buf + pos, item, (size_t)w);
+        pos += (size_t)w;
     }
-    if (pos < out_buf_size) out_buf[pos++] = ']';
-    out_buf[pos < out_buf_size ? pos : out_buf_size - 1] = '\0';
+    out_buf[pos++] = ']';
+    out_buf[pos] = '\0';
 
     pthread_mutex_unlock(&room_lock);
 }
@@ -260,20 +317,42 @@ void room_list_json(char *out_buf, size_t out_buf_size) {
 
     pthread_mutex_lock(&room_lock);
 
-    size_t pos = 0;
-    pos += (size_t)snprintf(out_buf + pos, out_buf_size - pos,
-                            "{\"type\":\"ROOM_LIST\",\"rooms\":[");
+    // Always reserve space for the longest possible tail so the JSON is
+    // closed properly even when the list does not fit (it stays parseable
+    // and reports that entries were omitted).
+    const size_t tail_reserve = sizeof(",\"truncated\":true}]}");
     bool first = true;
+    bool truncated = false;
+    size_t pos = 0;
+
+    int n = snprintf(out_buf, out_buf_size, "{\"type\":\"ROOM_LIST\",\"rooms\":[");
+    if (n > 0) pos = (size_t)n;
+
     for (room_t *r = room_list; r; r = r->next) {
-        if (pos >= out_buf_size) break;
-        pos += (size_t)snprintf(out_buf + pos, out_buf_size - pos,
+        // The description is free-form admin text: it MUST be escaped or a
+        // quote inside it would break the whole ROOM_LIST for every client.
+        char desc[ROOM_DESC_LEN * 6 + 1];
+        json_escape(r->description, desc, sizeof(desc));
+
+        char entry[MAX_ROOM_NAME + sizeof(desc) + 128];
+        int en = snprintf(entry, sizeof(entry),
             "%s{\"name\":\"%s\",\"desc\":\"%s\",\"members\":%d,\"code\":%s}",
-            first ? "" : ",", r->name, r->description, r->num_clients,
+            first ? "" : ",", r->name, desc, r->num_clients,
             r->code[0] ? "true" : "false");
+        if (en <= 0) continue;
+
+        size_t need = (size_t)en;
+        if (pos + need + tail_reserve >= out_buf_size) { truncated = true; break; }
+        memcpy(out_buf + pos, entry, need);
+        pos += need;
         first = false;
     }
-    snprintf(out_buf + (pos < out_buf_size ? pos : out_buf_size - 1),
-             out_buf_size - (pos < out_buf_size ? pos : out_buf_size - 1), "]}");
+
+    if (truncated) {
+        snprintf(out_buf + pos, out_buf_size - pos, "],\"truncated\":true}");
+    } else {
+        snprintf(out_buf + pos, out_buf_size - pos, "]}");
+    }
 
     pthread_mutex_unlock(&room_lock);
 }

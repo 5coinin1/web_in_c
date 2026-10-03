@@ -44,8 +44,18 @@ print('join gaming (bad code):', recv(a))
 send(a, {'type': 'JOIN', 'room': 'gaming', 'code': '1234'}); time.sleep(0.2)
 print('join gaming (good)    :', recv(a))
 
+# Design: cannot JOIN another room while in one - must LEAVE first.
+send(a, {'type': 'JOIN', 'room': 'vip', 'code': 'vip2026'}); time.sleep(0.2)
+print('join vip while in room:', recv(a))
+
+send(a, {'type': 'LEAVE'}); time.sleep(0.2)
+print('leave gaming          :', recv(a))
+
 send(a, {'type': 'JOIN', 'room': 'vip', 'code': 'vip2026'}); time.sleep(0.2)
 print('join vip (good)       :', recv(a))
+
+send(a, {'type': 'LEAVE'}); time.sleep(0.2)
+recv(a)
 
 send(a, {'type': 'JOIN', 'room': 'notexist'}); time.sleep(0.2)
 print('join missing room     :', recv(a))

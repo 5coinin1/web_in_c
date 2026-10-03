@@ -14,11 +14,12 @@ typedef struct room {
     struct room   *next;
 } room_t;
 
-// Result codes for room_join
+// Result codes for room_join and room_join_commit
 #define ROOM_JOIN_OK        0
 #define ROOM_JOIN_NOTFOUND -1
 #define ROOM_JOIN_BADCODE  -2
 #define ROOM_JOIN_FULL     -3
+#define ROOM_JOIN_BADSTATE -4   // caller is not STATE_AUTHENTICATED
 
 // Result codes for room_create
 #define ROOM_CREATE_OK        0
@@ -39,9 +40,18 @@ int room_create(const char *name, const char *description, const char *code);
 // Delete a room and persist the change. Returns a ROOM_DELETE_* code.
 int room_delete(const char *name);
 
-// Join a room, validating the code when the room is protected.
-int room_join(const char *room_name, const char *nickname, struct client *client,
-              const char *code);
+// Atomic join: validate the caller state, room, code and capacity, append the
+// member, set client->room and apply CLIENT_EVENT_JOIN_OK - all under a single
+// room_lock hold.
+//
+// room_delete() also takes room_lock, so it can never interleave with a
+// half-finished join. This is what keeps the invariant
+//     (client is in room->clients[])  <->  (state == STATE_IN_ROOM)
+// inductive: unlike the earlier "join, then re-check" sequence, there is no
+// window in which membership and state disagree, and no compensating rollback
+// is needed. Returns ROOM_JOIN_*.
+int room_join_commit(const char *room_name, const char *nickname,
+                     struct client *client, const char *code);
 
 // Leave a room. Returns 0 on success.
 int room_leave(const char *room_name, const char *nickname);

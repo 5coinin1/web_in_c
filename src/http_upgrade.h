@@ -4,9 +4,10 @@
 #include "common.h"
 
 typedef struct {
-    char method[16];
-    char websocket_key[64];
-    bool valid;
+    char   method[16];
+    char   websocket_key[64];
+    size_t header_len;   // bytes of the request (up to and incl. CRLFCRLF)
+    bool   valid;
 } http_request_t;
 
 // Parse HTTP request from raw buffer. Returns 1 if complete request parsed, 0 if incomplete, -1 on error.

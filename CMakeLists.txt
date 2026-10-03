@@ -26,17 +26,17 @@ else()
 endif()
 
 set(SERVER_SOURCES
-    src/main.c
-    src/client.c
+    src/server.c
+    src/connection.c
     src/ws_frame.c
     src/http_upgrade.c
     src/room.c
     src/auth.c
     src/session.c
     src/json_util.c
+    src/state_machine.c
     src/log.c
     src/tui.c
-    src/state_machine.c
 )
 
 # ---------------------------------------------------------------------------
@@ -55,7 +55,7 @@ target_link_libraries(wschat_server PRIVATE
 # Test client
 # ---------------------------------------------------------------------------
 add_executable(wschat_client
-    src/client_main.c
+    src/client.c
     src/ws_frame.c
     src/json_util.c
     src/log.c

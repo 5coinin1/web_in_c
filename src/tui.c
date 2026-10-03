@@ -100,51 +100,48 @@ void tui_raw_disable(void) {
 }
 
 #ifdef _WIN32
-// Read the next console input event and translate it into a TUI key.
-// Handles arrows, PageUp/Down and mouse wheel via INPUT_RECORD.
-static int read_win_event(char *ch) {
+// Read ONE console record and translate it into a TUI key.
+// Returns TUI_KEY_NONE for events that do not map to a key, so callers can
+// poll without blocking (used by tui_read_key_timeout).
+static int read_win_record(char *ch) {
     HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
     if (h == INVALID_HANDLE_VALUE) return TUI_KEY_EOF;
 
     INPUT_RECORD rec;
     DWORD n = 0;
-    for (;;) {
-        if (!ReadConsoleInputW(h, &rec, 1, &n) || n == 0) return TUI_KEY_EOF;
+    if (!ReadConsoleInputW(h, &rec, 1, &n) || n == 0) return TUI_KEY_EOF;
 
-        if (rec.EventType == KEY_EVENT) {
-            KEY_EVENT_RECORD *k = &rec.Event.KeyEvent;
-            if (!k->bKeyDown) continue;
-            WCHAR u = k->uChar.UnicodeChar;
+    if (rec.EventType == KEY_EVENT) {
+        KEY_EVENT_RECORD *k = &rec.Event.KeyEvent;
+        if (!k->bKeyDown) return TUI_KEY_NONE;
+        WCHAR u = k->uChar.UnicodeChar;
 
-            if (u == L'\r' || u == L'\n') return TUI_KEY_ENTER;
-            if (u == L'\b' || u == 127)   return TUI_KEY_BACKSPACE;
-            if (u == L'\t')               return TUI_KEY_TAB;
-            if (u == 3)                   return TUI_KEY_CTRL_C;
-            if (u == 16)                  return TUI_KEY_UP;      // Ctrl+P
-            if (u == 14)                  return TUI_KEY_DOWN;    // Ctrl+N
-            if (u >= 32) { if (ch) *ch = (char)u; return TUI_KEY_CHAR; }
+        if (u == L'\r' || u == L'\n') return TUI_KEY_ENTER;
+        if (u == L'\b' || u == 127)   return TUI_KEY_BACKSPACE;
+        if (u == L'\t')               return TUI_KEY_TAB;
+        if (u == 3)                   return TUI_KEY_CTRL_C;
+        if (u == 16)                  return TUI_KEY_UP;      // Ctrl+P
+        if (u == 14)                  return TUI_KEY_DOWN;    // Ctrl+N
+        if (u >= 32) { if (ch) *ch = (char)u; return TUI_KEY_CHAR; }
 
-            // No unicode char (special key): use the virtual key code.
-            switch (k->wVirtualKeyCode) {
-                case VK_UP:    return TUI_KEY_UP;
-                case VK_DOWN:  return TUI_KEY_DOWN;
-                case VK_PRIOR: return TUI_KEY_PGUP;
-                case VK_NEXT:  return TUI_KEY_PGDN;
-                default:       return TUI_KEY_NONE;
-            }
-        }
-        else if (rec.EventType == MOUSE_EVENT) {
-            MOUSE_EVENT_RECORD *m = &rec.Event.MouseEvent;
-            if (m->dwEventFlags == MOUSE_WHEELED) {
-                short delta = (short)HIWORD(m->dwButtonState);
-                return delta > 0 ? TUI_KEY_WHEEL_UP : TUI_KEY_WHEEL_DOWN;
-            }
-            continue;
-        }
-        else {
-            continue;   // window/focus events
+        // No unicode char (special key): use the virtual key code.
+        switch (k->wVirtualKeyCode) {
+            case VK_UP:    return TUI_KEY_UP;
+            case VK_DOWN:  return TUI_KEY_DOWN;
+            case VK_PRIOR: return TUI_KEY_PGUP;
+            case VK_NEXT:  return TUI_KEY_PGDN;
+            default:       return TUI_KEY_NONE;
         }
     }
+    if (rec.EventType == MOUSE_EVENT) {
+        MOUSE_EVENT_RECORD *m = &rec.Event.MouseEvent;
+        if (m->dwEventFlags == MOUSE_WHEELED) {
+            short delta = (short)HIWORD(m->dwButtonState);
+            return delta > 0 ? TUI_KEY_WHEEL_UP : TUI_KEY_WHEEL_DOWN;
+        }
+        return TUI_KEY_NONE;
+    }
+    return TUI_KEY_NONE;   // window/focus events
 }
 #else
 // ---- POSIX ----
@@ -205,7 +202,10 @@ int tui_read_key(char *ch) {
     if (ch) *ch = 0;
 
 #ifdef _WIN32
-    return read_win_event(ch);
+    for (;;) {
+        int k = read_win_record(ch);
+        if (k != TUI_KEY_NONE) return k;
+    }
 #else
     int c = read_byte();
     if (c < 0) return TUI_KEY_EOF;
@@ -228,8 +228,18 @@ int tui_read_key_timeout(char *ch, int ms) {
 #ifdef _WIN32
     HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
     if (h == INVALID_HANDLE_VALUE) return TUI_KEY_EOF;
-    if (WaitForSingleObject(h, (DWORD)ms) != WAIT_OBJECT_0) return TUI_KEY_NONE;
-    return read_win_event(ch);
+
+    DWORD start = GetTickCount();
+    for (;;) {
+        DWORD avail = 0;
+        if (GetNumberOfConsoleInputEvents(h, &avail) && avail > 0) {
+            int k = read_win_record(ch);
+            if (k != TUI_KEY_NONE) return k;
+            // non-key event consumed; keep polling
+        }
+        if ((DWORD)(GetTickCount() - start) >= (DWORD)ms) return TUI_KEY_NONE;
+        Sleep(10);
+    }
 #else
     if (!byte_available(ms)) return TUI_KEY_NONE;
     return tui_read_key(ch);

@@ -1,11 +1,12 @@
 #include "common.h"
-#include "client.h"
+#include "connection.h"
 #include "room.h"
 #include "auth.h"
 #include "path_util.h"
 #include "tui.h"
 #include <signal.h>
 #include <pthread.h>
+#include <time.h>
 
 static volatile int g_running = 1;
 static volatile int g_server_fd = -1;
@@ -67,6 +68,7 @@ static void *client_thread(void *arg) {
             }
             break;
         }
+        client->last_active = time(NULL);
 
         // Append to client's read buffer
         int space = (int)sizeof(client->read_buf) - client->read_len;
@@ -155,6 +157,7 @@ static pthread_mutex_t g_console_lock = PTHREAD_MUTEX_INITIALIZER;
 static char g_cinput[512];
 static int  g_cinput_len = 0;
 static int  g_log_scroll = 0;
+static volatile int g_console_dirty = 1;   // needs redraw
 static char g_cframe[1 << 16];
 static int  g_cframe_len;
 
@@ -265,8 +268,10 @@ static void render_console(void) {
     pthread_mutex_unlock(&g_console_lock);
 }
 
+// Log sink: do NOT redraw here (log_emit can fire many times per second).
+// Just mark the console dirty; the console thread redraws on its own tick.
 static void console_sink(void) {
-    render_console();
+    g_console_dirty = 1;
 }
 
 // Interactive admin console. TUI when stdout is a terminal, plain otherwise.
@@ -280,12 +285,18 @@ static void *console_thread(void *arg) {
         tui_raw_enable();
 
         for (;;) {
-            render_console();
+            if (g_console_dirty) {
+                render_console();
+                g_console_dirty = 0;
+            }
 
             char ch = 0;
-            int key = tui_read_key(&ch);
+            int key = tui_read_key_timeout(&ch, 100);
+            if (key == TUI_KEY_NONE) continue;   // timeout: loop re-checks dirty
+
             int cols, rows;
             tui_size(&cols, &rows);
+            g_console_dirty = 1;   // any handled key redraws
 
             if (key == TUI_KEY_CTRL_C || key == TUI_KEY_EOF) {
                 console_quit();
@@ -355,10 +366,33 @@ static void *console_thread(void *arg) {
     return NULL;
 }
 
+// Periodically close connections that have been idle for too long. Closing the
+// socket (shutdown) makes the client thread's recv() return so it can clean up
+// and release the account session.
+static void *idle_janitor(void *arg) {
+    (void)arg;
+    while (g_running) {
+#ifdef _WIN32
+        Sleep(5000);
+#else
+        sleep(5);
+#endif
+        time_t now = time(NULL);
+        pthread_mutex_lock(&g_clients_lock);
+        for (client_t *c = g_clients; c; c = c->next) {
+            if (now - c->last_active > IDLE_TIMEOUT_SECS) {
+                LOG_INFO("Idle timeout: closing fd=%d", c->fd);
+                SHUTDOWN_BOTH(c->fd);
+            }
+        }
+        pthread_mutex_unlock(&g_clients_lock);
+    }
+    return NULL;
+}
+
 // If running in a terminal, keep the window open so startup errors are visible
 // (e.g. when launched by double-click).
-static void fatal_pause(void) {
-    if (!tui_is_tty()) return;
+static void fatal_pause(void) {    if (!tui_is_tty()) return;
     printf("\nPress Enter to exit...");
     fflush(stdout);
     char b[8];
@@ -441,6 +475,12 @@ int main(int argc, char *argv[]) {
         pthread_detach(console_tid);
     }
 
+    // Idle-connection janitor
+    pthread_t janitor_tid;
+    if (pthread_create(&janitor_tid, NULL, idle_janitor, NULL) == 0) {
+        pthread_detach(janitor_tid);
+    }
+
     // Accept loop. Uses select() with a short timeout so the loop notices
     // g_running becoming 0 (from 'quit' or a signal) and shuts down cleanly.
     while (g_running) {
@@ -472,10 +512,21 @@ int main(int argc, char *argv[]) {
                  ntohs(client_addr.sin_port),
                  client_fd);
 
+        // Bound blocking sends so a stalled peer cannot pin a writer thread.
+        socket_set_send_timeout(client_fd, CLIENT_SEND_TIMEOUT_SECS);
+        socket_set_sndbuf(client_fd, CLIENT_SNDBUF);
+
         client_t *client = client_create(client_fd);
         if (!client) {
             LOG_ERR("Failed to create client for fd=%d", client_fd);
             CLOSE_SOCKET(client_fd);
+            continue;
+        }
+
+        // Writer thread owns send(); the reader thread below owns recv().
+        if (client_start_writer(client) != 0) {
+            LOG_ERR("Failed to create writer thread for fd=%d", client_fd);
+            client_destroy(client);
             continue;
         }
 

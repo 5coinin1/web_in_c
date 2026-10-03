@@ -97,6 +97,7 @@ int http_parse_request(const char *buf, size_t len, http_request_t *req) {
         return -1;
     }
 
+    req->header_len = (size_t)(end - buf) + 4;   // include trailing CRLFCRLF
     req->valid = true;
     return 1;
 }

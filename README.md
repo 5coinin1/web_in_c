@@ -70,7 +70,8 @@ Default accounts (seeded on first run): `alice / secret123`, `bob / hunter2`.
 
 ## Rooms
 
-Rooms are not hard-coded. Create/delete them from the server console:
+Only the server (its console) can create or delete rooms - there is no
+room-management endpoint over the network:
 
 ```
 room <name> <code|-> <description...>   create a room (- = no code)
@@ -78,15 +79,21 @@ del <name>                              delete a room
 list                                    list rooms
 ```
 
-or provision them from a script (useful for initial seed data):
+Rooms are persisted to `server_data/rooms.dat` (loaded at startup).
+
+If a room is deleted while clients are inside it, the server sends them a
+`ROOM_CLOSED` notice and moves them back to the authenticated state, so the
+client returns to the room list and can join another room.
+
+For initial seed data, a script can write that file offline (it is not a
+network client):
 
 ```sh
-python tools/provision_rooms.py                 # create the default rooms
-python tools/provision_rooms.py --replace       # wipe then create
+python tools/provision_rooms.py                 # add the default rooms
+python tools/provision_rooms.py --replace       # wipe then write the default set
+python tools/provision_rooms.py my.json         # add rooms from a JSON file
 python tools/provision_rooms.py --delete test   # delete one room
 ```
-
-Rooms are persisted to `server_data/rooms.dat`.
 
 ## Data layout
 

@@ -28,23 +28,29 @@ int main(int argc, char **argv)
         "\n"
         "Shared runtime state machine:\n"
         "\n"
+        " STATE_IDLE\n"
+        "          | ACCEPT\n"
+        "          v\n"
         " STATE_HTTP_HANDSHAKE\n"
-        "          |\n"
         "          | HTTP_UPGRADE_OK\n"
         "          v\n"
         " STATE_WS_CONNECTED\n"
-        "          |\n"
         "          | LOGIN_OK\n"
         "          v\n"
         " STATE_AUTHENTICATED\n"
-        "          |\n"
         "          | JOIN_OK\n"
         "          v\n"
         " STATE_IN_ROOM\n"
-        "          |\n"
-        "          | LEAVE\n"
+        "          | LEAVE_OK / ROOM_CLOSED\n"
         "          v\n"
-        " STATE_AUTHENTICATED\n");
+        " STATE_AUTHENTICATED\n"
+        "\n"
+        " (switch rooms: LEAVE then JOIN - JOIN is only valid from\n"
+        "  AUTHENTICATED, i.e. a client must leave before joining another)\n"
+        " (single session: a 2nd LOGIN for the same account fails -> LOGIN_FAIL,\n"
+        "  the connection stays in WS_CONNECTED)\n"
+        "\n"
+        " (any live state) --DISCONNECT--> STATE_CLOSED  (terminal)\n");
 
     printf(
         "\n"
@@ -52,17 +58,23 @@ int main(int argc, char **argv)
         "\n"
         " K = (S, S0, R, L)\n"
         "\n"
-        " S  = connection states\n"
-        " S0 = STATE_HTTP_HANDSHAKE\n"
+        " S  = 6 connection states (IDLE..CLOSED)\n"
+        " S0 = STATE_IDLE\n"
         " R  = client_state_next()\n"
-        " L  = {WS_OPEN, AUTHENTICATED, IN_ROOM}\n");
+        " L  = {WS_OPEN, AUTHENTICATED, IN_ROOM, CLOSED}\n");
 
     printf(
         "\n"
         "Safety properties:\n"
         "\n"
         " P1: AG(IN_ROOM -> AUTHENTICATED)\n"
-        " P2: AG(AUTHENTICATED -> WS_OPEN)\n");
+        " P2: AG(AUTHENTICATED -> WS_OPEN)\n"
+        " P3: AG(CLOSED -> !(WS_OPEN | AUTHENTICATED | IN_ROOM))\n"
+        "\n"
+        "Liveness (EF reachability):\n"
+        "\n"
+        " L1: from every connected state, IN_ROOM or CLOSED is reachable\n"
+        " L2: from IN_ROOM, AUTHENTICATED is reachable (leave possible)\n");
 
     if (kripke_run_tests() != 0)
     {
@@ -91,8 +103,10 @@ int main(int argc, char **argv)
         "=====================================================\n"
         " CHAPTER 1 RESULT: VERIFIED\n"
         " Shared state machine verified up to bound k=%d\n"
+        " (completeness threshold k* = %d)\n"
         "=====================================================\n",
-        bound);
+        bound,
+        kripke_completeness_threshold());
 
     return EXIT_SUCCESS;
 }

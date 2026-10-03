@@ -9,8 +9,9 @@ typedef struct {
     uint8_t *payload;
 } ws_frame_t;
 
-// Decode a WebSocket frame from buffer. Returns bytes consumed, or -1 on error.
-// After calling, caller owns frame->payload (must free).
+// Decode a WebSocket frame from buffer.
+// Returns bytes consumed (>0), 0 if more data is needed, or -1 on error.
+// On success the caller owns frame->payload (must free via ws_frame_free).
 int ws_frame_decode(const uint8_t *buf, size_t len, ws_frame_t *frame);
 
 // Free payload allocated by ws_frame_decode

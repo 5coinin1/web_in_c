@@ -3,6 +3,7 @@
 #include "path_util.h"
 #include <ctype.h>
 #include <time.h>
+#include <pthread.h>
 #include <openssl/sha.h>
 #include <openssl/rand.h>
 #include <openssl/crypto.h>
@@ -16,7 +17,7 @@
 #define RECORD_SIZE   (32 + SALT_LEN + HASH_LEN + 8)  // 88 bytes
 
 #define ACC_MAGIC     "WSAC"
-#define ACC_VERSION   1
+#define ACC_VERSION   1          /* v1: SHA-256(salt || password) */
 
 typedef struct {
     char    username[32];
@@ -29,6 +30,34 @@ static account_t g_accounts[MAX_ACCOUNTS];
 static int       g_num_accounts = 0;
 static char      g_db_path[256] = "server_data/accounts.dat";
 
+// ---- brute-force lockout (per username) ----
+#define MAX_LOGIN_FAILS 5
+#define LOCKOUT_SECONDS 30
+#define MAX_GUARDS      128
+
+typedef struct {
+    char   username[32];
+    int    fails;
+    time_t locked_until;
+} login_guard_t;
+
+static login_guard_t   g_guards[MAX_GUARDS];
+static int             g_num_guards = 0;
+static pthread_mutex_t g_guard_lock = PTHREAD_MUTEX_INITIALIZER;
+
+// Caller must hold g_guard_lock.
+static login_guard_t *guard_for(const char *username) {
+    for (int i = 0; i < g_num_guards; i++) {
+        if (strcmp(g_guards[i].username, username) == 0) return &g_guards[i];
+    }
+    if (g_num_guards >= MAX_GUARDS) return &g_guards[0];   // evict first (simple)
+    login_guard_t *g = &g_guards[g_num_guards++];
+    memset(g, 0, sizeof(*g));
+    strncpy(g->username, username, sizeof(g->username) - 1);
+    return g;
+}
+
+// Password hash: SHA-256(salt || password) with a per-account salt.
 static void hash_password(const uint8_t *salt, const char *password,
                           uint8_t out[HASH_LEN]) {
     uint8_t buf[SALT_LEN + 128];
@@ -138,11 +167,11 @@ static int load_store(void) {
     return rc;
 }
 
-static void save_store(void) {
+static bool save_store(void) {
     FILE *f = fopen(g_db_path, "wb");
     if (!f) {
         LOG_ERR("Cannot write account store '%s'", g_db_path);
-        return;
+        return false;
     }
 
     uint8_t header[12];
@@ -161,7 +190,9 @@ static void save_store(void) {
         put_i64(rec + 32 + SALT_LEN + HASH_LEN, g_accounts[i].created_at);
         fwrite(rec, 1, sizeof(rec), f);
     }
+    int err = ferror(f);
     fclose(f);
+    return err == 0;
 }
 
 static void add_account(const char *username, const char *password) {
@@ -193,15 +224,46 @@ void auth_init(const char *data_dir) {
     LOG_INFO("Seeded %d default account(s) into '%s'", g_num_accounts, g_db_path);
 }
 
-bool auth_check(const char *username, const char *password) {
-    if (!username || !password) return false;
+auth_result_t auth_check(const char *username, const char *password) {
+    if (!username || !password) return AUTH_BAD;
 
-    int idx = find_account(username);
-    if (idx < 0) return false;
+    // Reject early if this username is currently locked out.
+    pthread_mutex_lock(&g_guard_lock);
+    login_guard_t *guard = guard_for(username);
+    time_t now = time(NULL);
+    bool locked = (guard->locked_until > now);
+    pthread_mutex_unlock(&g_guard_lock);
+    if (locked) return AUTH_LOCKED;
 
+    // Verify. For an unknown user we still hash (with a dummy salt) so the
+    // response time does not reveal whether the account exists.
+    bool ok = false;
     uint8_t computed[HASH_LEN];
-    hash_password(g_accounts[idx].salt, password, computed);
-    return CRYPTO_memcmp(computed, g_accounts[idx].hash, HASH_LEN) == 0;
+    int idx = find_account(username);
+    if (idx >= 0) {
+        hash_password(g_accounts[idx].salt, password, computed);
+        ok = CRYPTO_memcmp(computed, g_accounts[idx].hash, HASH_LEN) == 0;
+    } else {
+        uint8_t dummy_salt[SALT_LEN] = {0};
+        hash_password(dummy_salt, password, computed);
+    }
+
+    // Update the failure counter / lockout.
+    pthread_mutex_lock(&g_guard_lock);
+    guard = guard_for(username);
+    if (ok) {
+        guard->fails = 0;
+        guard->locked_until = 0;
+    } else {
+        guard->fails++;
+        if (guard->fails >= MAX_LOGIN_FAILS) {
+            guard->locked_until = now + LOCKOUT_SECONDS;
+            guard->fails = 0;
+        }
+    }
+    pthread_mutex_unlock(&g_guard_lock);
+
+    return ok ? AUTH_OK : AUTH_BAD;
 }
 
 auth_reg_result_t auth_register(const char *username, const char *password) {
@@ -211,7 +273,11 @@ auth_reg_result_t auth_register(const char *username, const char *password) {
     if (g_num_accounts >= MAX_ACCOUNTS) return AUTH_REG_INVALID;
 
     add_account(username, password);
-    save_store();
+    if (!save_store()) {
+        g_num_accounts--;   // roll back: keep memory consistent with disk
+        LOG_ERR("Failed to persist new account '%s'", username);
+        return AUTH_REG_IO;
+    }
     LOG_INFO("Registered new user '%s'", username);
     return AUTH_REG_OK;
 }

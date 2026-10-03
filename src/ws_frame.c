@@ -18,7 +18,8 @@ static void write_be64(uint8_t *buf, uint64_t val) {
 }
 
 int ws_frame_decode(const uint8_t *buf, size_t len, ws_frame_t *frame) {
-    if (!buf || !frame || len < 2) return -1;
+    if (!buf || !frame) return -1;
+    if (len < 2) return 0;   // need more data
 
     size_t pos = 0;
 
@@ -31,11 +32,11 @@ int ws_frame_decode(const uint8_t *buf, size_t len, ws_frame_t *frame) {
     pos = 2;
 
     if (payload_len == 126) {
-        if (len < pos + 2) return -1;
+        if (len < pos + 2) return 0;   // need more data
         payload_len = (uint64_t)((uint16_t)buf[pos] << 8 | buf[pos + 1]);
         pos += 2;
     } else if (payload_len == 127) {
-        if (len < pos + 8) return -1;
+        if (len < pos + 8) return 0;   // need more data
         payload_len = read_be64(&buf[pos]);
         pos += 8;
     }
@@ -50,13 +51,13 @@ int ws_frame_decode(const uint8_t *buf, size_t len, ws_frame_t *frame) {
     // Mask key (4 bytes) — present only if masked bit is set
     uint8_t mask_key[4] = {0};
     if (masked) {
-        if (len < pos + 4) return -1;
+        if (len < pos + 4) return 0;   // need more data
         memcpy(mask_key, &buf[pos], 4);
         pos += 4;
     }
 
     // Payload
-    if (len < pos + payload_len) return -1;
+    if (len < pos + payload_len) return 0;   // need more data
 
     if (payload_len > 0) {
         frame->payload = (uint8_t *)malloc((size_t)payload_len);
