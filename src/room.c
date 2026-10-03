@@ -14,7 +14,10 @@
 #define ROOM_VERSION  1
 
 static room_t *room_list = NULL;
-static pthread_mutex_t room_lock = PTHREAD_MUTEX_INITIALIZER;
+// Guards the room list and each room's refs/deleting. Operations on a specific
+// room additionally take that room's own lock, so unrelated rooms don't block
+// each other. Lock order is always: list_lock -> room->lock.
+static pthread_mutex_t list_lock = PTHREAD_MUTEX_INITIALIZER;
 static char g_rooms_path[256] = "server_data/rooms.dat";
 static volatile int g_room_count = 0;   // lock-free count for the console UI
 
@@ -28,6 +31,7 @@ static bool valid_room_name(const char *name) {
     return true;
 }
 
+// Find a room by name. Caller must hold list_lock. No reference is taken.
 static room_t *find_room(const char *name) {
     room_t *r = room_list;
     while (r) {
@@ -37,9 +41,30 @@ static room_t *find_room(const char *name) {
     return NULL;
 }
 
+// Find a room and take a reference to it. Caller must hold list_lock. Returns
+// NULL if not found. Pair with room_unref() once the room lock is released.
+static room_t *find_room_ref(const char *name) {
+    room_t *r = find_room(name);
+    if (r) r->refs++;
+    return r;
+}
+
+// Drop a reference. If this was the last user of a room that room_delete()
+// already unlinked, free it here (the deleter could not free it while in use).
+static void room_unref(room_t *r) {
+    pthread_mutex_lock(&list_lock);
+    int free_it = (--r->refs == 0 && r->deleting);
+    pthread_mutex_unlock(&list_lock);
+    if (free_it) {
+        pthread_mutex_destroy(&r->lock);
+        free(r);
+    }
+}
+
 // ---- persistence ----
 static void room_save_locked(void) {
-    FILE *f = fopen(g_rooms_path, "wb");
+    char tmp[300];
+    FILE *f = atomic_open(g_rooms_path, tmp, sizeof(tmp));
     if (!f) {
         LOG_ERR("Cannot write rooms file '%s'", g_rooms_path);
         return;
@@ -62,7 +87,10 @@ static void room_save_locked(void) {
         memcpy(rec + MAX_ROOM_NAME + ROOM_DESC_LEN, r->code, strlen(r->code));
         fwrite(rec, 1, sizeof(rec), f);
     }
-    fclose(f);
+
+    if (ferror(f) != 0) { atomic_abort(tmp, f); LOG_ERR("Write error on '%s'", g_rooms_path); return; }
+    if (atomic_commit(g_rooms_path, tmp, f) != 0)
+        LOG_ERR("Atomic save of rooms file '%s' failed", g_rooms_path);
 }
 
 static void room_load(void) {
@@ -90,6 +118,9 @@ static void room_load(void) {
         r->description[ROOM_DESC_LEN - 1] = '\0';
         memcpy(r->code, rec + MAX_ROOM_NAME + ROOM_DESC_LEN, ROOM_CODE_LEN);
         r->code[ROOM_CODE_LEN - 1] = '\0';
+        pthread_mutex_init(&r->lock, NULL);
+        r->refs = 0;
+        r->deleting = 0;
         r->next = room_list;
         room_list = r;
         loaded++;
@@ -112,17 +143,20 @@ void room_init(const char *data_dir) {
 int room_create(const char *name, const char *description, const char *code) {
     if (!name || !valid_room_name(name)) return ROOM_CREATE_INVALID;
 
-    pthread_mutex_lock(&room_lock);
+    pthread_mutex_lock(&list_lock);
     if (find_room(name)) {
-        pthread_mutex_unlock(&room_lock);
+        pthread_mutex_unlock(&list_lock);
         return ROOM_CREATE_EXISTS;
     }
 
     room_t *r = (room_t *)calloc(1, sizeof(room_t));
     if (!r) {
-        pthread_mutex_unlock(&room_lock);
+        pthread_mutex_unlock(&list_lock);
         return ROOM_CREATE_INVALID;
     }
+    pthread_mutex_init(&r->lock, NULL);
+    r->refs = 0;
+    r->deleting = 0;
     strncpy(r->name, name, MAX_ROOM_NAME - 1);
     strncpy(r->description, description ? description : "", ROOM_DESC_LEN - 1);
     strncpy(r->code, code ? code : "", ROOM_CODE_LEN - 1);
@@ -131,7 +165,7 @@ int room_create(const char *name, const char *description, const char *code) {
     room_save_locked();
     g_room_count++;
 
-    pthread_mutex_unlock(&room_lock);
+    pthread_mutex_unlock(&list_lock);
     LOG_INFO("Room '%s' created and persisted", name);
     return ROOM_CREATE_OK;
 }
@@ -139,17 +173,19 @@ int room_create(const char *name, const char *description, const char *code) {
 int room_delete(const char *name) {
     if (!name) return ROOM_DELETE_NOTFOUND;
 
-    pthread_mutex_lock(&room_lock);
+    pthread_mutex_lock(&list_lock);
     room_t *prev = NULL, *r = room_list;
     while (r && strcmp(r->name, name) != 0) { prev = r; r = r->next; }
     if (!r) {
-        pthread_mutex_unlock(&room_lock);
+        pthread_mutex_unlock(&list_lock);
         return ROOM_DELETE_NOTFOUND;
     }
 
-    // Evict members: tell them the room is closed and move them back to
-    // STATE_AUTHENTICATED so they can pick another room (single shared
-    // transition relation - same event the Kripke model uses).
+    // Evict members under the room's own lock. We hold list_lock too, so the
+    // `deleting` flag is published consistently to room_unref().
+    pthread_mutex_lock(&r->lock);
+    r->deleting = 1;
+
     char notice[160];
     snprintf(notice, sizeof(notice),
              "{\"type\":\"ROOM_CLOSED\",\"room\":\"%s\"}", name);
@@ -158,18 +194,12 @@ int room_delete(const char *name) {
         if (!c) continue;
 
         /* Every member in this array is STATE_IN_ROOM: room_join_commit()
-         * sets membership and state together under room_lock, and room_leave()
-         * removes the member before changing state. The guard is therefore a
-         * defensive invariant check, not a case that is expected to trigger -
-         * ROOM_CLOSED is only legal from STATE_IN_ROOM. */
+         * sets membership and state together, and room_leave() removes the
+         * member before changing state. The guard is a defensive invariant
+         * check - ROOM_CLOSED is only legal from STATE_IN_ROOM. */
         if (c->state == STATE_IN_ROOM) {
             client_send_ws_text(c, notice);
             if (!client_state_apply(&c->state, CLIENT_EVENT_ROOM_CLOSED)) {
-                // Membership implies STATE_IN_ROOM, so the model says this
-                // cannot fail. If it ever did, clearing c->room alone would
-                // strand the client: JOIN needs STATE_AUTHENTICATED and
-                // LEAVE returns early on an empty room name, so it could
-                // never recover.
                 LOG_ERR("Evict '%s' from room '%s': unexpected state %s",
                         c->nickname, name, client_state_name(c->state));
                 c->state = STATE_AUTHENTICATED;
@@ -178,27 +208,41 @@ int room_delete(const char *name) {
         c->room[0] = '\0';
     }
     r->num_clients = 0;
+    pthread_mutex_unlock(&r->lock);
 
+    // Unlink and persist.
     if (prev) prev->next = r->next;
     else room_list = r->next;
-    free(r);
     room_save_locked();
     g_room_count--;
-    pthread_mutex_unlock(&room_lock);
+
+    // Free now only if no other thread holds a reference; otherwise the last
+    // room_unref() frees it (see the `deleting` check there).
+    int free_it = (r->refs == 0);
+    pthread_mutex_unlock(&list_lock);
+    if (free_it) {
+        pthread_mutex_destroy(&r->lock);
+        free(r);
+    }
+
     LOG_INFO("Room '%s' deleted and persisted", name);
     return ROOM_DELETE_OK;
 }
 
-int room_leave(const char *room_name, const char *nickname) {
-    if (!room_name || !nickname) return -1;
+int room_leave(const char *room_name, struct client *client) {
+    if (!room_name || !client) return -1;
 
-    pthread_mutex_lock(&room_lock);
+    pthread_mutex_lock(&list_lock);
+    room_t *room = find_room_ref(room_name);
+    pthread_mutex_unlock(&list_lock);
+    if (!room) return -1;
 
-    room_t *room = find_room(room_name);
-    if (!room) { pthread_mutex_unlock(&room_lock); return -1; }
+    pthread_mutex_lock(&room->lock);
 
+    // Identify the member by pointer, not by nickname: a nickname-keyed lookup
+    // could miss and leave a dangling pointer in the array.
     for (int i = 0; i < room->num_clients; i++) {
-        if (strcmp(room->clients[i]->nickname, nickname) == 0) {
+        if (room->clients[i] == client) {
             for (int j = i; j < room->num_clients - 1; j++) {
                 room->clients[j] = room->clients[j + 1];
             }
@@ -207,41 +251,45 @@ int room_leave(const char *room_name, const char *nickname) {
         }
     }
 
-    // Rooms are persisted, so an empty room is kept (not destroyed).
-
-    pthread_mutex_unlock(&room_lock);
+    pthread_mutex_unlock(&room->lock);
+    room_unref(room);
     return 0;
 }
 
-int room_join_commit(const char *room_name, const char *nickname,
-                     struct client *client, const char *code) {
-    if (!room_name || !nickname || !client) return ROOM_JOIN_NOTFOUND;
+int room_join_commit(const char *room_name, struct client *client,
+                     const char *code) {
+    if (!room_name || !client) return ROOM_JOIN_NOTFOUND;
 
-    pthread_mutex_lock(&room_lock);
+    pthread_mutex_lock(&list_lock);
+    room_t *room = find_room_ref(room_name);
+    pthread_mutex_unlock(&list_lock);
+    if (!room) return ROOM_JOIN_NOTFOUND;
 
-    // Everything that can reject the join is checked while holding the lock,
-    // so nothing can change between the checks, the membership update and the
-    // state transition.
-    if (client->state != STATE_AUTHENTICATED) {
-        pthread_mutex_unlock(&room_lock);
-        return ROOM_JOIN_BADSTATE;
-    }
+    pthread_mutex_lock(&room->lock);
 
-    room_t *room = find_room(room_name);
-    if (!room) {
-        pthread_mutex_unlock(&room_lock);
+    // Everything that can reject the join is checked while holding this room's
+    // lock, so nothing can change between the checks, the membership update and
+    // the state transition. A room being deleted (already unlinked) rejects.
+    if (room->deleting) {
+        pthread_mutex_unlock(&room->lock);
+        room_unref(room);
         return ROOM_JOIN_NOTFOUND;
     }
-
+    if (client->state != STATE_AUTHENTICATED) {
+        pthread_mutex_unlock(&room->lock);
+        room_unref(room);
+        return ROOM_JOIN_BADSTATE;
+    }
     if (room->code[0] != '\0') {
         if (!code || strcmp(code, room->code) != 0) {
-            pthread_mutex_unlock(&room_lock);
+            pthread_mutex_unlock(&room->lock);
+            room_unref(room);
             return ROOM_JOIN_BADCODE;
         }
     }
-
     if (room->num_clients >= MAX_CLIENTS_PER_ROOM) {
-        pthread_mutex_unlock(&room_lock);
+        pthread_mutex_unlock(&room->lock);
+        room_unref(room);
         return ROOM_JOIN_FULL;
     }
 
@@ -254,45 +302,47 @@ int room_join_commit(const char *room_name, const char *nickname,
         // membership back anyway so the client is never left half-joined.
         room->num_clients--;
         client->room[0] = '\0';
-        pthread_mutex_unlock(&room_lock);
+        pthread_mutex_unlock(&room->lock);
+        room_unref(room);
         return ROOM_JOIN_BADSTATE;
     }
 
-    pthread_mutex_unlock(&room_lock);
+    pthread_mutex_unlock(&room->lock);
+    room_unref(room);
     return ROOM_JOIN_OK;
 }
 
-void room_broadcast(const char *room_name, const char *exclude_nick,
-                    const char *msg, int exclude_fd) {
-    (void)exclude_fd;
+void room_broadcast(const char *room_name, struct client *exclude,
+                    const char *msg) {
     if (!room_name || !msg) return;
 
-    pthread_mutex_lock(&room_lock);
+    pthread_mutex_lock(&list_lock);
+    room_t *room = find_room_ref(room_name);
+    pthread_mutex_unlock(&list_lock);
+    if (!room) return;
 
-    room_t *room = find_room(room_name);
-    if (!room) { pthread_mutex_unlock(&room_lock); return; }
-
+    pthread_mutex_lock(&room->lock);
     for (int i = 0; i < room->num_clients; i++) {
         struct client *c = room->clients[i];
-        if (exclude_nick && strcmp(c->nickname, exclude_nick) == 0) continue;
+        if (exclude && c == exclude) continue;
         client_send_ws_text(c, msg);
     }
-
-    pthread_mutex_unlock(&room_lock);
+    pthread_mutex_unlock(&room->lock);
+    room_unref(room);
 }
 
 void room_get_users(const char *room_name, char *out_buf, size_t out_buf_size) {
     if (!room_name || !out_buf || out_buf_size < 3) return;
 
-    pthread_mutex_lock(&room_lock);
-
-    room_t *room = find_room(room_name);
+    pthread_mutex_lock(&list_lock);
+    room_t *room = find_room_ref(room_name);
+    pthread_mutex_unlock(&list_lock);
     if (!room) {
         strcpy(out_buf, "[]");
-        pthread_mutex_unlock(&room_lock);
         return;
     }
 
+    pthread_mutex_lock(&room->lock);
     out_buf[0] = '[';
     size_t pos = 1;
     for (int i = 0; i < room->num_clients; i++) {
@@ -308,67 +358,83 @@ void room_get_users(const char *room_name, char *out_buf, size_t out_buf_size) {
     }
     out_buf[pos++] = ']';
     out_buf[pos] = '\0';
+    pthread_mutex_unlock(&room->lock);
 
-    pthread_mutex_unlock(&room_lock);
+    room_unref(room);
 }
 
-void room_list_json(char *out_buf, size_t out_buf_size) {
-    if (!out_buf || out_buf_size < 8) return;
+void room_list_page_json(char *out_buf, size_t out_buf_size, int offset,
+                         int limit, int *has_more) {
+    if (has_more) *has_more = 0;
+    if (!out_buf || out_buf_size < 64) return;
+    if (offset < 0) offset = 0;
+    if (limit < 1) limit = 1;
 
-    pthread_mutex_lock(&room_lock);
+    pthread_mutex_lock(&list_lock);
 
-    // Always reserve space for the longest possible tail so the JSON is
-    // closed properly even when the list does not fit (it stays parseable
-    // and reports that entries were omitted).
-    const size_t tail_reserve = sizeof(",\"truncated\":true}]}");
-    bool first = true;
-    bool truncated = false;
+    int total = 0;
+    for (room_t *r = room_list; r; r = r->next) total++;
+
+    // Reserve room for the longest possible tail so the JSON always closes.
+    const size_t tail_reserve = 80;
     size_t pos = 0;
-
     int n = snprintf(out_buf, out_buf_size, "{\"type\":\"ROOM_LIST\",\"rooms\":[");
     if (n > 0) pos = (size_t)n;
 
-    for (room_t *r = room_list; r; r = r->next) {
-        // The description is free-form admin text: it MUST be escaped or a
-        // quote inside it would break the whole ROOM_LIST for every client.
+    int emitted = 0, index = 0;
+    for (room_t *r = room_list; r; r = r->next, index++) {
+        if (index < offset) continue;               // skip earlier pages
+        if (emitted >= limit) break;                // page is full
+
+        // name/desc/code are immutable while list_lock is held (no delete can
+        // run); only num_clients needs the room's own lock.
+        pthread_mutex_lock(&r->lock);
+        int mc = r->num_clients;
+        pthread_mutex_unlock(&r->lock);
+
+        // The description is free-form admin text: escape it or a quote would
+        // break the whole ROOM_LIST for every client.
         char desc[ROOM_DESC_LEN * 6 + 1];
         json_escape(r->description, desc, sizeof(desc));
 
         char entry[MAX_ROOM_NAME + sizeof(desc) + 128];
         int en = snprintf(entry, sizeof(entry),
             "%s{\"name\":\"%s\",\"desc\":\"%s\",\"members\":%d,\"code\":%s}",
-            first ? "" : ",", r->name, desc, r->num_clients,
+            emitted ? "," : "", r->name, desc, mc,
             r->code[0] ? "true" : "false");
         if (en <= 0) continue;
 
         size_t need = (size_t)en;
-        if (pos + need + tail_reserve >= out_buf_size) { truncated = true; break; }
+        if (pos + need + tail_reserve >= out_buf_size) break;   // no room left
         memcpy(out_buf + pos, entry, need);
         pos += need;
-        first = false;
+        emitted++;
     }
 
-    if (truncated) {
-        snprintf(out_buf + pos, out_buf_size - pos, "],\"truncated\":true}");
-    } else {
-        snprintf(out_buf + pos, out_buf_size - pos, "]}");
-    }
+    int more = (offset + emitted < total) ? 1 : 0;
+    snprintf(out_buf + pos, out_buf_size - pos,
+             "],\"offset\":%d,\"count\":%d,\"has_more\":%s}",
+             offset, emitted, more ? "true" : "false");
+    if (has_more) *has_more = more;
 
-    pthread_mutex_unlock(&room_lock);
+    pthread_mutex_unlock(&list_lock);
 }
 
 void room_print_console(void) {
-    pthread_mutex_lock(&room_lock);
+    pthread_mutex_lock(&list_lock);
     log_emit(2, NULL, 0, "  %-14s %-8s %-6s %s", "ROOM", "MEMBERS", "CODE", "DESCRIPTION");
     log_emit(2, NULL, 0, "  %-14s %-8s %-6s %s", "----", "-------", "----", "-----------");
     for (room_t *r = room_list; r; r = r->next) {
-        log_emit(2, NULL, 0, "  %-14s %-8d %-6s %s", r->name, r->num_clients,
+        pthread_mutex_lock(&r->lock);
+        int mc = r->num_clients;
+        pthread_mutex_unlock(&r->lock);
+        log_emit(2, NULL, 0, "  %-14s %-8d %-6s %s", r->name, mc,
                  r->code[0] ? "yes" : "-", r->description);
     }
-    pthread_mutex_unlock(&room_lock);
+    pthread_mutex_unlock(&list_lock);
 }
 
 int room_count(void) {
-    // Lock-free: safe to call from the console renderer while room_lock is held.
+    // Lock-free: safe to call from the console renderer while list_lock is held.
     return g_room_count;
 }

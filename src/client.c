@@ -338,32 +338,108 @@ static int parse_room_list(const char *json, room_info_t *out, int max) {
     return n;
 }
 
+// Print exactly `width` columns of text: copy at most that many chars and pad
+// with spaces. This is what keeps a long room name/description from spilling
+// into the neighbouring cells (printf %-Ns does NOT truncate).
+static void rl_field(const char *s, int width) {
+    char buf[256];
+    if (width > (int)sizeof(buf) - 1) width = (int)sizeof(buf) - 1;
+    int i = 0;
+    if (s) for (; i < width && s[i]; i++) buf[i] = s[i];
+    for (; i < width; i++) buf[i] = ' ';
+    buf[i] = '\0';
+    fputs(buf, stdout);
+}
+
+// Hard-wrap a token (no spaces) into segments of `width` columns. Returns the
+// number of segments (>= 1).
+static int hard_wrap(const char *s, int width, char segs[][13], int max) {
+    int len = (int)strlen(s), i = 0;
+    while (i < max && i * width < len) {
+        int off = i * width, n = len - off;
+        if (n > width) n = width;
+        memcpy(segs[i], s + off, n);
+        segs[i][n] = '\0';
+        i++;
+    }
+    if (i == 0) { segs[0][0] = '\0'; i = 1; }
+    return i;
+}
+
+// Word-wrap text into segments of `width` columns, breaking at spaces (a word
+// longer than the width is cut). Returns the number of segments (>= 1).
+static int word_wrap(const char *s, int width, char segs[][35], int max) {
+    int len = (int)strlen(s), pos = 0, i = 0;
+    while (i < max) {
+        while (pos < len && s[pos] == ' ') pos++;
+        if (pos >= len) break;
+        int start = pos, n;
+        if (len - pos <= width) { n = len - pos; pos = len; }
+        else {
+            int brk = -1;
+            for (int k = pos + width; k > pos; k--)
+                if (s[k] == ' ') { brk = k; break; }
+            if (brk > pos) { n = brk - pos; pos = brk; }
+            else           { n = width;     pos += width; }
+        }
+        if (n > width) n = width;
+        memcpy(segs[i], s + start, n);
+        segs[i][n] = '\0';
+        i++;
+    }
+    if (i == 0) { segs[0][0] = '\0'; i = 1; }
+    return i;
+}
+
 static void render_room_list(const room_info_t *rooms, int n, const char *username) {
     tui_clear();
 
-    // Fixed column layout so the borders line up.
-    const char *B = TUI_BLUE, *R = TUI_RESET;
-    const char *border = "+----+--------------+---------+------+------------------------------------+";
-    const char *sep    = "+====+==============+=========+======+====================================+";
+    const char *B = TUI_BLUE, *R = TUI_RESET, *C = TUI_CYAN;
+    const int WR = 12, WD = 34;
 
     printf("%s%s", TUI_CYAN, TUI_BOLD);
-    printf("%s\n", border);
-    printf("|  AVAILABLE ROOMS%*suser: %-10s |\n", 40, "", username);
-    printf("%s\n", sep);
+    printf("+----+--------------+---------+------+------------------------------------+\n");
+    printf("|  AVAILABLE ROOMS%*suser: %-10.10s |\n", 39, "", username);
+    printf("+====+==============+=========+======+====================================+\n");
     printf("|  # | ROOM         | MEMBERS | CODE | DESCRIPTION                        |\n");
-    printf("%s%s\n", TUI_BLUE, border);
-    printf("%s", R);
+    printf("%s+----+--------------+---------+------+------------------------------------+\n%s",
+           TUI_BLUE, R);
 
     for (int i = 0; i < n; i++) {
-        printf("%s|%s %s%2d%s %s|%s %s%-12s%s ", B, R, TUI_YELLOW, i + 1, R, B, R,
-               TUI_CYAN, rooms[i].name, R);
-        printf("%s|%s %7d %s|%s %-4s %s|%s %-34s %s|%s\n",
-               B, R, rooms[i].members, B, R,
-               rooms[i].has_code ? "yes" : "-", B, R,
-               rooms[i].desc, B, R);
+        char nseg[4][13];                         // name: hard-wrapped (<= 3 rows)
+        int nn = hard_wrap(rooms[i].name, WR, nseg, 4);
+        char dseg[48][35];                        // desc: word-wrapped
+        int nd = word_wrap(rooms[i].desc, WD, dseg, 48);
+        int rows = nn > nd ? nn : nd;
+
+        for (int r = 0; r < rows; r++) {
+            int first = (r == 0);
+            printf("%s|%s ", B, R);
+            char num[8]; snprintf(num, sizeof(num), "%d", i + 1);
+            if (first) { printf("%s", TUI_YELLOW); rl_field(num, 2); printf("%s", R); }
+            else       { rl_field("", 2); }
+
+            printf(" %s|%s ", B, R);
+            if (first) printf("%s", C);
+            rl_field(r < nn ? nseg[r] : "", WR);
+            if (first) printf("%s", R);
+
+            printf(" %s|%s ", B, R);
+            char mstr[16] = "";
+            if (first) snprintf(mstr, sizeof(mstr), "%d", rooms[i].members);
+            rl_field(mstr, 7);
+
+            printf(" %s|%s ", B, R);
+            rl_field(first ? (rooms[i].has_code ? "yes" : "-") : "", 4);
+
+            printf(" %s|%s ", B, R);
+            rl_field(r < nd ? dseg[r] : "", WD);
+            printf(" %s|%s\n", B, R);
+        }
     }
 
-    printf("%s%s\n%s", TUI_BLUE, border, R);
+    printf("%s+----+--------------+---------+------+------------------------------------+\n%s",
+           TUI_BLUE, R);
     printf("\n");
 }
 
@@ -373,28 +449,37 @@ static void render_room_list(const room_info_t *rooms, int n, const char *userna
 static char *ev_wait_any(const char *const *types, int n, int timeout_ms);
 static void  ev_flush(void);
 
-// Fetch the room list into rooms[]. Returns 0 on success, -1 on error.
-static int fetch_rooms(int fd, room_info_t *rooms, int *n_out) {
+// Fetch one page of rooms starting at `offset`. Sets *has_more if the server
+// reported more rooms beyond this page. Returns 0 on success, -1 on error.
+static int fetch_rooms(int fd, room_info_t *rooms, int max, int offset,
+                       int *n_out, int *has_more) {
     const char *want[] = { "ROOM_LIST", "DISCONNECTED" };
+    char req[64];
+    snprintf(req, sizeof(req), "{\"type\":\"ROOMS\",\"offset\":%d}", offset);
     ev_flush();                                 // drop any stale control reply
-    if (ws_send_json(fd, "{\"type\":\"ROOMS\"}") < 0) return -1;
+    if (ws_send_json(fd, req) < 0) return -1;
     char *resp = ev_wait_any(want, 2, 5000);
     if (!resp) return -1;                        // timeout
     int rc = 0;
     if (strstr(resp, "\"DISCONNECTED\"")) rc = -1;
-    else *n_out = parse_room_list(resp, rooms, 32);
+    else {
+        *n_out = parse_room_list(resp, rooms, max);
+        *has_more = (strstr(resp, "\"has_more\":true") != NULL);
+    }
     free(resp);
     return rc;
 }
 
 // Returns 0 = joined, 1 = user quit, -1 = disconnected/error.
 static int select_room(int fd, char *joined, size_t joined_size) {
-    room_info_t rooms[32];
-    int n = 0;
+    room_info_t rooms[ROOMS_PAGE];
+    int n = 0, offset = 0, has_more = 0;
+    int prev[128];                       // offsets of previous pages
+    int prev_top = 0;
 
     for (;;) {
-        if (fetch_rooms(fd, rooms, &n) != 0) return -1;
-        if (n <= 0) {
+        if (fetch_rooms(fd, rooms, ROOMS_PAGE, offset, &n, &has_more) != 0) return -1;
+        if (n <= 0 && offset == 0) {
             printf("No rooms available. Press Enter to refresh, or q to quit: ");
             fflush(stdout);
             char s[16];
@@ -404,9 +489,26 @@ static int select_room(int fd, char *joined, size_t joined_size) {
         }
         render_room_list(rooms, n, g_nickname);
 
+        // Page footer: tell the user there are more pages and how to move.
+        if (offset > 0 || has_more) {
+            printf("%sPage starting at room %d.%s ", TUI_DIM, offset + 1, TUI_RESET);
+            if (prev_top > 0) printf("%s[p]%s prev  ", TUI_YELLOW, TUI_RESET);
+            if (has_more)     printf("%s[n]%s next  ", TUI_YELLOW, TUI_RESET);
+            printf("\n");
+        }
+
         char sel[16];
         if (read_line("Select room # (q to quit): ", sel, sizeof(sel)) != 0) return 1;
         if (sel[0] == 'q' || sel[0] == 'Q') return 1;
+        if ((sel[0] == 'n' || sel[0] == 'N') && has_more) {
+            if (prev_top < (int)(sizeof(prev) / sizeof(prev[0]))) prev[prev_top++] = offset;
+            offset += n;                 // advance by the page actually returned
+            continue;
+        }
+        if ((sel[0] == 'p' || sel[0] == 'P') && prev_top > 0) {
+            offset = prev[--prev_top];
+            continue;
+        }
 
         int idx = atoi(sel) - 1;
         if (idx < 0 || idx >= n) {

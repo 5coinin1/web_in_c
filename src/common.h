@@ -31,11 +31,14 @@
 #define MAX_NICKNAME 32
 #define MAX_MSG_LEN 4096
 #define MAX_CLIENTS_PER_ROOM 32
+// Room list pagination: max rooms per ROOM_LIST page (server caps the page by
+// this and by the frame size; the client holds at most this many per page).
+#define ROOMS_PAGE 32
 #define WS_FRAME_MAX_PAYLOAD (1 << 20) // 1MB
 
 // ---- per-client outbound queue (producer/consumer, PA2) ----
 //
-// room_broadcast() must never touch the network while holding room_lock: one
+// room_broadcast() must never touch the network while holding the room lock: one
 // peer that stops reading would otherwise block send() and freeze every room.
 // Instead the producer only copies the encoded frame into this ring buffer and
 // signals the client's writer thread, which owns send() and runs outside all

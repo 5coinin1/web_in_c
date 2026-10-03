@@ -17,7 +17,7 @@ static void send_joined(client_t *client, const char *room);
 //
 // Producer: any thread may call client_send_ws_text(), which encodes the frame
 // and copies it into the client's ring buffer. This is a bounded memcpy and
-// never touches the network, so it is safe to call while holding room_lock.
+// never touches the network, so it is safe to call while holding a room lock.
 //
 // Consumer: one writer thread per client owns send(). It drains the ring
 // buffer with a blocking send() that carries SO_SNDTIMEO, so a peer that stops
@@ -26,7 +26,7 @@ static void send_joined(client_t *client, const char *room);
 //
 // Lifecycle: the client object is freed only after the writer thread has been
 // joined, so the queue is never touched after free. client_destroy() first
-// leaves the room (which takes room_lock, so no further enqueue can target
+// leaves the room (which takes the room lock, so no further enqueue can target
 // this client), then stops and joins the writer.
 // ---------------------------------------------------------------------------
 
@@ -93,7 +93,7 @@ static void *client_writer_thread(void *arg) {
         int fd = c->fd;
 
         // Crucially, send() runs OUTSIDE out_mu so a stuck peer cannot make
-        // the producer (and therefore room_lock) wait.
+        // the producer (and therefore the room lock) wait.
         pthread_mutex_unlock(&c->out_mu);
         ssize_t k = send(fd, (const char *)p, first, 0);
         pthread_mutex_lock(&c->out_mu);
@@ -153,7 +153,7 @@ client_t *client_create(int fd) {
 void client_destroy(client_t *client) {
     if (!client) return;
 
-    // Leave the room first: it takes room_lock, so once it returns no
+    // Leave the room first: it takes the room lock, so once it returns no
     // producer can enqueue to this client any more.
     client_leave_room(client);
 
@@ -208,8 +208,8 @@ static void client_leave_room(client_t *client) {
     snprintf(notice, sizeof(notice),
         "{\"type\":\"USER_LEAVE\",\"room\":\"%s\",\"user\":\"%s\"}",
         client->room, client->nickname);
-    room_broadcast(client->room, client->nickname, notice, -1);
-    room_leave(client->room, client->nickname);
+    room_broadcast(client->room, client, notice);
+    room_leave(client->room, client);
     LOG_INFO("'%s' left room '%s'", client->nickname, client->room);
     client->room[0] = '\0';
 
@@ -419,8 +419,15 @@ static int handle_ws_message(client_t *client, ws_frame_t *frame) {
             free(msg);
             return 0;
         }
+        // Optional pagination cursor: ROOMS {"offset":N}.
+        int offset = 0;
+        long off = 0;
+        if (json_get_int(msg, "offset", &off) == 0 && off > 0)
+            offset = (int)off;
+
         char list[MAX_MSG_LEN];
-        room_list_json(list, sizeof(list));
+        int has_more = 0;
+        room_list_page_json(list, sizeof(list), offset, ROOMS_PAGE, &has_more);
         client_send_ws_text(client, list);
     }
     else if (strcmp(msg_type, "JOIN") == 0) {
@@ -450,10 +457,10 @@ static int handle_ws_message(client_t *client, ws_frame_t *frame) {
         const char *nickname = client->nickname;
 
         // One atomic operation: validation, membership, room reference and the
-        // AUTHENTICATED -> IN_ROOM transition all happen under room_lock. The
+        // AUTHENTICATED -> IN_ROOM transition all happen under the room lock. The
         // console thread's room_delete() needs the same lock, so it can no
         // longer land in the middle of a join and strand the client.
-        int jr = room_join_commit(room_name, nickname, client, code);
+        int jr = room_join_commit(room_name, client, code);
         if (jr == ROOM_JOIN_OK) {
             send_joined(client, room_name);
 
@@ -462,7 +469,7 @@ static int handle_ws_message(client_t *client, ws_frame_t *frame) {
             snprintf(notify, sizeof(notify),
                 "{\"type\":\"USER_JOIN\",\"room\":\"%s\",\"user\":\"%s\"}",
                 room_name, nickname);
-            room_broadcast(room_name, nickname, notify, -1);
+            room_broadcast(room_name, client, notify);
 
             LOG_INFO("'%s' joined room '%s'", nickname, room_name);
         } else {
@@ -532,7 +539,7 @@ static int handle_ws_message(client_t *client, ws_frame_t *frame) {
         snprintf(resp, sizeof(resp),
             "{\"type\":\"MESSAGE\",\"from\":\"%s\",\"room\":\"%s\",\"content\":\"%s\"}",
             client->nickname, client->room, esc);
-        room_broadcast(client->room, NULL, resp, -1);
+        room_broadcast(client->room, NULL, resp);
         // Message content is intentionally NOT logged (volume + privacy).
     }
     else if (strcmp(msg_type, "LIST") == 0) {

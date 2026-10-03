@@ -168,7 +168,8 @@ static int load_store(void) {
 }
 
 static bool save_store(void) {
-    FILE *f = fopen(g_db_path, "wb");
+    char tmp[300];
+    FILE *f = atomic_open(g_db_path, tmp, sizeof(tmp));
     if (!f) {
         LOG_ERR("Cannot write account store '%s'", g_db_path);
         return false;
@@ -190,9 +191,13 @@ static bool save_store(void) {
         put_i64(rec + 32 + SALT_LEN + HASH_LEN, g_accounts[i].created_at);
         fwrite(rec, 1, sizeof(rec), f);
     }
-    int err = ferror(f);
-    fclose(f);
-    return err == 0;
+
+    if (ferror(f) != 0) { atomic_abort(tmp, f); return false; }
+    if (atomic_commit(g_db_path, tmp, f) != 0) {
+        LOG_ERR("Atomic save of account store '%s' failed", g_db_path);
+        return false;
+    }
+    return true;
 }
 
 static void add_account(const char *username, const char *password) {

@@ -1,6 +1,7 @@
 #include "json_util.h"
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 static int find_value(const char *json, const char *key, const char **out) {
     char pattern[64];
@@ -78,6 +79,18 @@ void json_escape(const char *src, char *dst, size_t dst_size) {
         }
     }
     dst[j] = '\0';
+}
+
+int json_get_int(const char *json, const char *key, long *out) {
+    const char *p;
+    if (!json || !key || !out) return -1;
+    if (find_value(json, key, &p) != 0) return -1;
+    if (*p == '"') p++;                     // tolerate a quoted number
+    char *end = NULL;
+    long v = strtol(p, &end, 10);
+    if (end == p) return -1;                // no digits found
+    *out = v;
+    return 0;
 }
 
 int json_get_raw(const char *json, const char *key, char *out, size_t out_size) {
