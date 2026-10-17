@@ -1,0 +1,3 @@
+# Ch4 fuzzing toolkit for the wschat project.
+# The fuzzer itself uses only the Python standard library; pytest is for tests.
+pytest>=7.0

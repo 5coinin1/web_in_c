@@ -189,6 +189,24 @@ bool kripke_room_product_counterexample(room_bug_t bug);
 
 
 /*
+ * Diagnostic (Tier-3b): the code's LEAVE is NOT atomic.
+ *
+ * room_join_commit() commits membership + state together under one lock, but
+ * client_leave_room() is a sequence:
+ *     room_broadcast -> room_leave (removes the client from the room's array)
+ *     -> clear client->room -> apply CLIENT_EVENT_LEAVE_OK
+ * and the room lock is NOT held across the state transition. So there is a
+ * window where the client is no longer in the room array (and may have no room
+ * name) while its connection state is still STATE_IN_ROOM.
+ *
+ * This builds that exact step sequence and returns true if the window (the
+ * membership flag disagreeing with the state) is reachable. It is - which means
+ * the atomic-LEAVE assumption of the Tier-3 model does not match the code.
+ */
+bool kripke_room_leave_window_reachable(void);
+
+
+/*
  * Deterministic tests for the shared state machine.
  *
  * Returns:

@@ -3,6 +3,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef _WIN32
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
+
+// When launched by double-click the console closes the moment main returns,
+// so the result is unreadable. Wait for Enter, but only on an interactive
+// terminal (ctest / redirected stdin is left alone so it never hangs).
+static void pause_if_tty(void)
+{
+#ifdef _WIN32
+    if (!_isatty(_fileno(stdin))) return;
+#else
+    if (!isatty(fileno(stdin))) return;
+#endif
+    printf("\nPress Enter to exit...");
+    fflush(stdout);
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF) { }
+}
+
 int main(int argc, char **argv)
 {
     int bound = 8;
@@ -83,6 +105,7 @@ int main(int argc, char **argv)
             "\n"
             "CHAPTER 1 RESULT: TEST FAILURE\n");
 
+        pause_if_tty();
         return EXIT_FAILURE;
     }
 
@@ -95,6 +118,7 @@ int main(int argc, char **argv)
             "\n"
             "CHAPTER 1 RESULT: MODEL CHECK FAILED\n");
 
+        pause_if_tty();
         return EXIT_FAILURE;
     }
 
@@ -108,5 +132,6 @@ int main(int argc, char **argv)
         bound,
         kripke_completeness_threshold());
 
+    pause_if_tty();
     return EXIT_SUCCESS;
 }

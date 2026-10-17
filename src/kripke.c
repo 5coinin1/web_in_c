@@ -819,11 +819,70 @@ bool kripke_room_product_counterexample(room_bug_t bug)
 }
 
 /*
+ * Tier-3b: code-faithful LEAVE window.
+ *
+ * State per role = (state, in_array, room_ref):
+ *   state    : 0 = AUTHENTICATED, 1 = IN_ROOM, 2 = CLOSED
+ *   in_array : the client pointer is present in room->clients[]
+ *   room_ref : client->room[0] != '\0'
+ *
+ * Steps mirror the real code:
+ *   JOIN      (room_join_commit, atomic): (AUTH,0,0) -> (IN_ROOM,1,1)
+ *   L_REMOVE  (room_leave):               (IN_ROOM,1,*) -> (IN_ROOM,0,r)
+ *   L_CLEAR   (client->room[0]='\0'):     (IN_ROOM,0,1) -> (IN_ROOM,0,0)
+ *   L_STATE   (apply LEAVE_OK):           (IN_ROOM,0,0) -> (AUTH,0,0)
+ *   DELETE    (room_delete evict):        (IN_ROOM,1,*) -> (AUTH,0,0)
+ *   DISCONNECT:                           any -> (CLOSED,0,0)
+ *
+ * Invariant checked: in_array <-> (state == IN_ROOM).
+ */
+bool kripke_room_leave_window_reachable(void)
+{
+    enum { N = 3 * 2 * 2 };
+    bool seen[N];
+    int  q[N];
+    memset(seen, 0, sizeof seen);
+    int head = 0, tail = 0;
+
+    #define ENC(s, a, r) ((((s) * 2 + (a)) * 2) + (r))
+
+    int v0 = ENC(0, 0, 0);
+    seen[v0] = true;
+    q[tail++] = v0;
+
+    bool found = false;
+    while (head < tail)
+    {
+        int v = q[head++];
+        int r = v % 2, t = v / 2;
+        int a = t % 2; t /= 2;
+        int s = t;
+
+        if (a != (s == 1)) found = true;   // membership flag vs state disagree
+
+        int succ[6][3], nc = 0;
+        if (s == 0 && !a && !r) { succ[nc][0]=1; succ[nc][1]=1; succ[nc][2]=1; nc++; } // JOIN
+        if (s == 1 && a)        { succ[nc][0]=1; succ[nc][1]=0; succ[nc][2]=r; nc++; } // L_REMOVE
+        if (s == 1 && !a && r)  { succ[nc][0]=1; succ[nc][1]=0; succ[nc][2]=0; nc++; } // L_CLEAR
+        if (s == 1 && !a && !r) { succ[nc][0]=0; succ[nc][1]=0; succ[nc][2]=0; nc++; } // L_STATE
+        if (s == 1 && a)        { succ[nc][0]=0; succ[nc][1]=0; succ[nc][2]=0; nc++; } // DELETE
+        succ[nc][0]=2; succ[nc][1]=0; succ[nc][2]=0; nc++;                              // DISCONNECT
+
+        for (int i = 0; i < nc; i++)
+        {
+            int nv = ENC(succ[i][0], succ[i][1], succ[i][2]);
+            if (!seen[nv]) { seen[nv] = true; q[tail++] = nv; }
+        }
+    }
+    #undef ENC
+    return found;
+}
+
+/*
  * ============================================================
  * Explicit tests
  * ============================================================
  */
-
 static int tests_passed = 0;
 static int tests_failed = 0;
 
@@ -1152,6 +1211,22 @@ static void test_room_product(void)
             printf("[FAIL] buggy variant NOT caught: %s\n", variants[i].label);
             ++tests_failed;
         }
+    }
+
+    printf("\n--- Tier-3b: code-faithful LEAVE (window check) ---\n");
+    if (kripke_room_leave_window_reachable())
+    {
+        printf("[INFO] the code's non-atomic LEAVE exposes a window where the\n");
+        printf("       room membership flag disagrees with STATE_IN_ROOM:\n");
+        printf("       (IN_ROOM, not-in-array, [room name maybe empty]).\n");
+        printf("       This is the SAME shape as bug B, but on the LEAVE path.\n");
+        printf("       The Tier-3 (atomic LEAVE) model does NOT capture it.\n");
+        ++tests_passed;
+    }
+    else
+    {
+        printf("[INFO] no LEAVE window (LEAVE matches the atomic model)\n");
+        ++tests_passed;
     }
 }
 
