@@ -1,0 +1,2 @@
+Compiled generated/core_regression.c with GCC and the project state_machine.c.
+Core snapshot regression: 0 failures

@@ -1,0 +1,2804 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "id": "E0",
+      "events": [
+        "TCP_DISCONNECT"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E1",
+      "events": [
+        "IDLE_TIMEOUT"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E2",
+      "events": [
+        "FIRST_BYTES"
+      ],
+      "expected_state": "S2",
+      "expected_result": "OK",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E4",
+      "events": [
+        "FIRST_BYTES",
+        "TCP_DISCONNECT"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E5",
+      "events": [
+        "FIRST_BYTES",
+        "IDLE_TIMEOUT"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E6",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_PARTIAL"
+      ],
+      "expected_state": "S2",
+      "expected_result": "WAIT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E7",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID"
+      ],
+      "expected_state": "S3",
+      "expected_result": "UPGRADED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E8",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_INVALID"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E9",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "TCP_DISCONNECT"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E10",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "IDLE_TIMEOUT"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E11",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "FRAME_PARTIAL"
+      ],
+      "expected_state": "S3",
+      "expected_result": "WAIT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E12",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "FRAME_OTHER_OPCODE"
+      ],
+      "expected_state": "S3",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E13",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "TEXT_EMPTY"
+      ],
+      "expected_state": "S3",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E14",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "TEXT_MISSING_TYPE"
+      ],
+      "expected_state": "S3",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E15",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "COMMAND_UNKNOWN"
+      ],
+      "expected_state": "S3",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E16",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "WS_PONG"
+      ],
+      "expected_state": "S3",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E17",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "WS_PING"
+      ],
+      "expected_state": "S3",
+      "expected_result": "PONG_ATTEMPT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E18",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "PING"
+      ],
+      "expected_state": "S3",
+      "expected_result": "PONG_ATTEMPT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E19",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "WS_CLOSE"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E20",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "FRAME_INVALID"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E21",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "REGISTER_OK"
+      ],
+      "expected_state": "S3",
+      "expected_result": "REGISTER_OK",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E22",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "REGISTER_MISSING_FIELDS"
+      ],
+      "expected_state": "S3",
+      "expected_result": "REGISTER_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E23",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "REGISTER_EXISTS"
+      ],
+      "expected_state": "S3",
+      "expected_result": "REGISTER_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E24",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "REGISTER_INVALID"
+      ],
+      "expected_state": "S3",
+      "expected_result": "REGISTER_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E25",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "REGISTER_IO_ERROR"
+      ],
+      "expected_state": "S3",
+      "expected_result": "REGISTER_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E26",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK"
+      ],
+      "expected_state": "S4",
+      "expected_result": "LOGIN_OK",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E27",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_MISSING_CREDENTIALS"
+      ],
+      "expected_state": "S3",
+      "expected_result": "LOGIN_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E28",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_BAD_CREDENTIALS"
+      ],
+      "expected_state": "S3",
+      "expected_result": "LOGIN_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E29",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_LOCKED"
+      ],
+      "expected_state": "S3",
+      "expected_result": "LOGIN_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E30",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_SESSION_DUP"
+      ],
+      "expected_state": "S3",
+      "expected_result": "LOGIN_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E31",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_SESSION_FULL"
+      ],
+      "expected_state": "S3",
+      "expected_result": "LOGIN_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E32",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "ROOMS"
+      ],
+      "expected_state": "S3",
+      "expected_result": "ERROR_LOGIN_REQUIRED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E33",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "JOIN_OK"
+      ],
+      "expected_state": "S3",
+      "expected_result": "ERROR_LOGIN_REQUIRED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E34",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "JOIN_INVALID_ROOM"
+      ],
+      "expected_state": "S3",
+      "expected_result": "ERROR_LOGIN_REQUIRED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E35",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "JOIN_BAD_CODE"
+      ],
+      "expected_state": "S3",
+      "expected_result": "ERROR_LOGIN_REQUIRED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E36",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "JOIN_NOT_FOUND"
+      ],
+      "expected_state": "S3",
+      "expected_result": "ERROR_LOGIN_REQUIRED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E37",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "JOIN_FULL"
+      ],
+      "expected_state": "S3",
+      "expected_result": "ERROR_LOGIN_REQUIRED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E38",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "JOIN_BAD_STATE"
+      ],
+      "expected_state": "S3",
+      "expected_result": "ERROR_LOGIN_REQUIRED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E39",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LEAVE"
+      ],
+      "expected_state": "S3",
+      "expected_result": "LEFT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E40",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGOUT"
+      ],
+      "expected_state": "S3",
+      "expected_result": "ERROR_NOT_LOGGED_IN",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E41",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "MESSAGE_VALID"
+      ],
+      "expected_state": "S3",
+      "expected_result": "ERROR_NOT_IN_ROOM",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E42",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "MESSAGE_MISSING_CONTENT"
+      ],
+      "expected_state": "S3",
+      "expected_result": "ERROR_NOT_IN_ROOM",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E43",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LIST"
+      ],
+      "expected_state": "S3",
+      "expected_result": "ERROR_NOT_IN_ROOM",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E44",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "TCP_DISCONNECT"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E45",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "IDLE_TIMEOUT"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E46",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "FRAME_PARTIAL"
+      ],
+      "expected_state": "S4",
+      "expected_result": "WAIT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E47",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "FRAME_OTHER_OPCODE"
+      ],
+      "expected_state": "S4",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E48",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "TEXT_EMPTY"
+      ],
+      "expected_state": "S4",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E49",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "TEXT_MISSING_TYPE"
+      ],
+      "expected_state": "S4",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E50",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "COMMAND_UNKNOWN"
+      ],
+      "expected_state": "S4",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E51",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "WS_PONG"
+      ],
+      "expected_state": "S4",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E52",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "WS_PING"
+      ],
+      "expected_state": "S4",
+      "expected_result": "PONG_ATTEMPT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E53",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "PING"
+      ],
+      "expected_state": "S4",
+      "expected_result": "PONG_ATTEMPT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E54",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "WS_CLOSE"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E55",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "FRAME_INVALID"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E56",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "REGISTER_OK"
+      ],
+      "expected_state": "S4",
+      "expected_result": "REGISTER_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E57",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "REGISTER_MISSING_FIELDS"
+      ],
+      "expected_state": "S4",
+      "expected_result": "REGISTER_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E58",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "REGISTER_EXISTS"
+      ],
+      "expected_state": "S4",
+      "expected_result": "REGISTER_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E59",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "REGISTER_INVALID"
+      ],
+      "expected_state": "S4",
+      "expected_result": "REGISTER_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E60",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "REGISTER_IO_ERROR"
+      ],
+      "expected_state": "S4",
+      "expected_result": "REGISTER_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E61",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGIN_OK"
+      ],
+      "expected_state": "S4",
+      "expected_result": "ERROR_ALREADY_LOGGED_IN",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E62",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGIN_MISSING_CREDENTIALS"
+      ],
+      "expected_state": "S4",
+      "expected_result": "ERROR_ALREADY_LOGGED_IN",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E63",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGIN_BAD_CREDENTIALS"
+      ],
+      "expected_state": "S4",
+      "expected_result": "ERROR_ALREADY_LOGGED_IN",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E64",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGIN_LOCKED"
+      ],
+      "expected_state": "S4",
+      "expected_result": "ERROR_ALREADY_LOGGED_IN",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E65",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGIN_SESSION_DUP"
+      ],
+      "expected_state": "S4",
+      "expected_result": "ERROR_ALREADY_LOGGED_IN",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E66",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGIN_SESSION_FULL"
+      ],
+      "expected_state": "S4",
+      "expected_result": "ERROR_ALREADY_LOGGED_IN",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E67",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "ROOMS"
+      ],
+      "expected_state": "S4",
+      "expected_result": "ROOM_LIST",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E68",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK"
+      ],
+      "expected_state": "S5",
+      "expected_result": "JOINED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E69",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_INVALID_ROOM"
+      ],
+      "expected_state": "S4",
+      "expected_result": "JOIN_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E70",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_BAD_CODE"
+      ],
+      "expected_state": "S4",
+      "expected_result": "JOIN_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E71",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_NOT_FOUND"
+      ],
+      "expected_state": "S4",
+      "expected_result": "JOIN_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E72",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_FULL"
+      ],
+      "expected_state": "S4",
+      "expected_result": "JOIN_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E73",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_BAD_STATE"
+      ],
+      "expected_state": "S4",
+      "expected_result": "JOIN_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E74",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LEAVE"
+      ],
+      "expected_state": "S4",
+      "expected_result": "LEFT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E75",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT"
+      ],
+      "expected_state": "S6",
+      "expected_result": "LOGGED_OUT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E76",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "MESSAGE_VALID"
+      ],
+      "expected_state": "S4",
+      "expected_result": "ERROR_NOT_IN_ROOM",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E77",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "MESSAGE_MISSING_CONTENT"
+      ],
+      "expected_state": "S4",
+      "expected_result": "ERROR_NOT_IN_ROOM",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E78",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LIST"
+      ],
+      "expected_state": "S4",
+      "expected_result": "ERROR_NOT_IN_ROOM",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E79",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "TCP_DISCONNECT"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E80",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "IDLE_TIMEOUT"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E81",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "FRAME_PARTIAL"
+      ],
+      "expected_state": "S5",
+      "expected_result": "WAIT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E82",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "FRAME_OTHER_OPCODE"
+      ],
+      "expected_state": "S5",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E83",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "TEXT_EMPTY"
+      ],
+      "expected_state": "S5",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E84",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "TEXT_MISSING_TYPE"
+      ],
+      "expected_state": "S5",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E85",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "COMMAND_UNKNOWN"
+      ],
+      "expected_state": "S5",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E86",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "WS_PONG"
+      ],
+      "expected_state": "S5",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E87",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "WS_PING"
+      ],
+      "expected_state": "S5",
+      "expected_result": "PONG_ATTEMPT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E88",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "PING"
+      ],
+      "expected_state": "S5",
+      "expected_result": "PONG_ATTEMPT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E89",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "WS_CLOSE"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E90",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "FRAME_INVALID"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E91",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "REGISTER_OK"
+      ],
+      "expected_state": "S5",
+      "expected_result": "REGISTER_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E92",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "REGISTER_MISSING_FIELDS"
+      ],
+      "expected_state": "S5",
+      "expected_result": "REGISTER_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E93",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "REGISTER_EXISTS"
+      ],
+      "expected_state": "S5",
+      "expected_result": "REGISTER_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E94",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "REGISTER_INVALID"
+      ],
+      "expected_state": "S5",
+      "expected_result": "REGISTER_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E95",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "REGISTER_IO_ERROR"
+      ],
+      "expected_state": "S5",
+      "expected_result": "REGISTER_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E96",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "LOGIN_OK"
+      ],
+      "expected_state": "S5",
+      "expected_result": "ERROR_ALREADY_LOGGED_IN",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E97",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "LOGIN_MISSING_CREDENTIALS"
+      ],
+      "expected_state": "S5",
+      "expected_result": "ERROR_ALREADY_LOGGED_IN",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E98",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "LOGIN_BAD_CREDENTIALS"
+      ],
+      "expected_state": "S5",
+      "expected_result": "ERROR_ALREADY_LOGGED_IN",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E99",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "LOGIN_LOCKED"
+      ],
+      "expected_state": "S5",
+      "expected_result": "ERROR_ALREADY_LOGGED_IN",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E100",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "LOGIN_SESSION_DUP"
+      ],
+      "expected_state": "S5",
+      "expected_result": "ERROR_ALREADY_LOGGED_IN",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E101",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "LOGIN_SESSION_FULL"
+      ],
+      "expected_state": "S5",
+      "expected_result": "ERROR_ALREADY_LOGGED_IN",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E102",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "ROOMS"
+      ],
+      "expected_state": "S5",
+      "expected_result": "ROOM_LIST",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E103",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "JOIN_OK"
+      ],
+      "expected_state": "S5",
+      "expected_result": "JOIN_FAIL_LEAVE_FIRST",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E104",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "JOIN_INVALID_ROOM"
+      ],
+      "expected_state": "S5",
+      "expected_result": "JOIN_FAIL_LEAVE_FIRST",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E105",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "JOIN_BAD_CODE"
+      ],
+      "expected_state": "S5",
+      "expected_result": "JOIN_FAIL_LEAVE_FIRST",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E106",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "JOIN_NOT_FOUND"
+      ],
+      "expected_state": "S5",
+      "expected_result": "JOIN_FAIL_LEAVE_FIRST",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E107",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "JOIN_FULL"
+      ],
+      "expected_state": "S5",
+      "expected_result": "JOIN_FAIL_LEAVE_FIRST",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E108",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "JOIN_BAD_STATE"
+      ],
+      "expected_state": "S5",
+      "expected_result": "JOIN_FAIL_LEAVE_FIRST",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E109",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "LEAVE"
+      ],
+      "expected_state": "S4",
+      "expected_result": "LEFT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E110",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "LOGOUT"
+      ],
+      "expected_state": "S6",
+      "expected_result": "LOGGED_OUT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E111",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID"
+      ],
+      "expected_state": "S7",
+      "expected_result": "BROADCAST_ATTEMPT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E112",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_MISSING_CONTENT"
+      ],
+      "expected_state": "S5",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E113",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "LIST"
+      ],
+      "expected_state": "S5",
+      "expected_result": "USER_LIST",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E114",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "ADMIN_DELETE_CURRENT_ROOM"
+      ],
+      "expected_state": "S4",
+      "expected_result": "ROOM_CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E115",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "TCP_DISCONNECT"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E116",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "IDLE_TIMEOUT"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E117",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL"
+      ],
+      "expected_state": "S8",
+      "expected_result": "WAIT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E118",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_OTHER_OPCODE"
+      ],
+      "expected_state": "S8",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E119",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "TEXT_EMPTY"
+      ],
+      "expected_state": "S8",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E120",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "TEXT_MISSING_TYPE"
+      ],
+      "expected_state": "S8",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E121",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "COMMAND_UNKNOWN"
+      ],
+      "expected_state": "S8",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E122",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "WS_PONG"
+      ],
+      "expected_state": "S8",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E123",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "WS_PING"
+      ],
+      "expected_state": "S8",
+      "expected_result": "PONG_ATTEMPT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E124",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "PING"
+      ],
+      "expected_state": "S8",
+      "expected_result": "PONG_ATTEMPT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E125",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "WS_CLOSE"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E126",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_INVALID"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E127",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "REGISTER_OK"
+      ],
+      "expected_state": "S8",
+      "expected_result": "REGISTER_OK",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E128",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "REGISTER_MISSING_FIELDS"
+      ],
+      "expected_state": "S8",
+      "expected_result": "REGISTER_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E129",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "REGISTER_EXISTS"
+      ],
+      "expected_state": "S8",
+      "expected_result": "REGISTER_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E130",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "REGISTER_INVALID"
+      ],
+      "expected_state": "S8",
+      "expected_result": "REGISTER_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E131",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "REGISTER_IO_ERROR"
+      ],
+      "expected_state": "S8",
+      "expected_result": "REGISTER_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E132",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "LOGIN_OK"
+      ],
+      "expected_state": "S4",
+      "expected_result": "LOGIN_OK",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E133",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "LOGIN_MISSING_CREDENTIALS"
+      ],
+      "expected_state": "S8",
+      "expected_result": "LOGIN_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E134",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "LOGIN_BAD_CREDENTIALS"
+      ],
+      "expected_state": "S8",
+      "expected_result": "LOGIN_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E135",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "LOGIN_LOCKED"
+      ],
+      "expected_state": "S8",
+      "expected_result": "LOGIN_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E136",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "LOGIN_SESSION_DUP"
+      ],
+      "expected_state": "S8",
+      "expected_result": "LOGIN_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E137",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "LOGIN_SESSION_FULL"
+      ],
+      "expected_state": "S8",
+      "expected_result": "LOGIN_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E138",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "ROOMS"
+      ],
+      "expected_state": "S8",
+      "expected_result": "ERROR_LOGIN_REQUIRED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E139",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "JOIN_OK"
+      ],
+      "expected_state": "S8",
+      "expected_result": "ERROR_LOGIN_REQUIRED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E140",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "JOIN_INVALID_ROOM"
+      ],
+      "expected_state": "S8",
+      "expected_result": "ERROR_LOGIN_REQUIRED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E141",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "JOIN_BAD_CODE"
+      ],
+      "expected_state": "S8",
+      "expected_result": "ERROR_LOGIN_REQUIRED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E142",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "JOIN_NOT_FOUND"
+      ],
+      "expected_state": "S8",
+      "expected_result": "ERROR_LOGIN_REQUIRED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E143",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "JOIN_FULL"
+      ],
+      "expected_state": "S8",
+      "expected_result": "ERROR_LOGIN_REQUIRED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E144",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "JOIN_BAD_STATE"
+      ],
+      "expected_state": "S8",
+      "expected_result": "ERROR_LOGIN_REQUIRED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E145",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "LEAVE"
+      ],
+      "expected_state": "S8",
+      "expected_result": "LEFT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E146",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "LOGOUT"
+      ],
+      "expected_state": "S8",
+      "expected_result": "ERROR_NOT_LOGGED_IN",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E147",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "MESSAGE_VALID"
+      ],
+      "expected_state": "S8",
+      "expected_result": "ERROR_NOT_IN_ROOM",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E148",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "MESSAGE_MISSING_CONTENT"
+      ],
+      "expected_state": "S8",
+      "expected_result": "ERROR_NOT_IN_ROOM",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E149",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "LIST"
+      ],
+      "expected_state": "S8",
+      "expected_result": "ERROR_NOT_IN_ROOM",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E150",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "TCP_DISCONNECT"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E151",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "IDLE_TIMEOUT"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E152",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "FRAME_PARTIAL"
+      ],
+      "expected_state": "S5",
+      "expected_result": "WAIT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E153",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "FRAME_OTHER_OPCODE"
+      ],
+      "expected_state": "S5",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E154",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "TEXT_EMPTY"
+      ],
+      "expected_state": "S5",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E155",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "TEXT_MISSING_TYPE"
+      ],
+      "expected_state": "S5",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E156",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "COMMAND_UNKNOWN"
+      ],
+      "expected_state": "S5",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E157",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "WS_PONG"
+      ],
+      "expected_state": "S5",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E158",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "WS_PING"
+      ],
+      "expected_state": "S5",
+      "expected_result": "PONG_ATTEMPT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E159",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "PING"
+      ],
+      "expected_state": "S5",
+      "expected_result": "PONG_ATTEMPT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E160",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "WS_CLOSE"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E161",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "FRAME_INVALID"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E162",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "REGISTER_OK"
+      ],
+      "expected_state": "S5",
+      "expected_result": "REGISTER_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E163",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "REGISTER_MISSING_FIELDS"
+      ],
+      "expected_state": "S5",
+      "expected_result": "REGISTER_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E164",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "REGISTER_EXISTS"
+      ],
+      "expected_state": "S5",
+      "expected_result": "REGISTER_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E165",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "REGISTER_INVALID"
+      ],
+      "expected_state": "S5",
+      "expected_result": "REGISTER_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E166",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "REGISTER_IO_ERROR"
+      ],
+      "expected_state": "S5",
+      "expected_result": "REGISTER_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E167",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "LOGIN_OK"
+      ],
+      "expected_state": "S5",
+      "expected_result": "ERROR_ALREADY_LOGGED_IN",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E168",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "LOGIN_MISSING_CREDENTIALS"
+      ],
+      "expected_state": "S5",
+      "expected_result": "ERROR_ALREADY_LOGGED_IN",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E169",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "LOGIN_BAD_CREDENTIALS"
+      ],
+      "expected_state": "S5",
+      "expected_result": "ERROR_ALREADY_LOGGED_IN",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E170",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "LOGIN_LOCKED"
+      ],
+      "expected_state": "S5",
+      "expected_result": "ERROR_ALREADY_LOGGED_IN",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E171",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "LOGIN_SESSION_DUP"
+      ],
+      "expected_state": "S5",
+      "expected_result": "ERROR_ALREADY_LOGGED_IN",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E172",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "LOGIN_SESSION_FULL"
+      ],
+      "expected_state": "S5",
+      "expected_result": "ERROR_ALREADY_LOGGED_IN",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E173",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "ROOMS"
+      ],
+      "expected_state": "S5",
+      "expected_result": "ROOM_LIST",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E174",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "JOIN_OK"
+      ],
+      "expected_state": "S5",
+      "expected_result": "JOIN_FAIL_LEAVE_FIRST",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E175",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "JOIN_INVALID_ROOM"
+      ],
+      "expected_state": "S5",
+      "expected_result": "JOIN_FAIL_LEAVE_FIRST",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E176",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "JOIN_BAD_CODE"
+      ],
+      "expected_state": "S5",
+      "expected_result": "JOIN_FAIL_LEAVE_FIRST",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E177",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "JOIN_NOT_FOUND"
+      ],
+      "expected_state": "S5",
+      "expected_result": "JOIN_FAIL_LEAVE_FIRST",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E178",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "JOIN_FULL"
+      ],
+      "expected_state": "S5",
+      "expected_result": "JOIN_FAIL_LEAVE_FIRST",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E179",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "JOIN_BAD_STATE"
+      ],
+      "expected_state": "S5",
+      "expected_result": "JOIN_FAIL_LEAVE_FIRST",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E180",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "LEAVE"
+      ],
+      "expected_state": "S4",
+      "expected_result": "LEFT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E181",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "LOGOUT"
+      ],
+      "expected_state": "S6",
+      "expected_result": "LOGGED_OUT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E182",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "MESSAGE_VALID"
+      ],
+      "expected_state": "S7",
+      "expected_result": "BROADCAST_ATTEMPT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E183",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "MESSAGE_MISSING_CONTENT"
+      ],
+      "expected_state": "S5",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E184",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "LIST"
+      ],
+      "expected_state": "S5",
+      "expected_result": "USER_LIST",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E185",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "JOIN_OK",
+        "MESSAGE_VALID",
+        "ADMIN_DELETE_CURRENT_ROOM"
+      ],
+      "expected_state": "S4",
+      "expected_result": "ROOM_CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E186",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "TCP_DISCONNECT"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E187",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "IDLE_TIMEOUT"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E188",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "FRAME_PARTIAL"
+      ],
+      "expected_state": "S8",
+      "expected_result": "WAIT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E189",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "FRAME_OTHER_OPCODE"
+      ],
+      "expected_state": "S8",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E190",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "TEXT_EMPTY"
+      ],
+      "expected_state": "S8",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E191",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "TEXT_MISSING_TYPE"
+      ],
+      "expected_state": "S8",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E192",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "COMMAND_UNKNOWN"
+      ],
+      "expected_state": "S8",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E193",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "WS_PONG"
+      ],
+      "expected_state": "S8",
+      "expected_result": "IGNORED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E194",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "WS_PING"
+      ],
+      "expected_state": "S8",
+      "expected_result": "PONG_ATTEMPT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E195",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "PING"
+      ],
+      "expected_state": "S8",
+      "expected_result": "PONG_ATTEMPT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E196",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "WS_CLOSE"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E197",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "FRAME_INVALID"
+      ],
+      "expected_state": "S1",
+      "expected_result": "CLOSED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E198",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "REGISTER_OK"
+      ],
+      "expected_state": "S8",
+      "expected_result": "REGISTER_OK",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E199",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "REGISTER_MISSING_FIELDS"
+      ],
+      "expected_state": "S8",
+      "expected_result": "REGISTER_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E200",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "REGISTER_EXISTS"
+      ],
+      "expected_state": "S8",
+      "expected_result": "REGISTER_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E201",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "REGISTER_INVALID"
+      ],
+      "expected_state": "S8",
+      "expected_result": "REGISTER_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E202",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "REGISTER_IO_ERROR"
+      ],
+      "expected_state": "S8",
+      "expected_result": "REGISTER_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E203",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "LOGIN_OK"
+      ],
+      "expected_state": "S4",
+      "expected_result": "LOGIN_OK",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E204",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "LOGIN_MISSING_CREDENTIALS"
+      ],
+      "expected_state": "S8",
+      "expected_result": "LOGIN_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E205",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "LOGIN_BAD_CREDENTIALS"
+      ],
+      "expected_state": "S8",
+      "expected_result": "LOGIN_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E206",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "LOGIN_LOCKED"
+      ],
+      "expected_state": "S8",
+      "expected_result": "LOGIN_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E207",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "LOGIN_SESSION_DUP"
+      ],
+      "expected_state": "S8",
+      "expected_result": "LOGIN_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E208",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "LOGIN_SESSION_FULL"
+      ],
+      "expected_state": "S8",
+      "expected_result": "LOGIN_FAIL",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E209",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "ROOMS"
+      ],
+      "expected_state": "S8",
+      "expected_result": "ERROR_LOGIN_REQUIRED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E210",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "JOIN_OK"
+      ],
+      "expected_state": "S8",
+      "expected_result": "ERROR_LOGIN_REQUIRED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E211",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "JOIN_INVALID_ROOM"
+      ],
+      "expected_state": "S8",
+      "expected_result": "ERROR_LOGIN_REQUIRED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E212",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "JOIN_BAD_CODE"
+      ],
+      "expected_state": "S8",
+      "expected_result": "ERROR_LOGIN_REQUIRED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E213",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "JOIN_NOT_FOUND"
+      ],
+      "expected_state": "S8",
+      "expected_result": "ERROR_LOGIN_REQUIRED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E214",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "JOIN_FULL"
+      ],
+      "expected_state": "S8",
+      "expected_result": "ERROR_LOGIN_REQUIRED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E215",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "JOIN_BAD_STATE"
+      ],
+      "expected_state": "S8",
+      "expected_result": "ERROR_LOGIN_REQUIRED",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E216",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "LEAVE"
+      ],
+      "expected_state": "S8",
+      "expected_result": "LEFT",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E217",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "LOGOUT"
+      ],
+      "expected_state": "S8",
+      "expected_result": "ERROR_NOT_LOGGED_IN",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E218",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "MESSAGE_VALID"
+      ],
+      "expected_state": "S8",
+      "expected_result": "ERROR_NOT_IN_ROOM",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E219",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "MESSAGE_MISSING_CONTENT"
+      ],
+      "expected_state": "S8",
+      "expected_result": "ERROR_NOT_IN_ROOM",
+      "scope": "abstract command model; network adapter required"
+    },
+    {
+      "id": "E220",
+      "events": [
+        "FIRST_BYTES",
+        "HTTP_UPGRADE_VALID",
+        "LOGIN_OK",
+        "LOGOUT",
+        "FRAME_PARTIAL",
+        "LIST"
+      ],
+      "expected_state": "S8",
+      "expected_result": "ERROR_NOT_IN_ROOM",
+      "scope": "abstract command model; network adapter required"
+    }
+  ]
+}

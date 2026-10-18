@@ -1,0 +1,21 @@
+{
+  "states": [
+    "S0",
+    "S2",
+    "S3",
+    "S4",
+    "S7"
+  ],
+  "edge_ids": [
+    "E2",
+    "E7",
+    "E26",
+    "E76"
+  ],
+  "events": [
+    "FIRST_BYTES",
+    "HTTP_UPGRADE_VALID",
+    "LOGIN_OK",
+    "MESSAGE_VALID"
+  ]
+}

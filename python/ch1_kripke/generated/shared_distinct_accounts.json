@@ -1,0 +1,3246 @@
+{
+  "schema_version": 1,
+  "name": "shared_distinct_accounts",
+  "initial_states": [
+    "G0"
+  ],
+  "states": [
+    {
+      "id": "G0",
+      "phases": [
+        "IDLE",
+        "IDLE"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G1",
+      "phases": [
+        "HTTP_HANDSHAKE",
+        "IDLE"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G2",
+      "phases": [
+        "CLOSED",
+        "IDLE"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G3",
+      "phases": [
+        "IDLE",
+        "HTTP_HANDSHAKE"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G4",
+      "phases": [
+        "IDLE",
+        "CLOSED"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G5",
+      "phases": [
+        "IDLE",
+        "IDLE"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": false,
+      "labels": [
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G6",
+      "phases": [
+        "WS_CONNECTED",
+        "IDLE"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G7",
+      "phases": [
+        "HTTP_HANDSHAKE",
+        "HTTP_HANDSHAKE"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G8",
+      "phases": [
+        "HTTP_HANDSHAKE",
+        "CLOSED"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G9",
+      "phases": [
+        "HTTP_HANDSHAKE",
+        "IDLE"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": false,
+      "labels": [
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G10",
+      "phases": [
+        "CLOSED",
+        "HTTP_HANDSHAKE"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G11",
+      "phases": [
+        "CLOSED",
+        "CLOSED"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G12",
+      "phases": [
+        "CLOSED",
+        "IDLE"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": false,
+      "labels": [
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G13",
+      "phases": [
+        "IDLE",
+        "WS_CONNECTED"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G14",
+      "phases": [
+        "IDLE",
+        "HTTP_HANDSHAKE"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": false,
+      "labels": [
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G15",
+      "phases": [
+        "IDLE",
+        "CLOSED"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": false,
+      "labels": [
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G16",
+      "phases": [
+        "AUTHENTICATED",
+        "IDLE"
+      ],
+      "auth": [
+        true,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G17",
+      "phases": [
+        "WS_CONNECTED",
+        "HTTP_HANDSHAKE"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G18",
+      "phases": [
+        "WS_CONNECTED",
+        "CLOSED"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G19",
+      "phases": [
+        "WS_CONNECTED",
+        "IDLE"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": false,
+      "labels": [
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G20",
+      "phases": [
+        "HTTP_HANDSHAKE",
+        "WS_CONNECTED"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G21",
+      "phases": [
+        "HTTP_HANDSHAKE",
+        "HTTP_HANDSHAKE"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": false,
+      "labels": [
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G22",
+      "phases": [
+        "HTTP_HANDSHAKE",
+        "CLOSED"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": false,
+      "labels": [
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G23",
+      "phases": [
+        "CLOSED",
+        "WS_CONNECTED"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G24",
+      "phases": [
+        "CLOSED",
+        "HTTP_HANDSHAKE"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": false,
+      "labels": [
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G25",
+      "phases": [
+        "CLOSED",
+        "CLOSED"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": false,
+      "labels": [
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G26",
+      "phases": [
+        "IDLE",
+        "AUTHENTICATED"
+      ],
+      "auth": [
+        false,
+        true
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G27",
+      "phases": [
+        "IDLE",
+        "WS_CONNECTED"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": false,
+      "labels": [
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G28",
+      "phases": [
+        "IN_ROOM",
+        "IDLE"
+      ],
+      "auth": [
+        true,
+        false
+      ],
+      "members": [
+        true,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "has_members",
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G29",
+      "phases": [
+        "AUTHENTICATED",
+        "HTTP_HANDSHAKE"
+      ],
+      "auth": [
+        true,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G30",
+      "phases": [
+        "AUTHENTICATED",
+        "CLOSED"
+      ],
+      "auth": [
+        true,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G31",
+      "phases": [
+        "AUTHENTICATED",
+        "IDLE"
+      ],
+      "auth": [
+        true,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": false,
+      "labels": [
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G32",
+      "phases": [
+        "WS_CONNECTED",
+        "WS_CONNECTED"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G33",
+      "phases": [
+        "WS_CONNECTED",
+        "HTTP_HANDSHAKE"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": false,
+      "labels": [
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G34",
+      "phases": [
+        "WS_CONNECTED",
+        "CLOSED"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": false,
+      "labels": [
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G35",
+      "phases": [
+        "HTTP_HANDSHAKE",
+        "AUTHENTICATED"
+      ],
+      "auth": [
+        false,
+        true
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G36",
+      "phases": [
+        "HTTP_HANDSHAKE",
+        "WS_CONNECTED"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": false,
+      "labels": [
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G37",
+      "phases": [
+        "CLOSED",
+        "AUTHENTICATED"
+      ],
+      "auth": [
+        false,
+        true
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G38",
+      "phases": [
+        "CLOSED",
+        "WS_CONNECTED"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": false,
+      "labels": [
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G39",
+      "phases": [
+        "IDLE",
+        "IN_ROOM"
+      ],
+      "auth": [
+        false,
+        true
+      ],
+      "members": [
+        false,
+        true
+      ],
+      "room_exists": true,
+      "labels": [
+        "has_members",
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G40",
+      "phases": [
+        "IDLE",
+        "AUTHENTICATED"
+      ],
+      "auth": [
+        false,
+        true
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": false,
+      "labels": [
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G41",
+      "phases": [
+        "IN_ROOM",
+        "HTTP_HANDSHAKE"
+      ],
+      "auth": [
+        true,
+        false
+      ],
+      "members": [
+        true,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "has_members",
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G42",
+      "phases": [
+        "IN_ROOM",
+        "CLOSED"
+      ],
+      "auth": [
+        true,
+        false
+      ],
+      "members": [
+        true,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "has_members",
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G43",
+      "phases": [
+        "AUTHENTICATED",
+        "WS_CONNECTED"
+      ],
+      "auth": [
+        true,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G44",
+      "phases": [
+        "AUTHENTICATED",
+        "HTTP_HANDSHAKE"
+      ],
+      "auth": [
+        true,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": false,
+      "labels": [
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G45",
+      "phases": [
+        "AUTHENTICATED",
+        "CLOSED"
+      ],
+      "auth": [
+        true,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": false,
+      "labels": [
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G46",
+      "phases": [
+        "WS_CONNECTED",
+        "AUTHENTICATED"
+      ],
+      "auth": [
+        false,
+        true
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G47",
+      "phases": [
+        "WS_CONNECTED",
+        "WS_CONNECTED"
+      ],
+      "auth": [
+        false,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": false,
+      "labels": [
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G48",
+      "phases": [
+        "HTTP_HANDSHAKE",
+        "IN_ROOM"
+      ],
+      "auth": [
+        false,
+        true
+      ],
+      "members": [
+        false,
+        true
+      ],
+      "room_exists": true,
+      "labels": [
+        "has_members",
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G49",
+      "phases": [
+        "HTTP_HANDSHAKE",
+        "AUTHENTICATED"
+      ],
+      "auth": [
+        false,
+        true
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": false,
+      "labels": [
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G50",
+      "phases": [
+        "CLOSED",
+        "IN_ROOM"
+      ],
+      "auth": [
+        false,
+        true
+      ],
+      "members": [
+        false,
+        true
+      ],
+      "room_exists": true,
+      "labels": [
+        "has_members",
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G51",
+      "phases": [
+        "CLOSED",
+        "AUTHENTICATED"
+      ],
+      "auth": [
+        false,
+        true
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": false,
+      "labels": [
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G52",
+      "phases": [
+        "IN_ROOM",
+        "WS_CONNECTED"
+      ],
+      "auth": [
+        true,
+        false
+      ],
+      "members": [
+        true,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "has_members",
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G53",
+      "phases": [
+        "AUTHENTICATED",
+        "AUTHENTICATED"
+      ],
+      "auth": [
+        true,
+        true
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "both_authenticated",
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G54",
+      "phases": [
+        "AUTHENTICATED",
+        "WS_CONNECTED"
+      ],
+      "auth": [
+        true,
+        false
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": false,
+      "labels": [
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G55",
+      "phases": [
+        "WS_CONNECTED",
+        "IN_ROOM"
+      ],
+      "auth": [
+        false,
+        true
+      ],
+      "members": [
+        false,
+        true
+      ],
+      "room_exists": true,
+      "labels": [
+        "has_members",
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G56",
+      "phases": [
+        "WS_CONNECTED",
+        "AUTHENTICATED"
+      ],
+      "auth": [
+        false,
+        true
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": false,
+      "labels": [
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G57",
+      "phases": [
+        "IN_ROOM",
+        "AUTHENTICATED"
+      ],
+      "auth": [
+        true,
+        true
+      ],
+      "members": [
+        true,
+        false
+      ],
+      "room_exists": true,
+      "labels": [
+        "both_authenticated",
+        "has_members",
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G58",
+      "phases": [
+        "AUTHENTICATED",
+        "IN_ROOM"
+      ],
+      "auth": [
+        true,
+        true
+      ],
+      "members": [
+        false,
+        true
+      ],
+      "room_exists": true,
+      "labels": [
+        "both_authenticated",
+        "has_members",
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G59",
+      "phases": [
+        "AUTHENTICATED",
+        "AUTHENTICATED"
+      ],
+      "auth": [
+        true,
+        true
+      ],
+      "members": [
+        false,
+        false
+      ],
+      "room_exists": false,
+      "labels": [
+        "both_authenticated",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    },
+    {
+      "id": "G60",
+      "phases": [
+        "IN_ROOM",
+        "IN_ROOM"
+      ],
+      "auth": [
+        true,
+        true
+      ],
+      "members": [
+        true,
+        true
+      ],
+      "room_exists": true,
+      "labels": [
+        "both_authenticated",
+        "has_members",
+        "room_exists",
+        "membership_consistent",
+        "members_authenticated"
+      ]
+    }
+  ],
+  "transitions": [
+    {
+      "id": "G_E0",
+      "from": "G0",
+      "to": "G1",
+      "event": "A:ACCEPT:ACCEPT"
+    },
+    {
+      "id": "G_E1",
+      "from": "G0",
+      "to": "G2",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E2",
+      "from": "G0",
+      "to": "G3",
+      "event": "B:ACCEPT:ACCEPT"
+    },
+    {
+      "id": "G_E3",
+      "from": "G0",
+      "to": "G4",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E4",
+      "from": "G0",
+      "to": "G5",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E5",
+      "from": "G1",
+      "to": "G6",
+      "event": "A:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK"
+    },
+    {
+      "id": "G_E6",
+      "from": "G1",
+      "to": "G2",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E7",
+      "from": "G1",
+      "to": "G7",
+      "event": "B:ACCEPT:ACCEPT"
+    },
+    {
+      "id": "G_E8",
+      "from": "G1",
+      "to": "G8",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E9",
+      "from": "G1",
+      "to": "G9",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E10",
+      "from": "G2",
+      "to": "G10",
+      "event": "B:ACCEPT:ACCEPT"
+    },
+    {
+      "id": "G_E11",
+      "from": "G2",
+      "to": "G11",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E12",
+      "from": "G2",
+      "to": "G12",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E13",
+      "from": "G3",
+      "to": "G7",
+      "event": "A:ACCEPT:ACCEPT"
+    },
+    {
+      "id": "G_E14",
+      "from": "G3",
+      "to": "G10",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E15",
+      "from": "G3",
+      "to": "G13",
+      "event": "B:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK"
+    },
+    {
+      "id": "G_E16",
+      "from": "G3",
+      "to": "G4",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E17",
+      "from": "G3",
+      "to": "G14",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E18",
+      "from": "G4",
+      "to": "G8",
+      "event": "A:ACCEPT:ACCEPT"
+    },
+    {
+      "id": "G_E19",
+      "from": "G4",
+      "to": "G11",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E20",
+      "from": "G4",
+      "to": "G15",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E21",
+      "from": "G5",
+      "to": "G9",
+      "event": "A:ACCEPT:ACCEPT"
+    },
+    {
+      "id": "G_E22",
+      "from": "G5",
+      "to": "G12",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E23",
+      "from": "G5",
+      "to": "G14",
+      "event": "B:ACCEPT:ACCEPT"
+    },
+    {
+      "id": "G_E24",
+      "from": "G5",
+      "to": "G15",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E25",
+      "from": "G5",
+      "to": "G0",
+      "event": "ADMIN_CREATE_ROOM"
+    },
+    {
+      "id": "G_E26",
+      "from": "G6",
+      "to": "G16",
+      "event": "A:LOGIN_OK:LOGIN_OK"
+    },
+    {
+      "id": "G_E27",
+      "from": "G6",
+      "to": "G6",
+      "event": "A:LOGIN_FAIL:LOGIN_FAIL"
+    },
+    {
+      "id": "G_E28",
+      "from": "G6",
+      "to": "G2",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E29",
+      "from": "G6",
+      "to": "G17",
+      "event": "B:ACCEPT:ACCEPT"
+    },
+    {
+      "id": "G_E30",
+      "from": "G6",
+      "to": "G18",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E31",
+      "from": "G6",
+      "to": "G19",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E32",
+      "from": "G7",
+      "to": "G17",
+      "event": "A:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK"
+    },
+    {
+      "id": "G_E33",
+      "from": "G7",
+      "to": "G10",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E34",
+      "from": "G7",
+      "to": "G20",
+      "event": "B:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK"
+    },
+    {
+      "id": "G_E35",
+      "from": "G7",
+      "to": "G8",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E36",
+      "from": "G7",
+      "to": "G21",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E37",
+      "from": "G8",
+      "to": "G18",
+      "event": "A:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK"
+    },
+    {
+      "id": "G_E38",
+      "from": "G8",
+      "to": "G11",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E39",
+      "from": "G8",
+      "to": "G22",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E40",
+      "from": "G9",
+      "to": "G19",
+      "event": "A:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK"
+    },
+    {
+      "id": "G_E41",
+      "from": "G9",
+      "to": "G12",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E42",
+      "from": "G9",
+      "to": "G21",
+      "event": "B:ACCEPT:ACCEPT"
+    },
+    {
+      "id": "G_E43",
+      "from": "G9",
+      "to": "G22",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E44",
+      "from": "G9",
+      "to": "G1",
+      "event": "ADMIN_CREATE_ROOM"
+    },
+    {
+      "id": "G_E45",
+      "from": "G10",
+      "to": "G23",
+      "event": "B:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK"
+    },
+    {
+      "id": "G_E46",
+      "from": "G10",
+      "to": "G11",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E47",
+      "from": "G10",
+      "to": "G24",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E48",
+      "from": "G11",
+      "to": "G25",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E49",
+      "from": "G12",
+      "to": "G24",
+      "event": "B:ACCEPT:ACCEPT"
+    },
+    {
+      "id": "G_E50",
+      "from": "G12",
+      "to": "G25",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E51",
+      "from": "G12",
+      "to": "G2",
+      "event": "ADMIN_CREATE_ROOM"
+    },
+    {
+      "id": "G_E52",
+      "from": "G13",
+      "to": "G20",
+      "event": "A:ACCEPT:ACCEPT"
+    },
+    {
+      "id": "G_E53",
+      "from": "G13",
+      "to": "G23",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E54",
+      "from": "G13",
+      "to": "G26",
+      "event": "B:LOGIN_OK:LOGIN_OK"
+    },
+    {
+      "id": "G_E55",
+      "from": "G13",
+      "to": "G13",
+      "event": "B:LOGIN_FAIL:LOGIN_FAIL"
+    },
+    {
+      "id": "G_E56",
+      "from": "G13",
+      "to": "G4",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E57",
+      "from": "G13",
+      "to": "G27",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E58",
+      "from": "G14",
+      "to": "G21",
+      "event": "A:ACCEPT:ACCEPT"
+    },
+    {
+      "id": "G_E59",
+      "from": "G14",
+      "to": "G24",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E60",
+      "from": "G14",
+      "to": "G27",
+      "event": "B:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK"
+    },
+    {
+      "id": "G_E61",
+      "from": "G14",
+      "to": "G15",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E62",
+      "from": "G14",
+      "to": "G3",
+      "event": "ADMIN_CREATE_ROOM"
+    },
+    {
+      "id": "G_E63",
+      "from": "G15",
+      "to": "G22",
+      "event": "A:ACCEPT:ACCEPT"
+    },
+    {
+      "id": "G_E64",
+      "from": "G15",
+      "to": "G25",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E65",
+      "from": "G15",
+      "to": "G4",
+      "event": "ADMIN_CREATE_ROOM"
+    },
+    {
+      "id": "G_E66",
+      "from": "G16",
+      "to": "G28",
+      "event": "A:JOIN_OK:JOIN_OK"
+    },
+    {
+      "id": "G_E67",
+      "from": "G16",
+      "to": "G16",
+      "event": "A:JOIN_FAIL:JOIN_FAIL"
+    },
+    {
+      "id": "G_E68",
+      "from": "G16",
+      "to": "G6",
+      "event": "A:LOGOUT:LOGOUT"
+    },
+    {
+      "id": "G_E69",
+      "from": "G16",
+      "to": "G2",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E70",
+      "from": "G16",
+      "to": "G29",
+      "event": "B:ACCEPT:ACCEPT"
+    },
+    {
+      "id": "G_E71",
+      "from": "G16",
+      "to": "G30",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E72",
+      "from": "G16",
+      "to": "G31",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E73",
+      "from": "G17",
+      "to": "G29",
+      "event": "A:LOGIN_OK:LOGIN_OK"
+    },
+    {
+      "id": "G_E74",
+      "from": "G17",
+      "to": "G17",
+      "event": "A:LOGIN_FAIL:LOGIN_FAIL"
+    },
+    {
+      "id": "G_E75",
+      "from": "G17",
+      "to": "G10",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E76",
+      "from": "G17",
+      "to": "G32",
+      "event": "B:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK"
+    },
+    {
+      "id": "G_E77",
+      "from": "G17",
+      "to": "G18",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E78",
+      "from": "G17",
+      "to": "G33",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E79",
+      "from": "G18",
+      "to": "G30",
+      "event": "A:LOGIN_OK:LOGIN_OK"
+    },
+    {
+      "id": "G_E80",
+      "from": "G18",
+      "to": "G18",
+      "event": "A:LOGIN_FAIL:LOGIN_FAIL"
+    },
+    {
+      "id": "G_E81",
+      "from": "G18",
+      "to": "G11",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E82",
+      "from": "G18",
+      "to": "G34",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E83",
+      "from": "G19",
+      "to": "G31",
+      "event": "A:LOGIN_OK:LOGIN_OK"
+    },
+    {
+      "id": "G_E84",
+      "from": "G19",
+      "to": "G19",
+      "event": "A:LOGIN_FAIL:LOGIN_FAIL"
+    },
+    {
+      "id": "G_E85",
+      "from": "G19",
+      "to": "G12",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E86",
+      "from": "G19",
+      "to": "G33",
+      "event": "B:ACCEPT:ACCEPT"
+    },
+    {
+      "id": "G_E87",
+      "from": "G19",
+      "to": "G34",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E88",
+      "from": "G19",
+      "to": "G6",
+      "event": "ADMIN_CREATE_ROOM"
+    },
+    {
+      "id": "G_E89",
+      "from": "G20",
+      "to": "G32",
+      "event": "A:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK"
+    },
+    {
+      "id": "G_E90",
+      "from": "G20",
+      "to": "G23",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E91",
+      "from": "G20",
+      "to": "G35",
+      "event": "B:LOGIN_OK:LOGIN_OK"
+    },
+    {
+      "id": "G_E92",
+      "from": "G20",
+      "to": "G20",
+      "event": "B:LOGIN_FAIL:LOGIN_FAIL"
+    },
+    {
+      "id": "G_E93",
+      "from": "G20",
+      "to": "G8",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E94",
+      "from": "G20",
+      "to": "G36",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E95",
+      "from": "G21",
+      "to": "G33",
+      "event": "A:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK"
+    },
+    {
+      "id": "G_E96",
+      "from": "G21",
+      "to": "G24",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E97",
+      "from": "G21",
+      "to": "G36",
+      "event": "B:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK"
+    },
+    {
+      "id": "G_E98",
+      "from": "G21",
+      "to": "G22",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E99",
+      "from": "G21",
+      "to": "G7",
+      "event": "ADMIN_CREATE_ROOM"
+    },
+    {
+      "id": "G_E100",
+      "from": "G22",
+      "to": "G34",
+      "event": "A:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK"
+    },
+    {
+      "id": "G_E101",
+      "from": "G22",
+      "to": "G25",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E102",
+      "from": "G22",
+      "to": "G8",
+      "event": "ADMIN_CREATE_ROOM"
+    },
+    {
+      "id": "G_E103",
+      "from": "G23",
+      "to": "G37",
+      "event": "B:LOGIN_OK:LOGIN_OK"
+    },
+    {
+      "id": "G_E104",
+      "from": "G23",
+      "to": "G23",
+      "event": "B:LOGIN_FAIL:LOGIN_FAIL"
+    },
+    {
+      "id": "G_E105",
+      "from": "G23",
+      "to": "G11",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E106",
+      "from": "G23",
+      "to": "G38",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E107",
+      "from": "G24",
+      "to": "G38",
+      "event": "B:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK"
+    },
+    {
+      "id": "G_E108",
+      "from": "G24",
+      "to": "G25",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E109",
+      "from": "G24",
+      "to": "G10",
+      "event": "ADMIN_CREATE_ROOM"
+    },
+    {
+      "id": "G_E110",
+      "from": "G25",
+      "to": "G11",
+      "event": "ADMIN_CREATE_ROOM"
+    },
+    {
+      "id": "G_E111",
+      "from": "G26",
+      "to": "G35",
+      "event": "A:ACCEPT:ACCEPT"
+    },
+    {
+      "id": "G_E112",
+      "from": "G26",
+      "to": "G37",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E113",
+      "from": "G26",
+      "to": "G39",
+      "event": "B:JOIN_OK:JOIN_OK"
+    },
+    {
+      "id": "G_E114",
+      "from": "G26",
+      "to": "G26",
+      "event": "B:JOIN_FAIL:JOIN_FAIL"
+    },
+    {
+      "id": "G_E115",
+      "from": "G26",
+      "to": "G13",
+      "event": "B:LOGOUT:LOGOUT"
+    },
+    {
+      "id": "G_E116",
+      "from": "G26",
+      "to": "G4",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E117",
+      "from": "G26",
+      "to": "G40",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E118",
+      "from": "G27",
+      "to": "G36",
+      "event": "A:ACCEPT:ACCEPT"
+    },
+    {
+      "id": "G_E119",
+      "from": "G27",
+      "to": "G38",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E120",
+      "from": "G27",
+      "to": "G40",
+      "event": "B:LOGIN_OK:LOGIN_OK"
+    },
+    {
+      "id": "G_E121",
+      "from": "G27",
+      "to": "G27",
+      "event": "B:LOGIN_FAIL:LOGIN_FAIL"
+    },
+    {
+      "id": "G_E122",
+      "from": "G27",
+      "to": "G15",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E123",
+      "from": "G27",
+      "to": "G13",
+      "event": "ADMIN_CREATE_ROOM"
+    },
+    {
+      "id": "G_E124",
+      "from": "G28",
+      "to": "G16",
+      "event": "A:LEAVE_OK:LEAVE_OK"
+    },
+    {
+      "id": "G_E125",
+      "from": "G28",
+      "to": "G2",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E126",
+      "from": "G28",
+      "to": "G41",
+      "event": "B:ACCEPT:ACCEPT"
+    },
+    {
+      "id": "G_E127",
+      "from": "G28",
+      "to": "G42",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E128",
+      "from": "G28",
+      "to": "G31",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E129",
+      "from": "G29",
+      "to": "G41",
+      "event": "A:JOIN_OK:JOIN_OK"
+    },
+    {
+      "id": "G_E130",
+      "from": "G29",
+      "to": "G29",
+      "event": "A:JOIN_FAIL:JOIN_FAIL"
+    },
+    {
+      "id": "G_E131",
+      "from": "G29",
+      "to": "G17",
+      "event": "A:LOGOUT:LOGOUT"
+    },
+    {
+      "id": "G_E132",
+      "from": "G29",
+      "to": "G10",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E133",
+      "from": "G29",
+      "to": "G43",
+      "event": "B:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK"
+    },
+    {
+      "id": "G_E134",
+      "from": "G29",
+      "to": "G30",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E135",
+      "from": "G29",
+      "to": "G44",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E136",
+      "from": "G30",
+      "to": "G42",
+      "event": "A:JOIN_OK:JOIN_OK"
+    },
+    {
+      "id": "G_E137",
+      "from": "G30",
+      "to": "G30",
+      "event": "A:JOIN_FAIL:JOIN_FAIL"
+    },
+    {
+      "id": "G_E138",
+      "from": "G30",
+      "to": "G18",
+      "event": "A:LOGOUT:LOGOUT"
+    },
+    {
+      "id": "G_E139",
+      "from": "G30",
+      "to": "G11",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E140",
+      "from": "G30",
+      "to": "G45",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E141",
+      "from": "G31",
+      "to": "G31",
+      "event": "A:JOIN_OK:JOIN_FAIL"
+    },
+    {
+      "id": "G_E142",
+      "from": "G31",
+      "to": "G31",
+      "event": "A:JOIN_FAIL:JOIN_FAIL"
+    },
+    {
+      "id": "G_E143",
+      "from": "G31",
+      "to": "G19",
+      "event": "A:LOGOUT:LOGOUT"
+    },
+    {
+      "id": "G_E144",
+      "from": "G31",
+      "to": "G12",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E145",
+      "from": "G31",
+      "to": "G44",
+      "event": "B:ACCEPT:ACCEPT"
+    },
+    {
+      "id": "G_E146",
+      "from": "G31",
+      "to": "G45",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E147",
+      "from": "G31",
+      "to": "G16",
+      "event": "ADMIN_CREATE_ROOM"
+    },
+    {
+      "id": "G_E148",
+      "from": "G32",
+      "to": "G43",
+      "event": "A:LOGIN_OK:LOGIN_OK"
+    },
+    {
+      "id": "G_E149",
+      "from": "G32",
+      "to": "G32",
+      "event": "A:LOGIN_FAIL:LOGIN_FAIL"
+    },
+    {
+      "id": "G_E150",
+      "from": "G32",
+      "to": "G23",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E151",
+      "from": "G32",
+      "to": "G46",
+      "event": "B:LOGIN_OK:LOGIN_OK"
+    },
+    {
+      "id": "G_E152",
+      "from": "G32",
+      "to": "G32",
+      "event": "B:LOGIN_FAIL:LOGIN_FAIL"
+    },
+    {
+      "id": "G_E153",
+      "from": "G32",
+      "to": "G18",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E154",
+      "from": "G32",
+      "to": "G47",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E155",
+      "from": "G33",
+      "to": "G44",
+      "event": "A:LOGIN_OK:LOGIN_OK"
+    },
+    {
+      "id": "G_E156",
+      "from": "G33",
+      "to": "G33",
+      "event": "A:LOGIN_FAIL:LOGIN_FAIL"
+    },
+    {
+      "id": "G_E157",
+      "from": "G33",
+      "to": "G24",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E158",
+      "from": "G33",
+      "to": "G47",
+      "event": "B:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK"
+    },
+    {
+      "id": "G_E159",
+      "from": "G33",
+      "to": "G34",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E160",
+      "from": "G33",
+      "to": "G17",
+      "event": "ADMIN_CREATE_ROOM"
+    },
+    {
+      "id": "G_E161",
+      "from": "G34",
+      "to": "G45",
+      "event": "A:LOGIN_OK:LOGIN_OK"
+    },
+    {
+      "id": "G_E162",
+      "from": "G34",
+      "to": "G34",
+      "event": "A:LOGIN_FAIL:LOGIN_FAIL"
+    },
+    {
+      "id": "G_E163",
+      "from": "G34",
+      "to": "G25",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E164",
+      "from": "G34",
+      "to": "G18",
+      "event": "ADMIN_CREATE_ROOM"
+    },
+    {
+      "id": "G_E165",
+      "from": "G35",
+      "to": "G46",
+      "event": "A:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK"
+    },
+    {
+      "id": "G_E166",
+      "from": "G35",
+      "to": "G37",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E167",
+      "from": "G35",
+      "to": "G48",
+      "event": "B:JOIN_OK:JOIN_OK"
+    },
+    {
+      "id": "G_E168",
+      "from": "G35",
+      "to": "G35",
+      "event": "B:JOIN_FAIL:JOIN_FAIL"
+    },
+    {
+      "id": "G_E169",
+      "from": "G35",
+      "to": "G20",
+      "event": "B:LOGOUT:LOGOUT"
+    },
+    {
+      "id": "G_E170",
+      "from": "G35",
+      "to": "G8",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E171",
+      "from": "G35",
+      "to": "G49",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E172",
+      "from": "G36",
+      "to": "G47",
+      "event": "A:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK"
+    },
+    {
+      "id": "G_E173",
+      "from": "G36",
+      "to": "G38",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E174",
+      "from": "G36",
+      "to": "G49",
+      "event": "B:LOGIN_OK:LOGIN_OK"
+    },
+    {
+      "id": "G_E175",
+      "from": "G36",
+      "to": "G36",
+      "event": "B:LOGIN_FAIL:LOGIN_FAIL"
+    },
+    {
+      "id": "G_E176",
+      "from": "G36",
+      "to": "G22",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E177",
+      "from": "G36",
+      "to": "G20",
+      "event": "ADMIN_CREATE_ROOM"
+    },
+    {
+      "id": "G_E178",
+      "from": "G37",
+      "to": "G50",
+      "event": "B:JOIN_OK:JOIN_OK"
+    },
+    {
+      "id": "G_E179",
+      "from": "G37",
+      "to": "G37",
+      "event": "B:JOIN_FAIL:JOIN_FAIL"
+    },
+    {
+      "id": "G_E180",
+      "from": "G37",
+      "to": "G23",
+      "event": "B:LOGOUT:LOGOUT"
+    },
+    {
+      "id": "G_E181",
+      "from": "G37",
+      "to": "G11",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E182",
+      "from": "G37",
+      "to": "G51",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E183",
+      "from": "G38",
+      "to": "G51",
+      "event": "B:LOGIN_OK:LOGIN_OK"
+    },
+    {
+      "id": "G_E184",
+      "from": "G38",
+      "to": "G38",
+      "event": "B:LOGIN_FAIL:LOGIN_FAIL"
+    },
+    {
+      "id": "G_E185",
+      "from": "G38",
+      "to": "G25",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E186",
+      "from": "G38",
+      "to": "G23",
+      "event": "ADMIN_CREATE_ROOM"
+    },
+    {
+      "id": "G_E187",
+      "from": "G39",
+      "to": "G48",
+      "event": "A:ACCEPT:ACCEPT"
+    },
+    {
+      "id": "G_E188",
+      "from": "G39",
+      "to": "G50",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E189",
+      "from": "G39",
+      "to": "G26",
+      "event": "B:LEAVE_OK:LEAVE_OK"
+    },
+    {
+      "id": "G_E190",
+      "from": "G39",
+      "to": "G4",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E191",
+      "from": "G39",
+      "to": "G40",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E192",
+      "from": "G40",
+      "to": "G49",
+      "event": "A:ACCEPT:ACCEPT"
+    },
+    {
+      "id": "G_E193",
+      "from": "G40",
+      "to": "G51",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E194",
+      "from": "G40",
+      "to": "G40",
+      "event": "B:JOIN_OK:JOIN_FAIL"
+    },
+    {
+      "id": "G_E195",
+      "from": "G40",
+      "to": "G40",
+      "event": "B:JOIN_FAIL:JOIN_FAIL"
+    },
+    {
+      "id": "G_E196",
+      "from": "G40",
+      "to": "G27",
+      "event": "B:LOGOUT:LOGOUT"
+    },
+    {
+      "id": "G_E197",
+      "from": "G40",
+      "to": "G15",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E198",
+      "from": "G40",
+      "to": "G26",
+      "event": "ADMIN_CREATE_ROOM"
+    },
+    {
+      "id": "G_E199",
+      "from": "G41",
+      "to": "G29",
+      "event": "A:LEAVE_OK:LEAVE_OK"
+    },
+    {
+      "id": "G_E200",
+      "from": "G41",
+      "to": "G10",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E201",
+      "from": "G41",
+      "to": "G52",
+      "event": "B:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK"
+    },
+    {
+      "id": "G_E202",
+      "from": "G41",
+      "to": "G42",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E203",
+      "from": "G41",
+      "to": "G44",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E204",
+      "from": "G42",
+      "to": "G30",
+      "event": "A:LEAVE_OK:LEAVE_OK"
+    },
+    {
+      "id": "G_E205",
+      "from": "G42",
+      "to": "G11",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E206",
+      "from": "G42",
+      "to": "G45",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E207",
+      "from": "G43",
+      "to": "G52",
+      "event": "A:JOIN_OK:JOIN_OK"
+    },
+    {
+      "id": "G_E208",
+      "from": "G43",
+      "to": "G43",
+      "event": "A:JOIN_FAIL:JOIN_FAIL"
+    },
+    {
+      "id": "G_E209",
+      "from": "G43",
+      "to": "G32",
+      "event": "A:LOGOUT:LOGOUT"
+    },
+    {
+      "id": "G_E210",
+      "from": "G43",
+      "to": "G23",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E211",
+      "from": "G43",
+      "to": "G53",
+      "event": "B:LOGIN_OK:LOGIN_OK"
+    },
+    {
+      "id": "G_E212",
+      "from": "G43",
+      "to": "G43",
+      "event": "B:LOGIN_FAIL:LOGIN_FAIL"
+    },
+    {
+      "id": "G_E213",
+      "from": "G43",
+      "to": "G30",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E214",
+      "from": "G43",
+      "to": "G54",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E215",
+      "from": "G44",
+      "to": "G44",
+      "event": "A:JOIN_OK:JOIN_FAIL"
+    },
+    {
+      "id": "G_E216",
+      "from": "G44",
+      "to": "G44",
+      "event": "A:JOIN_FAIL:JOIN_FAIL"
+    },
+    {
+      "id": "G_E217",
+      "from": "G44",
+      "to": "G33",
+      "event": "A:LOGOUT:LOGOUT"
+    },
+    {
+      "id": "G_E218",
+      "from": "G44",
+      "to": "G24",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E219",
+      "from": "G44",
+      "to": "G54",
+      "event": "B:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK"
+    },
+    {
+      "id": "G_E220",
+      "from": "G44",
+      "to": "G45",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E221",
+      "from": "G44",
+      "to": "G29",
+      "event": "ADMIN_CREATE_ROOM"
+    },
+    {
+      "id": "G_E222",
+      "from": "G45",
+      "to": "G45",
+      "event": "A:JOIN_OK:JOIN_FAIL"
+    },
+    {
+      "id": "G_E223",
+      "from": "G45",
+      "to": "G45",
+      "event": "A:JOIN_FAIL:JOIN_FAIL"
+    },
+    {
+      "id": "G_E224",
+      "from": "G45",
+      "to": "G34",
+      "event": "A:LOGOUT:LOGOUT"
+    },
+    {
+      "id": "G_E225",
+      "from": "G45",
+      "to": "G25",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E226",
+      "from": "G45",
+      "to": "G30",
+      "event": "ADMIN_CREATE_ROOM"
+    },
+    {
+      "id": "G_E227",
+      "from": "G46",
+      "to": "G53",
+      "event": "A:LOGIN_OK:LOGIN_OK"
+    },
+    {
+      "id": "G_E228",
+      "from": "G46",
+      "to": "G46",
+      "event": "A:LOGIN_FAIL:LOGIN_FAIL"
+    },
+    {
+      "id": "G_E229",
+      "from": "G46",
+      "to": "G37",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E230",
+      "from": "G46",
+      "to": "G55",
+      "event": "B:JOIN_OK:JOIN_OK"
+    },
+    {
+      "id": "G_E231",
+      "from": "G46",
+      "to": "G46",
+      "event": "B:JOIN_FAIL:JOIN_FAIL"
+    },
+    {
+      "id": "G_E232",
+      "from": "G46",
+      "to": "G32",
+      "event": "B:LOGOUT:LOGOUT"
+    },
+    {
+      "id": "G_E233",
+      "from": "G46",
+      "to": "G18",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E234",
+      "from": "G46",
+      "to": "G56",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E235",
+      "from": "G47",
+      "to": "G54",
+      "event": "A:LOGIN_OK:LOGIN_OK"
+    },
+    {
+      "id": "G_E236",
+      "from": "G47",
+      "to": "G47",
+      "event": "A:LOGIN_FAIL:LOGIN_FAIL"
+    },
+    {
+      "id": "G_E237",
+      "from": "G47",
+      "to": "G38",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E238",
+      "from": "G47",
+      "to": "G56",
+      "event": "B:LOGIN_OK:LOGIN_OK"
+    },
+    {
+      "id": "G_E239",
+      "from": "G47",
+      "to": "G47",
+      "event": "B:LOGIN_FAIL:LOGIN_FAIL"
+    },
+    {
+      "id": "G_E240",
+      "from": "G47",
+      "to": "G34",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E241",
+      "from": "G47",
+      "to": "G32",
+      "event": "ADMIN_CREATE_ROOM"
+    },
+    {
+      "id": "G_E242",
+      "from": "G48",
+      "to": "G55",
+      "event": "A:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK"
+    },
+    {
+      "id": "G_E243",
+      "from": "G48",
+      "to": "G50",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E244",
+      "from": "G48",
+      "to": "G35",
+      "event": "B:LEAVE_OK:LEAVE_OK"
+    },
+    {
+      "id": "G_E245",
+      "from": "G48",
+      "to": "G8",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E246",
+      "from": "G48",
+      "to": "G49",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E247",
+      "from": "G49",
+      "to": "G56",
+      "event": "A:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK"
+    },
+    {
+      "id": "G_E248",
+      "from": "G49",
+      "to": "G51",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E249",
+      "from": "G49",
+      "to": "G49",
+      "event": "B:JOIN_OK:JOIN_FAIL"
+    },
+    {
+      "id": "G_E250",
+      "from": "G49",
+      "to": "G49",
+      "event": "B:JOIN_FAIL:JOIN_FAIL"
+    },
+    {
+      "id": "G_E251",
+      "from": "G49",
+      "to": "G36",
+      "event": "B:LOGOUT:LOGOUT"
+    },
+    {
+      "id": "G_E252",
+      "from": "G49",
+      "to": "G22",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E253",
+      "from": "G49",
+      "to": "G35",
+      "event": "ADMIN_CREATE_ROOM"
+    },
+    {
+      "id": "G_E254",
+      "from": "G50",
+      "to": "G37",
+      "event": "B:LEAVE_OK:LEAVE_OK"
+    },
+    {
+      "id": "G_E255",
+      "from": "G50",
+      "to": "G11",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E256",
+      "from": "G50",
+      "to": "G51",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E257",
+      "from": "G51",
+      "to": "G51",
+      "event": "B:JOIN_OK:JOIN_FAIL"
+    },
+    {
+      "id": "G_E258",
+      "from": "G51",
+      "to": "G51",
+      "event": "B:JOIN_FAIL:JOIN_FAIL"
+    },
+    {
+      "id": "G_E259",
+      "from": "G51",
+      "to": "G38",
+      "event": "B:LOGOUT:LOGOUT"
+    },
+    {
+      "id": "G_E260",
+      "from": "G51",
+      "to": "G25",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E261",
+      "from": "G51",
+      "to": "G37",
+      "event": "ADMIN_CREATE_ROOM"
+    },
+    {
+      "id": "G_E262",
+      "from": "G52",
+      "to": "G43",
+      "event": "A:LEAVE_OK:LEAVE_OK"
+    },
+    {
+      "id": "G_E263",
+      "from": "G52",
+      "to": "G23",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E264",
+      "from": "G52",
+      "to": "G57",
+      "event": "B:LOGIN_OK:LOGIN_OK"
+    },
+    {
+      "id": "G_E265",
+      "from": "G52",
+      "to": "G52",
+      "event": "B:LOGIN_FAIL:LOGIN_FAIL"
+    },
+    {
+      "id": "G_E266",
+      "from": "G52",
+      "to": "G42",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E267",
+      "from": "G52",
+      "to": "G54",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E268",
+      "from": "G53",
+      "to": "G57",
+      "event": "A:JOIN_OK:JOIN_OK"
+    },
+    {
+      "id": "G_E269",
+      "from": "G53",
+      "to": "G53",
+      "event": "A:JOIN_FAIL:JOIN_FAIL"
+    },
+    {
+      "id": "G_E270",
+      "from": "G53",
+      "to": "G46",
+      "event": "A:LOGOUT:LOGOUT"
+    },
+    {
+      "id": "G_E271",
+      "from": "G53",
+      "to": "G37",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E272",
+      "from": "G53",
+      "to": "G58",
+      "event": "B:JOIN_OK:JOIN_OK"
+    },
+    {
+      "id": "G_E273",
+      "from": "G53",
+      "to": "G53",
+      "event": "B:JOIN_FAIL:JOIN_FAIL"
+    },
+    {
+      "id": "G_E274",
+      "from": "G53",
+      "to": "G43",
+      "event": "B:LOGOUT:LOGOUT"
+    },
+    {
+      "id": "G_E275",
+      "from": "G53",
+      "to": "G30",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E276",
+      "from": "G53",
+      "to": "G59",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E277",
+      "from": "G54",
+      "to": "G54",
+      "event": "A:JOIN_OK:JOIN_FAIL"
+    },
+    {
+      "id": "G_E278",
+      "from": "G54",
+      "to": "G54",
+      "event": "A:JOIN_FAIL:JOIN_FAIL"
+    },
+    {
+      "id": "G_E279",
+      "from": "G54",
+      "to": "G47",
+      "event": "A:LOGOUT:LOGOUT"
+    },
+    {
+      "id": "G_E280",
+      "from": "G54",
+      "to": "G38",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E281",
+      "from": "G54",
+      "to": "G59",
+      "event": "B:LOGIN_OK:LOGIN_OK"
+    },
+    {
+      "id": "G_E282",
+      "from": "G54",
+      "to": "G54",
+      "event": "B:LOGIN_FAIL:LOGIN_FAIL"
+    },
+    {
+      "id": "G_E283",
+      "from": "G54",
+      "to": "G45",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E284",
+      "from": "G54",
+      "to": "G43",
+      "event": "ADMIN_CREATE_ROOM"
+    },
+    {
+      "id": "G_E285",
+      "from": "G55",
+      "to": "G58",
+      "event": "A:LOGIN_OK:LOGIN_OK"
+    },
+    {
+      "id": "G_E286",
+      "from": "G55",
+      "to": "G55",
+      "event": "A:LOGIN_FAIL:LOGIN_FAIL"
+    },
+    {
+      "id": "G_E287",
+      "from": "G55",
+      "to": "G50",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E288",
+      "from": "G55",
+      "to": "G46",
+      "event": "B:LEAVE_OK:LEAVE_OK"
+    },
+    {
+      "id": "G_E289",
+      "from": "G55",
+      "to": "G18",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E290",
+      "from": "G55",
+      "to": "G56",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E291",
+      "from": "G56",
+      "to": "G59",
+      "event": "A:LOGIN_OK:LOGIN_OK"
+    },
+    {
+      "id": "G_E292",
+      "from": "G56",
+      "to": "G56",
+      "event": "A:LOGIN_FAIL:LOGIN_FAIL"
+    },
+    {
+      "id": "G_E293",
+      "from": "G56",
+      "to": "G51",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E294",
+      "from": "G56",
+      "to": "G56",
+      "event": "B:JOIN_OK:JOIN_FAIL"
+    },
+    {
+      "id": "G_E295",
+      "from": "G56",
+      "to": "G56",
+      "event": "B:JOIN_FAIL:JOIN_FAIL"
+    },
+    {
+      "id": "G_E296",
+      "from": "G56",
+      "to": "G47",
+      "event": "B:LOGOUT:LOGOUT"
+    },
+    {
+      "id": "G_E297",
+      "from": "G56",
+      "to": "G34",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E298",
+      "from": "G56",
+      "to": "G46",
+      "event": "ADMIN_CREATE_ROOM"
+    },
+    {
+      "id": "G_E299",
+      "from": "G57",
+      "to": "G53",
+      "event": "A:LEAVE_OK:LEAVE_OK"
+    },
+    {
+      "id": "G_E300",
+      "from": "G57",
+      "to": "G37",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E301",
+      "from": "G57",
+      "to": "G60",
+      "event": "B:JOIN_OK:JOIN_OK"
+    },
+    {
+      "id": "G_E302",
+      "from": "G57",
+      "to": "G57",
+      "event": "B:JOIN_FAIL:JOIN_FAIL"
+    },
+    {
+      "id": "G_E303",
+      "from": "G57",
+      "to": "G52",
+      "event": "B:LOGOUT:LOGOUT"
+    },
+    {
+      "id": "G_E304",
+      "from": "G57",
+      "to": "G42",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E305",
+      "from": "G57",
+      "to": "G59",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E306",
+      "from": "G58",
+      "to": "G60",
+      "event": "A:JOIN_OK:JOIN_OK"
+    },
+    {
+      "id": "G_E307",
+      "from": "G58",
+      "to": "G58",
+      "event": "A:JOIN_FAIL:JOIN_FAIL"
+    },
+    {
+      "id": "G_E308",
+      "from": "G58",
+      "to": "G55",
+      "event": "A:LOGOUT:LOGOUT"
+    },
+    {
+      "id": "G_E309",
+      "from": "G58",
+      "to": "G50",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E310",
+      "from": "G58",
+      "to": "G53",
+      "event": "B:LEAVE_OK:LEAVE_OK"
+    },
+    {
+      "id": "G_E311",
+      "from": "G58",
+      "to": "G30",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E312",
+      "from": "G58",
+      "to": "G59",
+      "event": "ADMIN_DELETE_ROOM"
+    },
+    {
+      "id": "G_E313",
+      "from": "G59",
+      "to": "G59",
+      "event": "A:JOIN_OK:JOIN_FAIL"
+    },
+    {
+      "id": "G_E314",
+      "from": "G59",
+      "to": "G59",
+      "event": "A:JOIN_FAIL:JOIN_FAIL"
+    },
+    {
+      "id": "G_E315",
+      "from": "G59",
+      "to": "G56",
+      "event": "A:LOGOUT:LOGOUT"
+    },
+    {
+      "id": "G_E316",
+      "from": "G59",
+      "to": "G51",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E317",
+      "from": "G59",
+      "to": "G59",
+      "event": "B:JOIN_OK:JOIN_FAIL"
+    },
+    {
+      "id": "G_E318",
+      "from": "G59",
+      "to": "G59",
+      "event": "B:JOIN_FAIL:JOIN_FAIL"
+    },
+    {
+      "id": "G_E319",
+      "from": "G59",
+      "to": "G54",
+      "event": "B:LOGOUT:LOGOUT"
+    },
+    {
+      "id": "G_E320",
+      "from": "G59",
+      "to": "G45",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E321",
+      "from": "G59",
+      "to": "G53",
+      "event": "ADMIN_CREATE_ROOM"
+    },
+    {
+      "id": "G_E322",
+      "from": "G60",
+      "to": "G58",
+      "event": "A:LEAVE_OK:LEAVE_OK"
+    },
+    {
+      "id": "G_E323",
+      "from": "G60",
+      "to": "G50",
+      "event": "A:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E324",
+      "from": "G60",
+      "to": "G57",
+      "event": "B:LEAVE_OK:LEAVE_OK"
+    },
+    {
+      "id": "G_E325",
+      "from": "G60",
+      "to": "G42",
+      "event": "B:DISCONNECT:DISCONNECT"
+    },
+    {
+      "id": "G_E326",
+      "from": "G60",
+      "to": "G59",
+      "event": "ADMIN_DELETE_ROOM"
+    }
+  ],
+  "abstraction": "two connections, atomic session acquire/release, one shared room, atomic commands"
+}

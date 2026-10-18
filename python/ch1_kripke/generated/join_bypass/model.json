@@ -1,0 +1,3542 @@
+{
+  "schema_version": 1,
+  "name": "websocket_join_bypass",
+  "initial_states": [
+    "S0"
+  ],
+  "abstraction": "one connection, one current room, atomic command boundaries",
+  "states": [
+    {
+      "id": "S0",
+      "phase": "IDLE",
+      "auth_history": false,
+      "member": false,
+      "last_effect": "NONE",
+      "labels": [
+        "phase_IDLE"
+      ]
+    },
+    {
+      "id": "S1",
+      "phase": "CLOSED",
+      "auth_history": false,
+      "member": false,
+      "last_effect": "NONE",
+      "labels": [
+        "phase_CLOSED",
+        "closed"
+      ]
+    },
+    {
+      "id": "S2",
+      "phase": "HTTP_HANDSHAKE",
+      "auth_history": false,
+      "member": false,
+      "last_effect": "NONE",
+      "labels": [
+        "phase_HTTP_HANDSHAKE"
+      ]
+    },
+    {
+      "id": "S3",
+      "phase": "WS_CONNECTED",
+      "auth_history": false,
+      "member": false,
+      "last_effect": "NONE",
+      "labels": [
+        "phase_WS_CONNECTED",
+        "ws_open"
+      ]
+    },
+    {
+      "id": "S4",
+      "phase": "AUTHENTICATED",
+      "auth_history": true,
+      "member": false,
+      "last_effect": "NONE",
+      "labels": [
+        "phase_AUTHENTICATED",
+        "ws_open",
+        "authenticated"
+      ]
+    },
+    {
+      "id": "S5",
+      "phase": "IN_ROOM",
+      "auth_history": false,
+      "member": true,
+      "last_effect": "NONE",
+      "labels": [
+        "phase_IN_ROOM",
+        "ws_open",
+        "in_room",
+        "member"
+      ]
+    },
+    {
+      "id": "S6",
+      "phase": "IN_ROOM",
+      "auth_history": true,
+      "member": true,
+      "last_effect": "NONE",
+      "labels": [
+        "phase_IN_ROOM",
+        "ws_open",
+        "in_room",
+        "authenticated",
+        "member"
+      ]
+    },
+    {
+      "id": "S7",
+      "phase": "WS_CONNECTED",
+      "auth_history": false,
+      "member": false,
+      "last_effect": "LOGOUT",
+      "labels": [
+        "phase_WS_CONNECTED",
+        "ws_open",
+        "logged_out"
+      ]
+    },
+    {
+      "id": "S8",
+      "phase": "AUTHENTICATED",
+      "auth_history": false,
+      "member": false,
+      "last_effect": "NONE",
+      "labels": [
+        "phase_AUTHENTICATED",
+        "ws_open"
+      ]
+    },
+    {
+      "id": "S9",
+      "phase": "IN_ROOM",
+      "auth_history": false,
+      "member": true,
+      "last_effect": "MESSAGE",
+      "labels": [
+        "phase_IN_ROOM",
+        "ws_open",
+        "in_room",
+        "member",
+        "message_accepted"
+      ]
+    },
+    {
+      "id": "S10",
+      "phase": "IN_ROOM",
+      "auth_history": true,
+      "member": true,
+      "last_effect": "MESSAGE",
+      "labels": [
+        "phase_IN_ROOM",
+        "ws_open",
+        "in_room",
+        "authenticated",
+        "member",
+        "message_accepted"
+      ]
+    }
+  ],
+  "transitions": [
+    {
+      "id": "E0",
+      "from": "S0",
+      "to": "S1",
+      "event": "TCP_DISCONNECT",
+      "core_events": [
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c:client_destroy / server.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E1",
+      "from": "S0",
+      "to": "S1",
+      "event": "IDLE_TIMEOUT",
+      "core_events": [
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c:client_destroy / server.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E2",
+      "from": "S0",
+      "to": "S2",
+      "event": "FIRST_BYTES",
+      "core_events": [
+        "ACCEPT"
+      ],
+      "result": "OK",
+      "source": "connection.c:client_process_buffer",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E3",
+      "from": "S1",
+      "to": "S1",
+      "event": "STUTTER",
+      "core_events": [],
+      "result": "TERMINAL",
+      "source": "CTL totalization",
+      "guard": "closed",
+      "kind": "model"
+    },
+    {
+      "id": "E4",
+      "from": "S2",
+      "to": "S1",
+      "event": "TCP_DISCONNECT",
+      "core_events": [
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c:client_destroy / server.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E5",
+      "from": "S2",
+      "to": "S1",
+      "event": "IDLE_TIMEOUT",
+      "core_events": [
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c:client_destroy / server.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E6",
+      "from": "S2",
+      "to": "S2",
+      "event": "HTTP_PARTIAL",
+      "core_events": [],
+      "result": "WAIT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E7",
+      "from": "S2",
+      "to": "S3",
+      "event": "HTTP_UPGRADE_VALID",
+      "core_events": [
+        "HTTP_UPGRADE_OK"
+      ],
+      "result": "UPGRADED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E8",
+      "from": "S2",
+      "to": "S1",
+      "event": "HTTP_UPGRADE_INVALID",
+      "core_events": [
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E9",
+      "from": "S3",
+      "to": "S1",
+      "event": "TCP_DISCONNECT",
+      "core_events": [
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c:client_destroy / server.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E10",
+      "from": "S3",
+      "to": "S1",
+      "event": "IDLE_TIMEOUT",
+      "core_events": [
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c:client_destroy / server.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E11",
+      "from": "S3",
+      "to": "S3",
+      "event": "FRAME_PARTIAL",
+      "core_events": [],
+      "result": "WAIT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E12",
+      "from": "S3",
+      "to": "S3",
+      "event": "FRAME_OTHER_OPCODE",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E13",
+      "from": "S3",
+      "to": "S3",
+      "event": "TEXT_EMPTY",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E14",
+      "from": "S3",
+      "to": "S3",
+      "event": "TEXT_MISSING_TYPE",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E15",
+      "from": "S3",
+      "to": "S3",
+      "event": "COMMAND_UNKNOWN",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E16",
+      "from": "S3",
+      "to": "S3",
+      "event": "WS_PONG",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E17",
+      "from": "S3",
+      "to": "S3",
+      "event": "WS_PING",
+      "core_events": [],
+      "result": "PONG_ATTEMPT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E18",
+      "from": "S3",
+      "to": "S3",
+      "event": "PING",
+      "core_events": [],
+      "result": "PONG_ATTEMPT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E19",
+      "from": "S3",
+      "to": "S1",
+      "event": "WS_CLOSE",
+      "core_events": [
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E20",
+      "from": "S3",
+      "to": "S1",
+      "event": "FRAME_INVALID",
+      "core_events": [
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E21",
+      "from": "S3",
+      "to": "S3",
+      "event": "REGISTER_OK",
+      "core_events": [],
+      "result": "REGISTER_OK",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E22",
+      "from": "S3",
+      "to": "S3",
+      "event": "REGISTER_MISSING_FIELDS",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E23",
+      "from": "S3",
+      "to": "S3",
+      "event": "REGISTER_EXISTS",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E24",
+      "from": "S3",
+      "to": "S3",
+      "event": "REGISTER_INVALID",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E25",
+      "from": "S3",
+      "to": "S3",
+      "event": "REGISTER_IO_ERROR",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E26",
+      "from": "S3",
+      "to": "S4",
+      "event": "LOGIN_OK",
+      "core_events": [
+        "LOGIN_OK"
+      ],
+      "result": "LOGIN_OK",
+      "source": "connection.c",
+      "guard": "auth_check then session_add",
+      "kind": "command"
+    },
+    {
+      "id": "E27",
+      "from": "S3",
+      "to": "S3",
+      "event": "LOGIN_MISSING_CREDENTIALS",
+      "core_events": [
+        "LOGIN_FAIL"
+      ],
+      "result": "LOGIN_FAIL",
+      "source": "connection.c",
+      "guard": "auth_check then session_add",
+      "kind": "command"
+    },
+    {
+      "id": "E28",
+      "from": "S3",
+      "to": "S3",
+      "event": "LOGIN_BAD_CREDENTIALS",
+      "core_events": [
+        "LOGIN_FAIL"
+      ],
+      "result": "LOGIN_FAIL",
+      "source": "connection.c",
+      "guard": "auth_check then session_add",
+      "kind": "command"
+    },
+    {
+      "id": "E29",
+      "from": "S3",
+      "to": "S3",
+      "event": "LOGIN_LOCKED",
+      "core_events": [
+        "LOGIN_FAIL"
+      ],
+      "result": "LOGIN_FAIL",
+      "source": "connection.c",
+      "guard": "auth_check then session_add",
+      "kind": "command"
+    },
+    {
+      "id": "E30",
+      "from": "S3",
+      "to": "S3",
+      "event": "LOGIN_SESSION_DUP",
+      "core_events": [
+        "LOGIN_FAIL"
+      ],
+      "result": "LOGIN_FAIL",
+      "source": "connection.c",
+      "guard": "auth_check then session_add",
+      "kind": "command"
+    },
+    {
+      "id": "E31",
+      "from": "S3",
+      "to": "S3",
+      "event": "LOGIN_SESSION_FULL",
+      "core_events": [
+        "LOGIN_FAIL"
+      ],
+      "result": "LOGIN_FAIL",
+      "source": "connection.c",
+      "guard": "auth_check then session_add",
+      "kind": "command"
+    },
+    {
+      "id": "E32",
+      "from": "S3",
+      "to": "S3",
+      "event": "ROOMS",
+      "core_events": [],
+      "result": "ERROR_LOGIN_REQUIRED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E33",
+      "from": "S3",
+      "to": "S5",
+      "event": "JOIN_OK",
+      "core_events": [
+        "JOIN_OK"
+      ],
+      "result": "JOINED",
+      "source": "connection.c",
+      "guard": "MUTATED login guard",
+      "kind": "command"
+    },
+    {
+      "id": "E34",
+      "from": "S3",
+      "to": "S3",
+      "event": "JOIN_INVALID_ROOM",
+      "core_events": [],
+      "result": "ERROR_LOGIN_REQUIRED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E35",
+      "from": "S3",
+      "to": "S3",
+      "event": "JOIN_BAD_CODE",
+      "core_events": [],
+      "result": "ERROR_LOGIN_REQUIRED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E36",
+      "from": "S3",
+      "to": "S3",
+      "event": "JOIN_NOT_FOUND",
+      "core_events": [],
+      "result": "ERROR_LOGIN_REQUIRED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E37",
+      "from": "S3",
+      "to": "S3",
+      "event": "JOIN_FULL",
+      "core_events": [],
+      "result": "ERROR_LOGIN_REQUIRED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E38",
+      "from": "S3",
+      "to": "S3",
+      "event": "JOIN_BAD_STATE",
+      "core_events": [],
+      "result": "ERROR_LOGIN_REQUIRED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E39",
+      "from": "S3",
+      "to": "S3",
+      "event": "LEAVE",
+      "core_events": [],
+      "result": "LEFT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E40",
+      "from": "S3",
+      "to": "S3",
+      "event": "LOGOUT",
+      "core_events": [],
+      "result": "ERROR_NOT_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E41",
+      "from": "S3",
+      "to": "S3",
+      "event": "MESSAGE_VALID",
+      "core_events": [],
+      "result": "ERROR_NOT_IN_ROOM",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E42",
+      "from": "S3",
+      "to": "S3",
+      "event": "MESSAGE_MISSING_CONTENT",
+      "core_events": [],
+      "result": "ERROR_NOT_IN_ROOM",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E43",
+      "from": "S3",
+      "to": "S3",
+      "event": "LIST",
+      "core_events": [],
+      "result": "ERROR_NOT_IN_ROOM",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E44",
+      "from": "S4",
+      "to": "S1",
+      "event": "TCP_DISCONNECT",
+      "core_events": [
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c:client_destroy / server.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E45",
+      "from": "S4",
+      "to": "S1",
+      "event": "IDLE_TIMEOUT",
+      "core_events": [
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c:client_destroy / server.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E46",
+      "from": "S4",
+      "to": "S4",
+      "event": "FRAME_PARTIAL",
+      "core_events": [],
+      "result": "WAIT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E47",
+      "from": "S4",
+      "to": "S4",
+      "event": "FRAME_OTHER_OPCODE",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E48",
+      "from": "S4",
+      "to": "S4",
+      "event": "TEXT_EMPTY",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E49",
+      "from": "S4",
+      "to": "S4",
+      "event": "TEXT_MISSING_TYPE",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E50",
+      "from": "S4",
+      "to": "S4",
+      "event": "COMMAND_UNKNOWN",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E51",
+      "from": "S4",
+      "to": "S4",
+      "event": "WS_PONG",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E52",
+      "from": "S4",
+      "to": "S4",
+      "event": "WS_PING",
+      "core_events": [],
+      "result": "PONG_ATTEMPT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E53",
+      "from": "S4",
+      "to": "S4",
+      "event": "PING",
+      "core_events": [],
+      "result": "PONG_ATTEMPT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E54",
+      "from": "S4",
+      "to": "S1",
+      "event": "WS_CLOSE",
+      "core_events": [
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E55",
+      "from": "S4",
+      "to": "S1",
+      "event": "FRAME_INVALID",
+      "core_events": [
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E56",
+      "from": "S4",
+      "to": "S4",
+      "event": "REGISTER_OK",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E57",
+      "from": "S4",
+      "to": "S4",
+      "event": "REGISTER_MISSING_FIELDS",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E58",
+      "from": "S4",
+      "to": "S4",
+      "event": "REGISTER_EXISTS",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E59",
+      "from": "S4",
+      "to": "S4",
+      "event": "REGISTER_INVALID",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E60",
+      "from": "S4",
+      "to": "S4",
+      "event": "REGISTER_IO_ERROR",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E61",
+      "from": "S4",
+      "to": "S4",
+      "event": "LOGIN_OK",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E62",
+      "from": "S4",
+      "to": "S4",
+      "event": "LOGIN_MISSING_CREDENTIALS",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E63",
+      "from": "S4",
+      "to": "S4",
+      "event": "LOGIN_BAD_CREDENTIALS",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E64",
+      "from": "S4",
+      "to": "S4",
+      "event": "LOGIN_LOCKED",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E65",
+      "from": "S4",
+      "to": "S4",
+      "event": "LOGIN_SESSION_DUP",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E66",
+      "from": "S4",
+      "to": "S4",
+      "event": "LOGIN_SESSION_FULL",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E67",
+      "from": "S4",
+      "to": "S4",
+      "event": "ROOMS",
+      "core_events": [],
+      "result": "ROOM_LIST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E68",
+      "from": "S4",
+      "to": "S6",
+      "event": "JOIN_OK",
+      "core_events": [
+        "JOIN_OK"
+      ],
+      "result": "JOINED",
+      "source": "room.c:room_join_commit",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E69",
+      "from": "S4",
+      "to": "S4",
+      "event": "JOIN_INVALID_ROOM",
+      "core_events": [],
+      "result": "JOIN_FAIL",
+      "source": "connection.c / room.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E70",
+      "from": "S4",
+      "to": "S4",
+      "event": "JOIN_BAD_CODE",
+      "core_events": [
+        "JOIN_FAIL"
+      ],
+      "result": "JOIN_FAIL",
+      "source": "connection.c / room.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E71",
+      "from": "S4",
+      "to": "S4",
+      "event": "JOIN_NOT_FOUND",
+      "core_events": [
+        "JOIN_FAIL"
+      ],
+      "result": "JOIN_FAIL",
+      "source": "connection.c / room.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E72",
+      "from": "S4",
+      "to": "S4",
+      "event": "JOIN_FULL",
+      "core_events": [
+        "JOIN_FAIL"
+      ],
+      "result": "JOIN_FAIL",
+      "source": "connection.c / room.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E73",
+      "from": "S4",
+      "to": "S4",
+      "event": "JOIN_BAD_STATE",
+      "core_events": [
+        "JOIN_FAIL"
+      ],
+      "result": "JOIN_FAIL",
+      "source": "connection.c / room.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E74",
+      "from": "S4",
+      "to": "S4",
+      "event": "LEAVE",
+      "core_events": [],
+      "result": "LEFT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E75",
+      "from": "S4",
+      "to": "S7",
+      "event": "LOGOUT",
+      "core_events": [
+        "LOGOUT"
+      ],
+      "result": "LOGGED_OUT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E76",
+      "from": "S4",
+      "to": "S4",
+      "event": "MESSAGE_VALID",
+      "core_events": [],
+      "result": "ERROR_NOT_IN_ROOM",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E77",
+      "from": "S4",
+      "to": "S4",
+      "event": "MESSAGE_MISSING_CONTENT",
+      "core_events": [],
+      "result": "ERROR_NOT_IN_ROOM",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E78",
+      "from": "S4",
+      "to": "S4",
+      "event": "LIST",
+      "core_events": [],
+      "result": "ERROR_NOT_IN_ROOM",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E79",
+      "from": "S5",
+      "to": "S1",
+      "event": "TCP_DISCONNECT",
+      "core_events": [
+        "LEAVE_OK",
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c:client_destroy / server.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E80",
+      "from": "S5",
+      "to": "S1",
+      "event": "IDLE_TIMEOUT",
+      "core_events": [
+        "LEAVE_OK",
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c:client_destroy / server.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E81",
+      "from": "S5",
+      "to": "S5",
+      "event": "FRAME_PARTIAL",
+      "core_events": [],
+      "result": "WAIT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E82",
+      "from": "S5",
+      "to": "S5",
+      "event": "FRAME_OTHER_OPCODE",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E83",
+      "from": "S5",
+      "to": "S5",
+      "event": "TEXT_EMPTY",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E84",
+      "from": "S5",
+      "to": "S5",
+      "event": "TEXT_MISSING_TYPE",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E85",
+      "from": "S5",
+      "to": "S5",
+      "event": "COMMAND_UNKNOWN",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E86",
+      "from": "S5",
+      "to": "S5",
+      "event": "WS_PONG",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E87",
+      "from": "S5",
+      "to": "S5",
+      "event": "WS_PING",
+      "core_events": [],
+      "result": "PONG_ATTEMPT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E88",
+      "from": "S5",
+      "to": "S5",
+      "event": "PING",
+      "core_events": [],
+      "result": "PONG_ATTEMPT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E89",
+      "from": "S5",
+      "to": "S1",
+      "event": "WS_CLOSE",
+      "core_events": [
+        "LEAVE_OK",
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E90",
+      "from": "S5",
+      "to": "S1",
+      "event": "FRAME_INVALID",
+      "core_events": [
+        "LEAVE_OK",
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E91",
+      "from": "S5",
+      "to": "S5",
+      "event": "REGISTER_OK",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E92",
+      "from": "S5",
+      "to": "S5",
+      "event": "REGISTER_MISSING_FIELDS",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E93",
+      "from": "S5",
+      "to": "S5",
+      "event": "REGISTER_EXISTS",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E94",
+      "from": "S5",
+      "to": "S5",
+      "event": "REGISTER_INVALID",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E95",
+      "from": "S5",
+      "to": "S5",
+      "event": "REGISTER_IO_ERROR",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E96",
+      "from": "S5",
+      "to": "S5",
+      "event": "LOGIN_OK",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E97",
+      "from": "S5",
+      "to": "S5",
+      "event": "LOGIN_MISSING_CREDENTIALS",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E98",
+      "from": "S5",
+      "to": "S5",
+      "event": "LOGIN_BAD_CREDENTIALS",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E99",
+      "from": "S5",
+      "to": "S5",
+      "event": "LOGIN_LOCKED",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E100",
+      "from": "S5",
+      "to": "S5",
+      "event": "LOGIN_SESSION_DUP",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E101",
+      "from": "S5",
+      "to": "S5",
+      "event": "LOGIN_SESSION_FULL",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E102",
+      "from": "S5",
+      "to": "S5",
+      "event": "ROOMS",
+      "core_events": [],
+      "result": "ROOM_LIST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E103",
+      "from": "S5",
+      "to": "S5",
+      "event": "JOIN_OK",
+      "core_events": [],
+      "result": "JOIN_FAIL_LEAVE_FIRST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E104",
+      "from": "S5",
+      "to": "S5",
+      "event": "JOIN_INVALID_ROOM",
+      "core_events": [],
+      "result": "JOIN_FAIL_LEAVE_FIRST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E105",
+      "from": "S5",
+      "to": "S5",
+      "event": "JOIN_BAD_CODE",
+      "core_events": [],
+      "result": "JOIN_FAIL_LEAVE_FIRST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E106",
+      "from": "S5",
+      "to": "S5",
+      "event": "JOIN_NOT_FOUND",
+      "core_events": [],
+      "result": "JOIN_FAIL_LEAVE_FIRST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E107",
+      "from": "S5",
+      "to": "S5",
+      "event": "JOIN_FULL",
+      "core_events": [],
+      "result": "JOIN_FAIL_LEAVE_FIRST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E108",
+      "from": "S5",
+      "to": "S5",
+      "event": "JOIN_BAD_STATE",
+      "core_events": [],
+      "result": "JOIN_FAIL_LEAVE_FIRST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E109",
+      "from": "S5",
+      "to": "S8",
+      "event": "LEAVE",
+      "core_events": [
+        "LEAVE_OK"
+      ],
+      "result": "LEFT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E110",
+      "from": "S5",
+      "to": "S7",
+      "event": "LOGOUT",
+      "core_events": [
+        "LEAVE_OK",
+        "LOGOUT"
+      ],
+      "result": "LOGGED_OUT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E111",
+      "from": "S5",
+      "to": "S9",
+      "event": "MESSAGE_VALID",
+      "core_events": [],
+      "result": "BROADCAST_ATTEMPT",
+      "source": "connection.c",
+      "guard": "phase == IN_ROOM; valid content",
+      "kind": "command"
+    },
+    {
+      "id": "E112",
+      "from": "S5",
+      "to": "S5",
+      "event": "MESSAGE_MISSING_CONTENT",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E113",
+      "from": "S5",
+      "to": "S5",
+      "event": "LIST",
+      "core_events": [],
+      "result": "USER_LIST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E114",
+      "from": "S5",
+      "to": "S8",
+      "event": "ADMIN_DELETE_CURRENT_ROOM",
+      "core_events": [
+        "ROOM_CLOSED"
+      ],
+      "result": "ROOM_CLOSED",
+      "source": "room.c:room_delete",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E115",
+      "from": "S6",
+      "to": "S1",
+      "event": "TCP_DISCONNECT",
+      "core_events": [
+        "LEAVE_OK",
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c:client_destroy / server.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E116",
+      "from": "S6",
+      "to": "S1",
+      "event": "IDLE_TIMEOUT",
+      "core_events": [
+        "LEAVE_OK",
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c:client_destroy / server.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E117",
+      "from": "S6",
+      "to": "S6",
+      "event": "FRAME_PARTIAL",
+      "core_events": [],
+      "result": "WAIT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E118",
+      "from": "S6",
+      "to": "S6",
+      "event": "FRAME_OTHER_OPCODE",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E119",
+      "from": "S6",
+      "to": "S6",
+      "event": "TEXT_EMPTY",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E120",
+      "from": "S6",
+      "to": "S6",
+      "event": "TEXT_MISSING_TYPE",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E121",
+      "from": "S6",
+      "to": "S6",
+      "event": "COMMAND_UNKNOWN",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E122",
+      "from": "S6",
+      "to": "S6",
+      "event": "WS_PONG",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E123",
+      "from": "S6",
+      "to": "S6",
+      "event": "WS_PING",
+      "core_events": [],
+      "result": "PONG_ATTEMPT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E124",
+      "from": "S6",
+      "to": "S6",
+      "event": "PING",
+      "core_events": [],
+      "result": "PONG_ATTEMPT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E125",
+      "from": "S6",
+      "to": "S1",
+      "event": "WS_CLOSE",
+      "core_events": [
+        "LEAVE_OK",
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E126",
+      "from": "S6",
+      "to": "S1",
+      "event": "FRAME_INVALID",
+      "core_events": [
+        "LEAVE_OK",
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E127",
+      "from": "S6",
+      "to": "S6",
+      "event": "REGISTER_OK",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E128",
+      "from": "S6",
+      "to": "S6",
+      "event": "REGISTER_MISSING_FIELDS",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E129",
+      "from": "S6",
+      "to": "S6",
+      "event": "REGISTER_EXISTS",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E130",
+      "from": "S6",
+      "to": "S6",
+      "event": "REGISTER_INVALID",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E131",
+      "from": "S6",
+      "to": "S6",
+      "event": "REGISTER_IO_ERROR",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E132",
+      "from": "S6",
+      "to": "S6",
+      "event": "LOGIN_OK",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E133",
+      "from": "S6",
+      "to": "S6",
+      "event": "LOGIN_MISSING_CREDENTIALS",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E134",
+      "from": "S6",
+      "to": "S6",
+      "event": "LOGIN_BAD_CREDENTIALS",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E135",
+      "from": "S6",
+      "to": "S6",
+      "event": "LOGIN_LOCKED",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E136",
+      "from": "S6",
+      "to": "S6",
+      "event": "LOGIN_SESSION_DUP",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E137",
+      "from": "S6",
+      "to": "S6",
+      "event": "LOGIN_SESSION_FULL",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E138",
+      "from": "S6",
+      "to": "S6",
+      "event": "ROOMS",
+      "core_events": [],
+      "result": "ROOM_LIST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E139",
+      "from": "S6",
+      "to": "S6",
+      "event": "JOIN_OK",
+      "core_events": [],
+      "result": "JOIN_FAIL_LEAVE_FIRST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E140",
+      "from": "S6",
+      "to": "S6",
+      "event": "JOIN_INVALID_ROOM",
+      "core_events": [],
+      "result": "JOIN_FAIL_LEAVE_FIRST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E141",
+      "from": "S6",
+      "to": "S6",
+      "event": "JOIN_BAD_CODE",
+      "core_events": [],
+      "result": "JOIN_FAIL_LEAVE_FIRST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E142",
+      "from": "S6",
+      "to": "S6",
+      "event": "JOIN_NOT_FOUND",
+      "core_events": [],
+      "result": "JOIN_FAIL_LEAVE_FIRST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E143",
+      "from": "S6",
+      "to": "S6",
+      "event": "JOIN_FULL",
+      "core_events": [],
+      "result": "JOIN_FAIL_LEAVE_FIRST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E144",
+      "from": "S6",
+      "to": "S6",
+      "event": "JOIN_BAD_STATE",
+      "core_events": [],
+      "result": "JOIN_FAIL_LEAVE_FIRST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E145",
+      "from": "S6",
+      "to": "S4",
+      "event": "LEAVE",
+      "core_events": [
+        "LEAVE_OK"
+      ],
+      "result": "LEFT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E146",
+      "from": "S6",
+      "to": "S7",
+      "event": "LOGOUT",
+      "core_events": [
+        "LEAVE_OK",
+        "LOGOUT"
+      ],
+      "result": "LOGGED_OUT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E147",
+      "from": "S6",
+      "to": "S10",
+      "event": "MESSAGE_VALID",
+      "core_events": [],
+      "result": "BROADCAST_ATTEMPT",
+      "source": "connection.c",
+      "guard": "phase == IN_ROOM; valid content",
+      "kind": "command"
+    },
+    {
+      "id": "E148",
+      "from": "S6",
+      "to": "S6",
+      "event": "MESSAGE_MISSING_CONTENT",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E149",
+      "from": "S6",
+      "to": "S6",
+      "event": "LIST",
+      "core_events": [],
+      "result": "USER_LIST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E150",
+      "from": "S6",
+      "to": "S4",
+      "event": "ADMIN_DELETE_CURRENT_ROOM",
+      "core_events": [
+        "ROOM_CLOSED"
+      ],
+      "result": "ROOM_CLOSED",
+      "source": "room.c:room_delete",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E151",
+      "from": "S7",
+      "to": "S1",
+      "event": "TCP_DISCONNECT",
+      "core_events": [
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c:client_destroy / server.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E152",
+      "from": "S7",
+      "to": "S1",
+      "event": "IDLE_TIMEOUT",
+      "core_events": [
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c:client_destroy / server.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E153",
+      "from": "S7",
+      "to": "S3",
+      "event": "FRAME_PARTIAL",
+      "core_events": [],
+      "result": "WAIT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E154",
+      "from": "S7",
+      "to": "S3",
+      "event": "FRAME_OTHER_OPCODE",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E155",
+      "from": "S7",
+      "to": "S3",
+      "event": "TEXT_EMPTY",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E156",
+      "from": "S7",
+      "to": "S3",
+      "event": "TEXT_MISSING_TYPE",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E157",
+      "from": "S7",
+      "to": "S3",
+      "event": "COMMAND_UNKNOWN",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E158",
+      "from": "S7",
+      "to": "S3",
+      "event": "WS_PONG",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E159",
+      "from": "S7",
+      "to": "S3",
+      "event": "WS_PING",
+      "core_events": [],
+      "result": "PONG_ATTEMPT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E160",
+      "from": "S7",
+      "to": "S3",
+      "event": "PING",
+      "core_events": [],
+      "result": "PONG_ATTEMPT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E161",
+      "from": "S7",
+      "to": "S1",
+      "event": "WS_CLOSE",
+      "core_events": [
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E162",
+      "from": "S7",
+      "to": "S1",
+      "event": "FRAME_INVALID",
+      "core_events": [
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E163",
+      "from": "S7",
+      "to": "S3",
+      "event": "REGISTER_OK",
+      "core_events": [],
+      "result": "REGISTER_OK",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E164",
+      "from": "S7",
+      "to": "S3",
+      "event": "REGISTER_MISSING_FIELDS",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E165",
+      "from": "S7",
+      "to": "S3",
+      "event": "REGISTER_EXISTS",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E166",
+      "from": "S7",
+      "to": "S3",
+      "event": "REGISTER_INVALID",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E167",
+      "from": "S7",
+      "to": "S3",
+      "event": "REGISTER_IO_ERROR",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E168",
+      "from": "S7",
+      "to": "S4",
+      "event": "LOGIN_OK",
+      "core_events": [
+        "LOGIN_OK"
+      ],
+      "result": "LOGIN_OK",
+      "source": "connection.c",
+      "guard": "auth_check then session_add",
+      "kind": "command"
+    },
+    {
+      "id": "E169",
+      "from": "S7",
+      "to": "S3",
+      "event": "LOGIN_MISSING_CREDENTIALS",
+      "core_events": [
+        "LOGIN_FAIL"
+      ],
+      "result": "LOGIN_FAIL",
+      "source": "connection.c",
+      "guard": "auth_check then session_add",
+      "kind": "command"
+    },
+    {
+      "id": "E170",
+      "from": "S7",
+      "to": "S3",
+      "event": "LOGIN_BAD_CREDENTIALS",
+      "core_events": [
+        "LOGIN_FAIL"
+      ],
+      "result": "LOGIN_FAIL",
+      "source": "connection.c",
+      "guard": "auth_check then session_add",
+      "kind": "command"
+    },
+    {
+      "id": "E171",
+      "from": "S7",
+      "to": "S3",
+      "event": "LOGIN_LOCKED",
+      "core_events": [
+        "LOGIN_FAIL"
+      ],
+      "result": "LOGIN_FAIL",
+      "source": "connection.c",
+      "guard": "auth_check then session_add",
+      "kind": "command"
+    },
+    {
+      "id": "E172",
+      "from": "S7",
+      "to": "S3",
+      "event": "LOGIN_SESSION_DUP",
+      "core_events": [
+        "LOGIN_FAIL"
+      ],
+      "result": "LOGIN_FAIL",
+      "source": "connection.c",
+      "guard": "auth_check then session_add",
+      "kind": "command"
+    },
+    {
+      "id": "E173",
+      "from": "S7",
+      "to": "S3",
+      "event": "LOGIN_SESSION_FULL",
+      "core_events": [
+        "LOGIN_FAIL"
+      ],
+      "result": "LOGIN_FAIL",
+      "source": "connection.c",
+      "guard": "auth_check then session_add",
+      "kind": "command"
+    },
+    {
+      "id": "E174",
+      "from": "S7",
+      "to": "S3",
+      "event": "ROOMS",
+      "core_events": [],
+      "result": "ERROR_LOGIN_REQUIRED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E175",
+      "from": "S7",
+      "to": "S5",
+      "event": "JOIN_OK",
+      "core_events": [
+        "JOIN_OK"
+      ],
+      "result": "JOINED",
+      "source": "connection.c",
+      "guard": "MUTATED login guard",
+      "kind": "command"
+    },
+    {
+      "id": "E176",
+      "from": "S7",
+      "to": "S3",
+      "event": "JOIN_INVALID_ROOM",
+      "core_events": [],
+      "result": "ERROR_LOGIN_REQUIRED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E177",
+      "from": "S7",
+      "to": "S3",
+      "event": "JOIN_BAD_CODE",
+      "core_events": [],
+      "result": "ERROR_LOGIN_REQUIRED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E178",
+      "from": "S7",
+      "to": "S3",
+      "event": "JOIN_NOT_FOUND",
+      "core_events": [],
+      "result": "ERROR_LOGIN_REQUIRED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E179",
+      "from": "S7",
+      "to": "S3",
+      "event": "JOIN_FULL",
+      "core_events": [],
+      "result": "ERROR_LOGIN_REQUIRED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E180",
+      "from": "S7",
+      "to": "S3",
+      "event": "JOIN_BAD_STATE",
+      "core_events": [],
+      "result": "ERROR_LOGIN_REQUIRED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E181",
+      "from": "S7",
+      "to": "S3",
+      "event": "LEAVE",
+      "core_events": [],
+      "result": "LEFT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E182",
+      "from": "S7",
+      "to": "S3",
+      "event": "LOGOUT",
+      "core_events": [],
+      "result": "ERROR_NOT_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E183",
+      "from": "S7",
+      "to": "S3",
+      "event": "MESSAGE_VALID",
+      "core_events": [],
+      "result": "ERROR_NOT_IN_ROOM",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E184",
+      "from": "S7",
+      "to": "S3",
+      "event": "MESSAGE_MISSING_CONTENT",
+      "core_events": [],
+      "result": "ERROR_NOT_IN_ROOM",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E185",
+      "from": "S7",
+      "to": "S3",
+      "event": "LIST",
+      "core_events": [],
+      "result": "ERROR_NOT_IN_ROOM",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E186",
+      "from": "S8",
+      "to": "S1",
+      "event": "TCP_DISCONNECT",
+      "core_events": [
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c:client_destroy / server.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E187",
+      "from": "S8",
+      "to": "S1",
+      "event": "IDLE_TIMEOUT",
+      "core_events": [
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c:client_destroy / server.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E188",
+      "from": "S8",
+      "to": "S8",
+      "event": "FRAME_PARTIAL",
+      "core_events": [],
+      "result": "WAIT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E189",
+      "from": "S8",
+      "to": "S8",
+      "event": "FRAME_OTHER_OPCODE",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E190",
+      "from": "S8",
+      "to": "S8",
+      "event": "TEXT_EMPTY",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E191",
+      "from": "S8",
+      "to": "S8",
+      "event": "TEXT_MISSING_TYPE",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E192",
+      "from": "S8",
+      "to": "S8",
+      "event": "COMMAND_UNKNOWN",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E193",
+      "from": "S8",
+      "to": "S8",
+      "event": "WS_PONG",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E194",
+      "from": "S8",
+      "to": "S8",
+      "event": "WS_PING",
+      "core_events": [],
+      "result": "PONG_ATTEMPT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E195",
+      "from": "S8",
+      "to": "S8",
+      "event": "PING",
+      "core_events": [],
+      "result": "PONG_ATTEMPT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E196",
+      "from": "S8",
+      "to": "S1",
+      "event": "WS_CLOSE",
+      "core_events": [
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E197",
+      "from": "S8",
+      "to": "S1",
+      "event": "FRAME_INVALID",
+      "core_events": [
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E198",
+      "from": "S8",
+      "to": "S8",
+      "event": "REGISTER_OK",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E199",
+      "from": "S8",
+      "to": "S8",
+      "event": "REGISTER_MISSING_FIELDS",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E200",
+      "from": "S8",
+      "to": "S8",
+      "event": "REGISTER_EXISTS",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E201",
+      "from": "S8",
+      "to": "S8",
+      "event": "REGISTER_INVALID",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E202",
+      "from": "S8",
+      "to": "S8",
+      "event": "REGISTER_IO_ERROR",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E203",
+      "from": "S8",
+      "to": "S8",
+      "event": "LOGIN_OK",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E204",
+      "from": "S8",
+      "to": "S8",
+      "event": "LOGIN_MISSING_CREDENTIALS",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E205",
+      "from": "S8",
+      "to": "S8",
+      "event": "LOGIN_BAD_CREDENTIALS",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E206",
+      "from": "S8",
+      "to": "S8",
+      "event": "LOGIN_LOCKED",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E207",
+      "from": "S8",
+      "to": "S8",
+      "event": "LOGIN_SESSION_DUP",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E208",
+      "from": "S8",
+      "to": "S8",
+      "event": "LOGIN_SESSION_FULL",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E209",
+      "from": "S8",
+      "to": "S8",
+      "event": "ROOMS",
+      "core_events": [],
+      "result": "ROOM_LIST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E210",
+      "from": "S8",
+      "to": "S5",
+      "event": "JOIN_OK",
+      "core_events": [
+        "JOIN_OK"
+      ],
+      "result": "JOINED",
+      "source": "room.c:room_join_commit",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E211",
+      "from": "S8",
+      "to": "S8",
+      "event": "JOIN_INVALID_ROOM",
+      "core_events": [],
+      "result": "JOIN_FAIL",
+      "source": "connection.c / room.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E212",
+      "from": "S8",
+      "to": "S8",
+      "event": "JOIN_BAD_CODE",
+      "core_events": [
+        "JOIN_FAIL"
+      ],
+      "result": "JOIN_FAIL",
+      "source": "connection.c / room.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E213",
+      "from": "S8",
+      "to": "S8",
+      "event": "JOIN_NOT_FOUND",
+      "core_events": [
+        "JOIN_FAIL"
+      ],
+      "result": "JOIN_FAIL",
+      "source": "connection.c / room.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E214",
+      "from": "S8",
+      "to": "S8",
+      "event": "JOIN_FULL",
+      "core_events": [
+        "JOIN_FAIL"
+      ],
+      "result": "JOIN_FAIL",
+      "source": "connection.c / room.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E215",
+      "from": "S8",
+      "to": "S8",
+      "event": "JOIN_BAD_STATE",
+      "core_events": [
+        "JOIN_FAIL"
+      ],
+      "result": "JOIN_FAIL",
+      "source": "connection.c / room.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E216",
+      "from": "S8",
+      "to": "S8",
+      "event": "LEAVE",
+      "core_events": [],
+      "result": "LEFT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E217",
+      "from": "S8",
+      "to": "S7",
+      "event": "LOGOUT",
+      "core_events": [
+        "LOGOUT"
+      ],
+      "result": "LOGGED_OUT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E218",
+      "from": "S8",
+      "to": "S8",
+      "event": "MESSAGE_VALID",
+      "core_events": [],
+      "result": "ERROR_NOT_IN_ROOM",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E219",
+      "from": "S8",
+      "to": "S8",
+      "event": "MESSAGE_MISSING_CONTENT",
+      "core_events": [],
+      "result": "ERROR_NOT_IN_ROOM",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E220",
+      "from": "S8",
+      "to": "S8",
+      "event": "LIST",
+      "core_events": [],
+      "result": "ERROR_NOT_IN_ROOM",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E221",
+      "from": "S9",
+      "to": "S1",
+      "event": "TCP_DISCONNECT",
+      "core_events": [
+        "LEAVE_OK",
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c:client_destroy / server.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E222",
+      "from": "S9",
+      "to": "S1",
+      "event": "IDLE_TIMEOUT",
+      "core_events": [
+        "LEAVE_OK",
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c:client_destroy / server.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E223",
+      "from": "S9",
+      "to": "S5",
+      "event": "FRAME_PARTIAL",
+      "core_events": [],
+      "result": "WAIT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E224",
+      "from": "S9",
+      "to": "S5",
+      "event": "FRAME_OTHER_OPCODE",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E225",
+      "from": "S9",
+      "to": "S5",
+      "event": "TEXT_EMPTY",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E226",
+      "from": "S9",
+      "to": "S5",
+      "event": "TEXT_MISSING_TYPE",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E227",
+      "from": "S9",
+      "to": "S5",
+      "event": "COMMAND_UNKNOWN",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E228",
+      "from": "S9",
+      "to": "S5",
+      "event": "WS_PONG",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E229",
+      "from": "S9",
+      "to": "S5",
+      "event": "WS_PING",
+      "core_events": [],
+      "result": "PONG_ATTEMPT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E230",
+      "from": "S9",
+      "to": "S5",
+      "event": "PING",
+      "core_events": [],
+      "result": "PONG_ATTEMPT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E231",
+      "from": "S9",
+      "to": "S1",
+      "event": "WS_CLOSE",
+      "core_events": [
+        "LEAVE_OK",
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E232",
+      "from": "S9",
+      "to": "S1",
+      "event": "FRAME_INVALID",
+      "core_events": [
+        "LEAVE_OK",
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E233",
+      "from": "S9",
+      "to": "S5",
+      "event": "REGISTER_OK",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E234",
+      "from": "S9",
+      "to": "S5",
+      "event": "REGISTER_MISSING_FIELDS",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E235",
+      "from": "S9",
+      "to": "S5",
+      "event": "REGISTER_EXISTS",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E236",
+      "from": "S9",
+      "to": "S5",
+      "event": "REGISTER_INVALID",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E237",
+      "from": "S9",
+      "to": "S5",
+      "event": "REGISTER_IO_ERROR",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E238",
+      "from": "S9",
+      "to": "S5",
+      "event": "LOGIN_OK",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E239",
+      "from": "S9",
+      "to": "S5",
+      "event": "LOGIN_MISSING_CREDENTIALS",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E240",
+      "from": "S9",
+      "to": "S5",
+      "event": "LOGIN_BAD_CREDENTIALS",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E241",
+      "from": "S9",
+      "to": "S5",
+      "event": "LOGIN_LOCKED",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E242",
+      "from": "S9",
+      "to": "S5",
+      "event": "LOGIN_SESSION_DUP",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E243",
+      "from": "S9",
+      "to": "S5",
+      "event": "LOGIN_SESSION_FULL",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E244",
+      "from": "S9",
+      "to": "S5",
+      "event": "ROOMS",
+      "core_events": [],
+      "result": "ROOM_LIST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E245",
+      "from": "S9",
+      "to": "S5",
+      "event": "JOIN_OK",
+      "core_events": [],
+      "result": "JOIN_FAIL_LEAVE_FIRST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E246",
+      "from": "S9",
+      "to": "S5",
+      "event": "JOIN_INVALID_ROOM",
+      "core_events": [],
+      "result": "JOIN_FAIL_LEAVE_FIRST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E247",
+      "from": "S9",
+      "to": "S5",
+      "event": "JOIN_BAD_CODE",
+      "core_events": [],
+      "result": "JOIN_FAIL_LEAVE_FIRST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E248",
+      "from": "S9",
+      "to": "S5",
+      "event": "JOIN_NOT_FOUND",
+      "core_events": [],
+      "result": "JOIN_FAIL_LEAVE_FIRST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E249",
+      "from": "S9",
+      "to": "S5",
+      "event": "JOIN_FULL",
+      "core_events": [],
+      "result": "JOIN_FAIL_LEAVE_FIRST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E250",
+      "from": "S9",
+      "to": "S5",
+      "event": "JOIN_BAD_STATE",
+      "core_events": [],
+      "result": "JOIN_FAIL_LEAVE_FIRST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E251",
+      "from": "S9",
+      "to": "S8",
+      "event": "LEAVE",
+      "core_events": [
+        "LEAVE_OK"
+      ],
+      "result": "LEFT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E252",
+      "from": "S9",
+      "to": "S7",
+      "event": "LOGOUT",
+      "core_events": [
+        "LEAVE_OK",
+        "LOGOUT"
+      ],
+      "result": "LOGGED_OUT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E253",
+      "from": "S9",
+      "to": "S9",
+      "event": "MESSAGE_VALID",
+      "core_events": [],
+      "result": "BROADCAST_ATTEMPT",
+      "source": "connection.c",
+      "guard": "phase == IN_ROOM; valid content",
+      "kind": "command"
+    },
+    {
+      "id": "E254",
+      "from": "S9",
+      "to": "S5",
+      "event": "MESSAGE_MISSING_CONTENT",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E255",
+      "from": "S9",
+      "to": "S5",
+      "event": "LIST",
+      "core_events": [],
+      "result": "USER_LIST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E256",
+      "from": "S9",
+      "to": "S8",
+      "event": "ADMIN_DELETE_CURRENT_ROOM",
+      "core_events": [
+        "ROOM_CLOSED"
+      ],
+      "result": "ROOM_CLOSED",
+      "source": "room.c:room_delete",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E257",
+      "from": "S10",
+      "to": "S1",
+      "event": "TCP_DISCONNECT",
+      "core_events": [
+        "LEAVE_OK",
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c:client_destroy / server.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E258",
+      "from": "S10",
+      "to": "S1",
+      "event": "IDLE_TIMEOUT",
+      "core_events": [
+        "LEAVE_OK",
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c:client_destroy / server.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E259",
+      "from": "S10",
+      "to": "S6",
+      "event": "FRAME_PARTIAL",
+      "core_events": [],
+      "result": "WAIT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E260",
+      "from": "S10",
+      "to": "S6",
+      "event": "FRAME_OTHER_OPCODE",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E261",
+      "from": "S10",
+      "to": "S6",
+      "event": "TEXT_EMPTY",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E262",
+      "from": "S10",
+      "to": "S6",
+      "event": "TEXT_MISSING_TYPE",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E263",
+      "from": "S10",
+      "to": "S6",
+      "event": "COMMAND_UNKNOWN",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E264",
+      "from": "S10",
+      "to": "S6",
+      "event": "WS_PONG",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E265",
+      "from": "S10",
+      "to": "S6",
+      "event": "WS_PING",
+      "core_events": [],
+      "result": "PONG_ATTEMPT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E266",
+      "from": "S10",
+      "to": "S6",
+      "event": "PING",
+      "core_events": [],
+      "result": "PONG_ATTEMPT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E267",
+      "from": "S10",
+      "to": "S1",
+      "event": "WS_CLOSE",
+      "core_events": [
+        "LEAVE_OK",
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E268",
+      "from": "S10",
+      "to": "S1",
+      "event": "FRAME_INVALID",
+      "core_events": [
+        "LEAVE_OK",
+        "DISCONNECT"
+      ],
+      "result": "CLOSED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E269",
+      "from": "S10",
+      "to": "S6",
+      "event": "REGISTER_OK",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E270",
+      "from": "S10",
+      "to": "S6",
+      "event": "REGISTER_MISSING_FIELDS",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E271",
+      "from": "S10",
+      "to": "S6",
+      "event": "REGISTER_EXISTS",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E272",
+      "from": "S10",
+      "to": "S6",
+      "event": "REGISTER_INVALID",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E273",
+      "from": "S10",
+      "to": "S6",
+      "event": "REGISTER_IO_ERROR",
+      "core_events": [],
+      "result": "REGISTER_FAIL",
+      "source": "connection.c",
+      "guard": "phase == WS_CONNECTED; payload/outcome abstracted",
+      "kind": "command"
+    },
+    {
+      "id": "E274",
+      "from": "S10",
+      "to": "S6",
+      "event": "LOGIN_OK",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E275",
+      "from": "S10",
+      "to": "S6",
+      "event": "LOGIN_MISSING_CREDENTIALS",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E276",
+      "from": "S10",
+      "to": "S6",
+      "event": "LOGIN_BAD_CREDENTIALS",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E277",
+      "from": "S10",
+      "to": "S6",
+      "event": "LOGIN_LOCKED",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E278",
+      "from": "S10",
+      "to": "S6",
+      "event": "LOGIN_SESSION_DUP",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E279",
+      "from": "S10",
+      "to": "S6",
+      "event": "LOGIN_SESSION_FULL",
+      "core_events": [],
+      "result": "ERROR_ALREADY_LOGGED_IN",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E280",
+      "from": "S10",
+      "to": "S6",
+      "event": "ROOMS",
+      "core_events": [],
+      "result": "ROOM_LIST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E281",
+      "from": "S10",
+      "to": "S6",
+      "event": "JOIN_OK",
+      "core_events": [],
+      "result": "JOIN_FAIL_LEAVE_FIRST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E282",
+      "from": "S10",
+      "to": "S6",
+      "event": "JOIN_INVALID_ROOM",
+      "core_events": [],
+      "result": "JOIN_FAIL_LEAVE_FIRST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E283",
+      "from": "S10",
+      "to": "S6",
+      "event": "JOIN_BAD_CODE",
+      "core_events": [],
+      "result": "JOIN_FAIL_LEAVE_FIRST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E284",
+      "from": "S10",
+      "to": "S6",
+      "event": "JOIN_NOT_FOUND",
+      "core_events": [],
+      "result": "JOIN_FAIL_LEAVE_FIRST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E285",
+      "from": "S10",
+      "to": "S6",
+      "event": "JOIN_FULL",
+      "core_events": [],
+      "result": "JOIN_FAIL_LEAVE_FIRST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E286",
+      "from": "S10",
+      "to": "S6",
+      "event": "JOIN_BAD_STATE",
+      "core_events": [],
+      "result": "JOIN_FAIL_LEAVE_FIRST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E287",
+      "from": "S10",
+      "to": "S4",
+      "event": "LEAVE",
+      "core_events": [
+        "LEAVE_OK"
+      ],
+      "result": "LEFT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E288",
+      "from": "S10",
+      "to": "S7",
+      "event": "LOGOUT",
+      "core_events": [
+        "LEAVE_OK",
+        "LOGOUT"
+      ],
+      "result": "LOGGED_OUT",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E289",
+      "from": "S10",
+      "to": "S10",
+      "event": "MESSAGE_VALID",
+      "core_events": [],
+      "result": "BROADCAST_ATTEMPT",
+      "source": "connection.c",
+      "guard": "phase == IN_ROOM; valid content",
+      "kind": "command"
+    },
+    {
+      "id": "E290",
+      "from": "S10",
+      "to": "S6",
+      "event": "MESSAGE_MISSING_CONTENT",
+      "core_events": [],
+      "result": "IGNORED",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E291",
+      "from": "S10",
+      "to": "S6",
+      "event": "LIST",
+      "core_events": [],
+      "result": "USER_LIST",
+      "source": "connection.c",
+      "guard": "",
+      "kind": "command"
+    },
+    {
+      "id": "E292",
+      "from": "S10",
+      "to": "S4",
+      "event": "ADMIN_DELETE_CURRENT_ROOM",
+      "core_events": [
+        "ROOM_CLOSED"
+      ],
+      "result": "ROOM_CLOSED",
+      "source": "room.c:room_delete",
+      "guard": "",
+      "kind": "command"
+    }
+  ]
+}

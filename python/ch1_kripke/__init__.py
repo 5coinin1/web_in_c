@@ -1,12 +1,9 @@
-"""Chương 1 — Mô hình hóa & Kiểm chứng hình thức (Kripke + BMC).
+"""WebSocket-only Kripke verification for web_in_c.
 
-Máy trạng thái và Kripke/BMC của dự án đã có sẵn ở C:
-    src/state_machine.c, src/kripke.c — chạy bởi test/ch1_kripke.c.
-Package này là chỗ đặt phần Python: dựng lại quan hệ chuyển tiếp để đối chiếu,
-sinh counterexample, kiểm tra chéo với model C.
-
-TODO (Ch1):
-  * kripke.py   : dựng K = (S, S0, R, L) từ state_machine
-  * bmc.py      : bounded model checking + completeness threshold
-  * liveness.py : EF reachability (safety + liveness)
+kripke: finite graph, BFS, AG/EF/AG EF.
+model: one-connection command-boundary product with auth/membership monitors.
+products: two-connection shared session/room abstractions and LEAVE diagnostic.
+properties: requirements; handoff: JSON/CSV/DOT/test-vector exports.
+bmc/liveness: small bounded/progress helpers for the team's verification work.
+verify: run checks and C state-machine replay; see README.md.
 """

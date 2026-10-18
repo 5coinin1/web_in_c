@@ -1,0 +1,65 @@
+{
+  "name": "leave_nonatomic_diagnostic",
+  "initial_states": [
+    "L0"
+  ],
+  "states": [
+    {
+      "id": "L0",
+      "labels": [
+        "in_room",
+        "room_ref",
+        "member"
+      ],
+      "description": "before room_leave"
+    },
+    {
+      "id": "L1",
+      "labels": [
+        "in_room",
+        "room_ref",
+        "mismatch"
+      ],
+      "description": "after room_leave removes membership"
+    },
+    {
+      "id": "L2",
+      "labels": [
+        "in_room",
+        "mismatch"
+      ],
+      "description": "after client->room[0] = 0"
+    },
+    {
+      "id": "L3",
+      "labels": [],
+      "description": "after client_state_apply(LEAVE_OK)"
+    }
+  ],
+  "transitions": [
+    {
+      "id": "D0",
+      "from": "L0",
+      "to": "L1",
+      "event": "room_leave"
+    },
+    {
+      "id": "D1",
+      "from": "L1",
+      "to": "L2",
+      "event": "clear_room_ref"
+    },
+    {
+      "id": "D2",
+      "from": "L2",
+      "to": "L3",
+      "event": "LEAVE_OK"
+    },
+    {
+      "id": "D3",
+      "from": "L3",
+      "to": "L3",
+      "event": "STUTTER"
+    }
+  ]
+}

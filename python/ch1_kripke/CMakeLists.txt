@@ -1,0 +1,16 @@
+cmake_minimum_required(VERSION 3.15)
+project(websocket_kripke C)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+find_package(Python3 3.9 COMPONENTS Interpreter REQUIRED)
+add_executable(ch1_chat_bridge c/chat_bridge.c ../../src/state_machine.c)
+target_include_directories(ch1_chat_bridge PRIVATE ../../src)
+if(WIN32)
+    target_link_libraries(ch1_chat_bridge PRIVATE ws2_32)
+endif()
+enable_testing()
+add_test(NAME websocket_kripke COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/verify.py"
+    --bridge $<TARGET_FILE:ch1_chat_bridge>)
+set_tests_properties(websocket_kripke PROPERTIES TIMEOUT 120)
+add_custom_target(check COMMAND "${CMAKE_CTEST_COMMAND}" --verbose --output-on-failure
+    DEPENDS ch1_chat_bridge WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")

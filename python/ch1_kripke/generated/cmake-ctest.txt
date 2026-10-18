@@ -1,0 +1,21 @@
+-- The C compiler identification is GNU 13.3.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Found Python3: /opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3.12 (found suitable version "3.12.14", minimum required is "3.9") found components: Interpreter
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/websocket-pristine-check/build
+[ 33%] Building C object CMakeFiles/ch1_chat_bridge.dir/c/chat_bridge.c.o
+[ 66%] Building C object CMakeFiles/ch1_chat_bridge.dir/tmp/websocket-pristine-check/src/state_machine.c.o
+[100%] Linking C executable ch1_chat_bridge
+[100%] Built target ch1_chat_bridge
+Test project /tmp/websocket-pristine-check/build
+    Start 1: websocket_kripke
+1/1 Test #1: websocket_kripke .................   Passed    0.18 sec
+
+100% tests passed out of 1
+
+Total Test time (real) =   0.18 sec

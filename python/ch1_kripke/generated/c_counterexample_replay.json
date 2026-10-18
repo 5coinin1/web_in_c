@@ -1,0 +1,57 @@
+{
+  "events": [
+    "ACCEPT",
+    "HTTP_UPGRADE_OK",
+    "JOIN_OK"
+  ],
+  "buggy": {
+    "initial": "IDLE",
+    "steps": [
+      {
+        "event": "ACCEPT",
+        "accepted": true,
+        "state": "HTTP_HANDSHAKE",
+        "auth_history": false
+      },
+      {
+        "event": "HTTP_UPGRADE_OK",
+        "accepted": true,
+        "state": "WS_CONNECTED",
+        "auth_history": false
+      },
+      {
+        "event": "JOIN_OK",
+        "accepted": true,
+        "state": "IN_ROOM",
+        "auth_history": false
+      }
+    ],
+    "final": "IN_ROOM",
+    "violation": true
+  },
+  "safe": {
+    "initial": "IDLE",
+    "steps": [
+      {
+        "event": "ACCEPT",
+        "accepted": true,
+        "state": "HTTP_HANDSHAKE",
+        "auth_history": false
+      },
+      {
+        "event": "HTTP_UPGRADE_OK",
+        "accepted": true,
+        "state": "WS_CONNECTED",
+        "auth_history": false
+      },
+      {
+        "event": "JOIN_OK",
+        "accepted": false,
+        "state": "WS_CONNECTED",
+        "auth_history": false
+      }
+    ],
+    "final": "WS_CONNECTED",
+    "violation": false
+  }
+}
