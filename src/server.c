@@ -1,5 +1,6 @@
 #include "common.h"
 #include "connection.h"
+#include "read_buffer.h"
 #include "room.h"
 #include "auth.h"
 #include "path_util.h"
@@ -56,7 +57,7 @@ static void remove_client_from_list(client_t *client) {
 
 static void *client_thread(void *arg) {
     client_t *client = (client_t *)arg;
-    char recv_buf[4096];
+    char recv_buf[CLIENT_RECV_CAPACITY];
 
     LOG_INFO("Client thread started for fd=%d", client->fd);
 
@@ -72,15 +73,11 @@ static void *client_thread(void *arg) {
         }
         client->last_active = time(NULL);
 
-        // Append to client's read buffer
-        int space = (int)sizeof(client->read_buf) - client->read_len;
-        if (n > space) {
-            LOG_ERR("Client fd=%d buffer overflow", client->fd);
+        // Reserve the terminator byte before copying any received bytes.
+        if (client_read_append(client, recv_buf, n) < 0) {
+            LOG_ERR("Client fd=%d read buffer has insufficient headroom", client->fd);
             break;
         }
-        memcpy(client->read_buf + client->read_len, recv_buf, n);
-        client->read_len += n;
-        client->read_buf[client->read_len] = '\0';
 
         int r = client_process_buffer(client);
         if (r < 0) {
