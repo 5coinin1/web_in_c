@@ -1,0 +1,56 @@
+/mnt/c/Users/lenovo/Desktop/temp/web_in_c/results/ch2/build/fuzz_store_vuln /mnt/c/Users/lenovo/Desktop/temp/web_in_c/results/ch2/pocs/poc_offbyone.dat
+returncode: 1
+elapsed_s: 0.106
+--- stdout ---
+--- stderr ---
+=================================================================
+==696==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x79f9fd9e001b at pc 0x5afe7b1952f8 bp 0x7ffc5a373d80 sp 0x7ffc5a373d70
+READ of size 1 at 0x79f9fd9e001b thread T0
+    #0 0x5afe7b1952f7 in get_u32 /mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/bytes.h:30
+    #1 0x5afe7b1952f7 in auth_store_parse /mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/auth.c:122
+    #2 0x5afe7b1939d9 in main /mnt/c/Users/lenovo/Desktop/temp/web_in_c/test/fuzz_store.c:33
+    #3 0x7dd9fea2a600 in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:59
+    #4 0x7dd9fea2a717 in __libc_start_main_impl ../csu/libc-start.c:360
+    #5 0x5afe7b193824 in _start (/mnt/c/Users/lenovo/Desktop/temp/web_in_c/results/ch2/build/fuzz_store_vuln+0x7824) (BuildId: 0a738e2ae429c830be47c9f4ba1500438bb00067)
+
+0x79f9fd9e001b is located 0 bytes after 11-byte region [0x79f9fd9e0010,0x79f9fd9e001b)
+allocated by thread T0 here:
+    #0 0x7dd9ff72b60f in malloc ../../../../src/libsanitizer/asan/asan_malloc_linux.cpp:67
+    #1 0x5afe7b19399c in main /mnt/c/Users/lenovo/Desktop/temp/web_in_c/test/fuzz_store.c:28
+    #2 0x7dd9fea2a600 in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:59
+    #3 0x7dd9fea2a717 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0x5afe7b193824 in _start (/mnt/c/Users/lenovo/Desktop/temp/web_in_c/results/ch2/build/fuzz_store_vuln+0x7824) (BuildId: 0a738e2ae429c830be47c9f4ba1500438bb00067)
+
+SUMMARY: AddressSanitizer: heap-buffer-overflow /mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/bytes.h:30 in get_u32
+Shadow bytes around the buggy address:
+  0x79f9fd9dfd80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x79f9fd9dfe00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x79f9fd9dfe80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x79f9fd9dff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x79f9fd9dff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+=>0x79f9fd9e0000: fa fa 00[03]fa fa fa fa fa fa fa fa fa fa fa fa
+  0x79f9fd9e0080: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x79f9fd9e0100: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x79f9fd9e0180: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x79f9fd9e0200: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x79f9fd9e0280: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07 
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+==696==ABORTING

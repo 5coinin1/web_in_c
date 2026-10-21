@@ -1,0 +1,119 @@
+{
+  "toolchain": {
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+    "gcc": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+    "python": "3.14.4",
+    "asan": true
+  },
+  "target": "src/auth.c::auth_store_parse",
+  "harness": "test/fuzz_store.c",
+  "builds": {
+    "vuln": "results/ch2/build/fuzz_store_vuln",
+    "fixed": "results/ch2/build/fuzz_store_fixed",
+    "flags": "-std=gnu11 -g -O1 -fsanitize=address,undefined -fno-omit-frame-pointer"
+  },
+  "expected": {
+    "poc_count.dat": {
+      "error": "global-buffer-overflow",
+      "access": "WRITE",
+      "size": 32,
+      "frame": "src/auth.c:142",
+      "cwe": "CWE-787"
+    },
+    "poc_short.dat": {
+      "error": "heap-buffer-overflow",
+      "access": "READ",
+      "size": 32,
+      "frame": "src/auth.c:142",
+      "cwe": "CWE-125"
+    },
+    "poc_offbyone.dat": {
+      "error": "heap-buffer-overflow",
+      "access": "READ",
+      "size": 1,
+      "frame": "src/bytes.h:30",
+      "cwe": "CWE-193"
+    }
+  },
+  "runs": [
+    {
+      "variant": "vuln",
+      "poc": "poc_count.dat",
+      "returncode": 1,
+      "error": "global-buffer-overflow",
+      "access": "WRITE",
+      "size": 32,
+      "frame": "src/auth.c:142",
+      "accounts": null,
+      "parser_rc": null,
+      "log": "results/ch2/asan/vuln_poc_count.dat.txt"
+    },
+    {
+      "variant": "vuln",
+      "poc": "poc_offbyone.dat",
+      "returncode": 1,
+      "error": "heap-buffer-overflow",
+      "access": "READ",
+      "size": 1,
+      "frame": "src/bytes.h:30",
+      "accounts": null,
+      "parser_rc": null,
+      "log": "results/ch2/asan/vuln_poc_offbyone.dat.txt"
+    },
+    {
+      "variant": "vuln",
+      "poc": "poc_short.dat",
+      "returncode": 1,
+      "error": "heap-buffer-overflow",
+      "access": "READ",
+      "size": 32,
+      "frame": "src/auth.c:142",
+      "accounts": null,
+      "parser_rc": null,
+      "log": "results/ch2/asan/vuln_poc_short.dat.txt"
+    },
+    {
+      "variant": "fixed",
+      "poc": "poc_count.dat",
+      "returncode": 0,
+      "error": null,
+      "access": null,
+      "size": null,
+      "frame": null,
+      "accounts": 256,
+      "parser_rc": 0,
+      "log": "results/ch2/asan/fixed_poc_count.dat.txt"
+    },
+    {
+      "variant": "fixed",
+      "poc": "poc_offbyone.dat",
+      "returncode": 0,
+      "error": null,
+      "access": null,
+      "size": null,
+      "frame": null,
+      "accounts": 0,
+      "parser_rc": -1,
+      "log": "results/ch2/asan/fixed_poc_offbyone.dat.txt"
+    },
+    {
+      "variant": "fixed",
+      "poc": "poc_short.dat",
+      "returncode": 0,
+      "error": null,
+      "access": null,
+      "size": null,
+      "frame": null,
+      "accounts": 0,
+      "parser_rc": 0,
+      "log": "results/ch2/asan/fixed_poc_short.dat.txt"
+    }
+  ],
+  "checks": {
+    "vuln_bugs_found": 3,
+    "fixed_clean": 3,
+    "vuln_ok": true,
+    "fixed_ok": true,
+    "all_expected": true
+  }
+}

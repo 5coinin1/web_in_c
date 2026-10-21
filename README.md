@@ -174,14 +174,36 @@ With ASan, build `wschat_fuzz_store_vuln` via `-DWCHAT_SANITIZE=ON` and rerun -
 A reports a `global-buffer-overflow`, B a `heap-buffer-overflow`, C an
 out-of-bounds read.
 
+### Chapter 2 evidence (WSL)
+
+ASan/UBSan are not available in the MinGW toolchain, so the audit runs in WSL:
+
+```sh
+py -3 python/ch2_memory_safety/run_ch2.py        # Windows -> WSL
+# or, inside WSL/Linux:
+python3 python/ch2_memory_safety/run_ch2.py
+```
+
+The pipeline runs cppcheck + the project pattern scanner, builds
+`wschat_fuzz_store` with `-DVULN` and without, executes the three PoCs under
+`-fsanitize=address,undefined`, and writes:
+
+- `results/ch2/` — cppcheck XML/text, pattern scan, ASan logs, `results.json`;
+- `docs/findings_ch2.md` — findings report (5 sub-sections per CWE);
+- `docs/before_after_ch2.md` — before/after table.
+
+Expected: 3/3 ASan reports on `-DVULN` and 0 on the fixed build. See
+`python/ch2_memory_safety/README.md` for details.
+
 ### Suggested module mapping
 
 - **Ch2**: run `cppcheck` / the memory-safety scanner on `src/auth.c`, then
   ASan on the `_vuln` harness with the PoCs; apply the `[FIX x]` branches and
   confirm with `wschat_fuzz_store`.
-- **Ch3**: model `count`, `off = 12 + i * RECORD_SIZE` and `len` in Z3;
-  prove `count <= MAX_ACCOUNTS && RECORD_SIZE <= len - off` is safe and let it
-  return the counterexample when those constraints are dropped.
+- **Ch3**: model `client_read_append()` (`src/read_buffer.h`) in Z3:
+  `L + N < 8192` plus the NUL-terminator headroom, with an inductive invariant
+  and a BMC over k recv rounds; run `python/ch3_smt/run.py` for the six SMT
+  queries, six BMC checks and the C harness.
 - **Ch4**: fuzz `auth_store_parse` black-box (random bytes must guess the 4-byte
   `"WSAC"` magic) vs white-box (Z3 solves the magic and the length conditions),
   and compare attempts/time.

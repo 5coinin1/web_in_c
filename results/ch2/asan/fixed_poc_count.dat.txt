@@ -1,0 +1,6 @@
+/mnt/c/Users/lenovo/Desktop/temp/web_in_c/results/ch2/build/fuzz_store_fixed /mnt/c/Users/lenovo/Desktop/temp/web_in_c/results/ch2/pocs/poc_count.dat
+returncode: 0
+elapsed_s: 0.012
+--- stdout ---
+auth_store_parse -> rc=0 accounts=256
+--- stderr ---

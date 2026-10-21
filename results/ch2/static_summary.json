@@ -1,0 +1,248 @@
+{
+  "vuln": {
+    "available": true,
+    "summary": "11 finding(s): information=1, style=10",
+    "by_severity": {
+      "information": 1,
+      "style": 10
+    },
+    "memory_findings": [],
+    "findings": [
+      {
+        "file": "/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/auth.c",
+        "line": 252,
+        "severity": "style",
+        "cwe": "398",
+        "message": "Variable 'dummy_salt' can be declared as const array",
+        "check_id": "constVariable"
+      },
+      {
+        "file": "/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/auth.c",
+        "line": 213,
+        "severity": "style",
+        "cwe": "561",
+        "message": "The function 'auth_init' is never used.",
+        "check_id": "unusedFunction"
+      },
+      {
+        "file": "/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/auth.c",
+        "line": 232,
+        "severity": "style",
+        "cwe": "561",
+        "message": "The function 'auth_check' is never used.",
+        "check_id": "unusedFunction"
+      },
+      {
+        "file": "/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/auth.c",
+        "line": 274,
+        "severity": "style",
+        "cwe": "561",
+        "message": "The function 'auth_register' is never used.",
+        "check_id": "unusedFunction"
+      },
+      {
+        "file": "/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/auth.c",
+        "line": 290,
+        "severity": "style",
+        "cwe": "561",
+        "message": "The function 'auth_num_accounts' is never used.",
+        "check_id": "unusedFunction"
+      },
+      {
+        "file": "/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/common.h",
+        "line": 55,
+        "severity": "style",
+        "cwe": "561",
+        "message": "The function 'socket_set_sndbuf' is never used.",
+        "check_id": "unusedFunction"
+      },
+      {
+        "file": "/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/common.h",
+        "line": 61,
+        "severity": "style",
+        "cwe": "561",
+        "message": "The function 'socket_set_send_timeout' is never used.",
+        "check_id": "unusedFunction"
+      },
+      {
+        "file": "/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/common.h",
+        "line": 74,
+        "severity": "style",
+        "cwe": "561",
+        "message": "The function 'socket_send_would_block' is never used.",
+        "check_id": "unusedFunction"
+      },
+      {
+        "file": "/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/path_util.h",
+        "line": 85,
+        "severity": "style",
+        "cwe": "561",
+        "message": "The function 'data_dir_path' is never used.",
+        "check_id": "unusedFunction"
+      },
+      {
+        "file": "/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/auth.c",
+        "line": 107,
+        "severity": "style",
+        "cwe": null,
+        "message": "The function 'auth_store_parse' should have static linkage since it is not used outside of its translation unit.",
+        "check_id": "staticFunction"
+      },
+      {
+        "file": "?",
+        "line": 0,
+        "severity": "information",
+        "cwe": null,
+        "message": "Active checkers: 119/975 (use --checkers-report=<filename> to see details)",
+        "check_id": "checkersReport"
+      }
+    ]
+  },
+  "fixed": {
+    "available": true,
+    "summary": "12 finding(s): information=2, style=10",
+    "by_severity": {
+      "information": 2,
+      "style": 10
+    },
+    "memory_findings": [],
+    "findings": [
+      {
+        "file": "/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/auth.c",
+        "line": 0,
+        "severity": "information",
+        "cwe": null,
+        "message": "Limiting analysis of branches. Use --check-level=exhaustive to analyze all branches.",
+        "check_id": "normalCheckLevelMaxBranches"
+      },
+      {
+        "file": "/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/auth.c",
+        "line": 252,
+        "severity": "style",
+        "cwe": "398",
+        "message": "Variable 'dummy_salt' can be declared as const array",
+        "check_id": "constVariable"
+      },
+      {
+        "file": "/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/auth.c",
+        "line": 213,
+        "severity": "style",
+        "cwe": "561",
+        "message": "The function 'auth_init' is never used.",
+        "check_id": "unusedFunction"
+      },
+      {
+        "file": "/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/auth.c",
+        "line": 232,
+        "severity": "style",
+        "cwe": "561",
+        "message": "The function 'auth_check' is never used.",
+        "check_id": "unusedFunction"
+      },
+      {
+        "file": "/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/auth.c",
+        "line": 274,
+        "severity": "style",
+        "cwe": "561",
+        "message": "The function 'auth_register' is never used.",
+        "check_id": "unusedFunction"
+      },
+      {
+        "file": "/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/auth.c",
+        "line": 290,
+        "severity": "style",
+        "cwe": "561",
+        "message": "The function 'auth_num_accounts' is never used.",
+        "check_id": "unusedFunction"
+      },
+      {
+        "file": "/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/common.h",
+        "line": 55,
+        "severity": "style",
+        "cwe": "561",
+        "message": "The function 'socket_set_sndbuf' is never used.",
+        "check_id": "unusedFunction"
+      },
+      {
+        "file": "/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/common.h",
+        "line": 61,
+        "severity": "style",
+        "cwe": "561",
+        "message": "The function 'socket_set_send_timeout' is never used.",
+        "check_id": "unusedFunction"
+      },
+      {
+        "file": "/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/common.h",
+        "line": 74,
+        "severity": "style",
+        "cwe": "561",
+        "message": "The function 'socket_send_would_block' is never used.",
+        "check_id": "unusedFunction"
+      },
+      {
+        "file": "/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/path_util.h",
+        "line": 85,
+        "severity": "style",
+        "cwe": "561",
+        "message": "The function 'data_dir_path' is never used.",
+        "check_id": "unusedFunction"
+      },
+      {
+        "file": "/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/auth.c",
+        "line": 107,
+        "severity": "style",
+        "cwe": null,
+        "message": "The function 'auth_store_parse' should have static linkage since it is not used outside of its translation unit.",
+        "check_id": "staticFunction"
+      },
+      {
+        "file": "?",
+        "line": 0,
+        "severity": "information",
+        "cwe": null,
+        "message": "Active checkers: 119/975 (use --checkers-report=<filename> to see details)",
+        "check_id": "checkersReport"
+      }
+    ]
+  },
+  "pattern_scan": {
+    "count": 3,
+    "by_cwe": {
+      "CWE-125": 1,
+      "CWE-129": 1,
+      "CWE-193": 1
+    },
+    "findings": [
+      {
+        "file": "src/auth.c",
+        "line": 114,
+        "variant": "vuln",
+        "rule": "header-length-off-by-one",
+        "cwe": "CWE-193",
+        "severity": "HIGH",
+        "message": "Header accepts an 11-byte store; get_u32(buf + 8) then reads buf[8..11], one byte past the end. The fixed bound is len < 12.",
+        "code": "if (!buf || len < 11) return -1;"
+      },
+      {
+        "file": "src/auth.c",
+        "line": 122,
+        "variant": "vuln",
+        "rule": "unbounded-count",
+        "cwe": "CWE-129",
+        "severity": "HIGH",
+        "message": "File-controlled count is used as the loop bound and as an index into g_accounts[MAX_ACCOUNTS] (256) without a cap; a crafted store writes past the global array (CWE-787).",
+        "code": "uint32_t count = get_u32(buf + 8);"
+      },
+      {
+        "file": "src/auth.c",
+        "line": 142,
+        "variant": "vuln",
+        "rule": "unchecked-record-offset",
+        "cwe": "CWE-125",
+        "severity": "HIGH",
+        "message": "Record copy uses off = 12 + i*88 without checking off/off+88 against len; a short store causes an out-of-bounds heap read.",
+        "code": "memcpy(a->username, buf + off, 32);"
+      }
+    ]
+  }
+}

@@ -1,6 +1,7 @@
 # Build output
 /build/
 /build-asan/
+/results/ch2/build/
 
 # Server / client data
 /server_data/
@@ -14,6 +15,8 @@
 # Editor / OS
 .vscode/
 .idea/
+__pycache__/
+*.pyc
 *.o
 *.exe
 *.log

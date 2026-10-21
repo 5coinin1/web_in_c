@@ -1,0 +1,10 @@
+3 pattern finding(s):
+  src/auth.c:114 [vuln] header-length-off-by-one (CWE-193, HIGH)
+      Header accepts an 11-byte store; get_u32(buf + 8) then reads buf[8..11], one byte past the end. The fixed bound is len < 12.
+      if (!buf || len < 11) return -1;
+  src/auth.c:122 [vuln] unbounded-count (CWE-129, HIGH)
+      File-controlled count is used as the loop bound and as an index into g_accounts[MAX_ACCOUNTS] (256) without a cap; a crafted store writes past the global array (CWE-787).
+      uint32_t count = get_u32(buf + 8);
+  src/auth.c:142 [vuln] unchecked-record-offset (CWE-125, HIGH)
+      Record copy uses off = 12 + i*88 without checking off/off+88 against len; a short store causes an out-of-bounds heap read.
+      memcpy(a->username, buf + off, 32);

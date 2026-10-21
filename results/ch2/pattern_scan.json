@@ -1,0 +1,32 @@
+[
+  {
+    "file": "src/auth.c",
+    "line": 114,
+    "variant": "vuln",
+    "rule": "header-length-off-by-one",
+    "cwe": "CWE-193",
+    "severity": "HIGH",
+    "message": "Header accepts an 11-byte store; get_u32(buf + 8) then reads buf[8..11], one byte past the end. The fixed bound is len < 12.",
+    "code": "if (!buf || len < 11) return -1;"
+  },
+  {
+    "file": "src/auth.c",
+    "line": 122,
+    "variant": "vuln",
+    "rule": "unbounded-count",
+    "cwe": "CWE-129",
+    "severity": "HIGH",
+    "message": "File-controlled count is used as the loop bound and as an index into g_accounts[MAX_ACCOUNTS] (256) without a cap; a crafted store writes past the global array (CWE-787).",
+    "code": "uint32_t count = get_u32(buf + 8);"
+  },
+  {
+    "file": "src/auth.c",
+    "line": 142,
+    "variant": "vuln",
+    "rule": "unchecked-record-offset",
+    "cwe": "CWE-125",
+    "severity": "HIGH",
+    "message": "Record copy uses off = 12 + i*88 without checking off/off+88 against len; a short store causes an out-of-bounds heap read.",
+    "code": "memcpy(a->username, buf + off, 32);"
+  }
+]

@@ -6,10 +6,10 @@ thể để các chương phân tích.
 
 ```
 python/
-  ch1_kripke/            # Ch1: Mô hình hóa & Kiểm chứng hình thức (Kripke + BMC)  (KHUNG)
-  ch2_memory_safety/     # Ch2: Kiểm toán an toàn bộ nhớ C                          (KHUNG)
-  ch3_smt/               # Ch3: Kiểm chứng số học/alignment bằng SMT (Z3)          (KHUNG)
-  ch4_fuzzing/           # Ch4: Fuzzing (black-box vs white-box)               <-- ĐÃ LÀM
+  ch1_kripke/            # Ch1: Mô hình hóa & Kiểm chứng hình thức (Kripke + BMC)  ĐÃ LÀM
+  ch2_memory_safety/     # Ch2: Kiểm toán an toàn bộ nhớ C (cppcheck + ASan)      ĐÃ LÀM
+  ch3_smt/               # Ch3: Kiểm chứng số học/alignment bằng SMT (Z3)          ĐÃ LÀM
+  ch4_fuzzing/           # Ch4: Fuzzing (black-box vs white-box)                  ĐÃ LÀM
     __init__.py
     build.py             # biên dịch target (--coverage, -fsanitize=address, -DVULN)
     fuzzing.py           # run / coverage / crash-oracle / black-box / coverage-guided
@@ -25,15 +25,34 @@ python/
   README.md
 ```
 
-`ch1`–`ch3` có sẵn `__init__.py` nêu rõ việc cần làm (xem docstring trong mỗi package).
+Mỗi package Ch1–Ch3 có `README.md`/docstring riêng mô tả cách chạy và đầu ra.
 
 Ánh xạ với đề bài:
 | Ch | Hướng | Mã C liên quan | Trạng thái |
 |---|---|---|---|
-| 1 | Kripke + BMC | `src/state_machine.c`, `src/kripke.c`, `test/ch1_kripke.c` | khung Python |
-| 2 | Memory safety | `src/auth.c` (lỗi cố ý `-DVULN`) | khung Python |
-| 3 | SMT | `src/auth.c` (`off = 12 + i*RECORD_SIZE`) | khung Python |
+| 1 | Kripke + BMC | `src/state_machine.c`, `src/kripke.c`, `test/ch1_kripke.c` + `python/ch1_kripke/` | **hoàn thiện (C + Python, 185 test)** |
+| 2 | Memory safety | `src/auth.c` (lỗi cố ý `-DVULN`), `test/fuzz_store.c` | **hoàn thiện (cppcheck + pattern + ASan/UBSan)** |
+| 3 | SMT | `src/read_buffer.h` (`client_read_append`), `src/server.c` | **hoàn thiện (Z3 + BMC + C harness)** |
 | 4 | Fuzzing | `src/auth.c` (`auth_store_parse`) + `test/fuzz_store.c` | **hoàn thiện** |
+
+---
+
+# Chương 2 — Memory Safety Audit
+
+```bash
+# Windows -> tự dispatch vào WSL (ASan/UBSan không có trên MinGW)
+py -3 python/ch2_memory_safety/run_ch2.py
+
+# Trong WSL/Linux
+python3 python/ch2_memory_safety/run_ch2.py
+```
+
+Ba bước: `static_check.py` (cppcheck XML + pattern scanner) → `asan_runner.py`
+(build `-DVULN`/fixed với `-fsanitize=address,undefined`, chạy 3 PoC) →
+`report.py` (sinh `docs/findings_ch2.md`, `docs/before_after_ch2.md`).
+
+Kết quả kỳ vọng: 3/3 lỗi ASan ở bản `-DVULN`; bản vá sạch (0 ASan);
+xem `results/ch2/` và `python/ch2_memory_safety/README.md`.
 
 ---
 

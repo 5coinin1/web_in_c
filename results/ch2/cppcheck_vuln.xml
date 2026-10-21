@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<results version="2">
+    <cppcheck version="2.19.0"/>
+    <errors>
+        <error id="constVariable" severity="style" msg="Variable &apos;dummy_salt&apos; can be declared as const array" verbose="Variable &apos;dummy_salt&apos; can be declared as const array" cwe="398" file0="/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/auth.c">
+            <location file="/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/auth.c" line="252" column="17" info="Variable &apos;dummy_salt&apos; can be declared as const array"/>
+            <symbol>dummy_salt</symbol>
+        </error>
+        <error id="unusedFunction" severity="style" msg="The function &apos;auth_init&apos; is never used." verbose="The function &apos;auth_init&apos; is never used." cwe="561">
+            <location file="/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/auth.c" line="213" column="6"/>
+            <symbol>auth_init</symbol>
+        </error>
+        <error id="unusedFunction" severity="style" msg="The function &apos;auth_check&apos; is never used." verbose="The function &apos;auth_check&apos; is never used." cwe="561">
+            <location file="/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/auth.c" line="232" column="15"/>
+            <symbol>auth_check</symbol>
+        </error>
+        <error id="unusedFunction" severity="style" msg="The function &apos;auth_register&apos; is never used." verbose="The function &apos;auth_register&apos; is never used." cwe="561">
+            <location file="/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/auth.c" line="274" column="19"/>
+            <symbol>auth_register</symbol>
+        </error>
+        <error id="unusedFunction" severity="style" msg="The function &apos;auth_num_accounts&apos; is never used." verbose="The function &apos;auth_num_accounts&apos; is never used." cwe="561">
+            <location file="/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/auth.c" line="290" column="5"/>
+            <symbol>auth_num_accounts</symbol>
+        </error>
+        <error id="unusedFunction" severity="style" msg="The function &apos;socket_set_sndbuf&apos; is never used." verbose="The function &apos;socket_set_sndbuf&apos; is never used." cwe="561">
+            <location file="/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/common.h" line="55" column="20"/>
+            <symbol>socket_set_sndbuf</symbol>
+        </error>
+        <error id="unusedFunction" severity="style" msg="The function &apos;socket_set_send_timeout&apos; is never used." verbose="The function &apos;socket_set_send_timeout&apos; is never used." cwe="561">
+            <location file="/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/common.h" line="61" column="20"/>
+            <symbol>socket_set_send_timeout</symbol>
+        </error>
+        <error id="unusedFunction" severity="style" msg="The function &apos;socket_send_would_block&apos; is never used." verbose="The function &apos;socket_send_would_block&apos; is never used." cwe="561">
+            <location file="/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/common.h" line="74" column="19"/>
+            <symbol>socket_send_would_block</symbol>
+        </error>
+        <error id="unusedFunction" severity="style" msg="The function &apos;data_dir_path&apos; is never used." verbose="The function &apos;data_dir_path&apos; is never used." cwe="561">
+            <location file="/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/path_util.h" line="85" column="20"/>
+            <symbol>data_dir_path</symbol>
+        </error>
+        <error id="staticFunction" severity="style" msg="The function &apos;auth_store_parse&apos; should have static linkage since it is not used outside of its translation unit." verbose="The function &apos;auth_store_parse&apos; should have static linkage since it is not used outside of its translation unit.">
+            <location file="/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/auth.c" line="107" column="5"/>
+            <symbol>auth_store_parse</symbol>
+        </error>
+        <error id="checkersReport" severity="information" msg="Active checkers: 119/975 (use --checkers-report=&lt;filename&gt; to see details)" verbose="Active checkers: 119/975 (use --checkers-report=&lt;filename&gt; to see details)"/>
+    </errors>
+</results>

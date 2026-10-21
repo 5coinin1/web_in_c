@@ -1,0 +1,16 @@
+Chapter 2 - ASan/UBSan evidence
+generated: 2026-10-21 18:23:44
+toolchain: gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+
+variant  poc                     asan/error                 access size frame              parser_rc accounts
+-------  ----------------------  -------------------------  ------ ---- ----------------  --------- --------
+vuln     poc_count.dat           global-buffer-overflow     WRITE  32   src/auth.c:142    -         -
+vuln     poc_offbyone.dat        heap-buffer-overflow       READ   1    src/bytes.h:30    -         -
+vuln     poc_short.dat           heap-buffer-overflow       READ   32   src/auth.c:142    -         -
+fixed    poc_count.dat           none                       -      -    -                 0         256
+fixed    poc_offbyone.dat        none                       -      -    -                 -1        0
+fixed    poc_short.dat           none                       -      -    -                 0         0
+
+vulnerable bugs found : 3/3
+fixed cases clean     : 3/3
+all expectations met  : True

@@ -1,0 +1,56 @@
+/mnt/c/Users/lenovo/Desktop/temp/web_in_c/results/ch2/build/fuzz_store_vuln /mnt/c/Users/lenovo/Desktop/temp/web_in_c/results/ch2/pocs/poc_short.dat
+returncode: 1
+elapsed_s: 0.104
+--- stdout ---
+--- stderr ---
+=================================================================
+==697==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x7b6d537e004c at pc 0x62020feef6f1 bp 0x7fffd7bb0350 sp 0x7fffd7bb0340
+READ of size 32 at 0x7b6d537e004c thread T0
+    #0 0x62020feef6f0 in memcpy /usr/include/x86_64-linux-gnu/bits/string_fortified.h:29
+    #1 0x62020feef6f0 in auth_store_parse /mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/auth.c:142
+    #2 0x62020feed9d9 in main /mnt/c/Users/lenovo/Desktop/temp/web_in_c/test/fuzz_store.c:33
+    #3 0x7f3d5482a600 in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:59
+    #4 0x7f3d5482a717 in __libc_start_main_impl ../csu/libc-start.c:360
+    #5 0x62020feed824 in _start (/mnt/c/Users/lenovo/Desktop/temp/web_in_c/results/ch2/build/fuzz_store_vuln+0x7824) (BuildId: 0a738e2ae429c830be47c9f4ba1500438bb00067)
+
+0x7b6d537e0051 is located 0 bytes after 17-byte region [0x7b6d537e0040,0x7b6d537e0051)
+allocated by thread T0 here:
+    #0 0x7f3d5552b60f in malloc ../../../../src/libsanitizer/asan/asan_malloc_linux.cpp:67
+    #1 0x62020feed99c in main /mnt/c/Users/lenovo/Desktop/temp/web_in_c/test/fuzz_store.c:28
+    #2 0x7f3d5482a600 in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:59
+    #3 0x7f3d5482a717 in __libc_start_main_impl ../csu/libc-start.c:360
+    #4 0x62020feed824 in _start (/mnt/c/Users/lenovo/Desktop/temp/web_in_c/results/ch2/build/fuzz_store_vuln+0x7824) (BuildId: 0a738e2ae429c830be47c9f4ba1500438bb00067)
+
+SUMMARY: AddressSanitizer: heap-buffer-overflow /usr/include/x86_64-linux-gnu/bits/string_fortified.h:29 in memcpy
+Shadow bytes around the buggy address:
+  0x7b6d537dfd80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7b6d537dfe00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7b6d537dfe80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7b6d537dff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x7b6d537dff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+=>0x7b6d537e0000: fa fa 00 00 00 fa fa fa 00[00]01 fa fa fa fa fa
+  0x7b6d537e0080: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x7b6d537e0100: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x7b6d537e0180: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x7b6d537e0200: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x7b6d537e0280: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07 
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+==697==ABORTING

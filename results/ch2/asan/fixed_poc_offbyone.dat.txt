@@ -1,0 +1,6 @@
+/mnt/c/Users/lenovo/Desktop/temp/web_in_c/results/ch2/build/fuzz_store_fixed /mnt/c/Users/lenovo/Desktop/temp/web_in_c/results/ch2/pocs/poc_offbyone.dat
+returncode: 0
+elapsed_s: 0.011
+--- stdout ---
+auth_store_parse -> rc=-1 accounts=0
+--- stderr ---
