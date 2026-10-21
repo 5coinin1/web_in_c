@@ -15,6 +15,7 @@ python/
     fuzzing.py           # run / coverage / crash-oracle / black-box / coverage-guided
     whitebox.py          # dựng input theo cấu trúc + giải cổng magic bằng Z3
     seeds.py             # seed corpus
+    report.py            # sinh docs/findings_ch4.md + before/after
     stubs/openssl/*.h    # stub OpenSSL (parser không dùng crypto)
     stubs/stub_openssl.c
     _work/               # binary + .gcno/.gcda + seeds (sinh khi chạy)
@@ -53,6 +54,26 @@ Ba bước: `static_check.py` (cppcheck XML + pattern scanner) → `asan_runner.
 
 Kết quả kỳ vọng: 3/3 lỗi ASan ở bản `-DVULN`; bản vá sạch (0 ASan);
 xem `results/ch2/` và `python/ch2_memory_safety/README.md`.
+
+---
+
+# Báo cáo bằng chứng (Ch1/Ch3/Ch4)
+
+```bash
+python3 python/ch1_kripke/report.py                 # results/ch1 + docs/findings_ch1.md
+python3 python/ch3_smt/run.py --output results/ch3  # SMT + BMC + C harness
+python3 python/ch3_smt/report.py                    # docs/findings_ch3.md
+# Ch4: chạy demo/pytest trong WSL trước, rồi sinh report
+python3 python/ch4_fuzzing/report.py                # docs/findings_ch4.md
+python3 tools/build_evidence.py                     # sinh lại toàn bộ report chương
+```
+
+Tổng hợp:
+
+- `docs/README.md` — chỉ mục toàn bộ tài liệu bằng chứng.
+- `docs/cwe_cve_summary.md` — 12 phát hiện, 6 nhóm CWE, ánh xạ CWE/CVE.
+- `docs/before_after_all.md` — bảng before/after tổng hợp.
+- `docs/evidence_index.md` — chỉ mục toàn bộ log/JSON/bằng chứng.
 
 ---
 

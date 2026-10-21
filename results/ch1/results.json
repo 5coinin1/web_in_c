@@ -1,0 +1,918 @@
+{
+  "command_models": {
+    "none": {
+      "P1": {
+        "formula": "AG(in_room -> authenticated)",
+        "holds": true,
+        "counterexample": null,
+        "vacuous": false
+      },
+      "P2": {
+        "formula": "AG(authenticated -> ws_open)",
+        "holds": true,
+        "counterexample": null,
+        "vacuous": false
+      },
+      "P3": {
+        "formula": "AG(closed -> NOT(authenticated OR member OR ws_open))",
+        "holds": true,
+        "counterexample": null,
+        "vacuous": false
+      },
+      "P4": {
+        "formula": "AG(message_accepted -> (authenticated AND member AND in_room))",
+        "holds": true,
+        "counterexample": null,
+        "vacuous": false
+      },
+      "P5": {
+        "formula": "AG(logged_out -> NOT(authenticated OR member OR in_room))",
+        "holds": true,
+        "counterexample": null,
+        "vacuous": false
+      },
+      "P6": {
+        "formula": "AG(member <-> in_room)",
+        "holds": true,
+        "counterexample": null
+      },
+      "P7": {
+        "formula": "AG(authenticated -> (phase_AUTHENTICATED OR phase_IN_ROOM))",
+        "holds": true,
+        "counterexample": null,
+        "vacuous": false
+      },
+      "R1": {
+        "formula": "EF authenticated",
+        "holds": true,
+        "witness": {
+          "states": [
+            "S0",
+            "S2",
+            "S3",
+            "S4"
+          ],
+          "edge_ids": [
+            "E2",
+            "E7",
+            "E26"
+          ],
+          "events": [
+            "FIRST_BYTES",
+            "HTTP_UPGRADE_VALID",
+            "LOGIN_OK"
+          ]
+        }
+      },
+      "R2": {
+        "formula": "EF in_room",
+        "holds": true,
+        "witness": {
+          "states": [
+            "S0",
+            "S2",
+            "S3",
+            "S4",
+            "S5"
+          ],
+          "edge_ids": [
+            "E2",
+            "E7",
+            "E26",
+            "E68"
+          ],
+          "events": [
+            "FIRST_BYTES",
+            "HTTP_UPGRADE_VALID",
+            "LOGIN_OK",
+            "JOIN_OK"
+          ]
+        }
+      },
+      "R3": {
+        "formula": "EF message_accepted",
+        "holds": true,
+        "witness": {
+          "states": [
+            "S0",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S7"
+          ],
+          "edge_ids": [
+            "E2",
+            "E7",
+            "E26",
+            "E68",
+            "E111"
+          ],
+          "events": [
+            "FIRST_BYTES",
+            "HTTP_UPGRADE_VALID",
+            "LOGIN_OK",
+            "JOIN_OK",
+            "MESSAGE_VALID"
+          ]
+        }
+      },
+      "R4": {
+        "formula": "EF logged_out",
+        "holds": true,
+        "witness": {
+          "states": [
+            "S0",
+            "S2",
+            "S3",
+            "S4",
+            "S6"
+          ],
+          "edge_ids": [
+            "E2",
+            "E7",
+            "E26",
+            "E75"
+          ],
+          "events": [
+            "FIRST_BYTES",
+            "HTTP_UPGRADE_VALID",
+            "LOGIN_OK",
+            "LOGOUT"
+          ]
+        }
+      },
+      "R5": {
+        "formula": "EF closed",
+        "holds": true,
+        "witness": {
+          "states": [
+            "S0",
+            "S1"
+          ],
+          "edge_ids": [
+            "E0"
+          ],
+          "events": [
+            "TCP_DISCONNECT"
+          ]
+        }
+      },
+      "L1": {
+        "formula": "AG(ws_open -> EF(in_room OR closed))",
+        "holds": true,
+        "counterexample": null
+      },
+      "L2": {
+        "formula": "AG(in_room -> EF(authenticated AND NOT in_room))",
+        "holds": true,
+        "counterexample": null
+      }
+    },
+    "join_bypass": {
+      "P1": {
+        "formula": "AG(in_room -> authenticated)",
+        "holds": false,
+        "counterexample": {
+          "states": [
+            "S0",
+            "S2",
+            "S3",
+            "S5"
+          ],
+          "edge_ids": [
+            "E2",
+            "E7",
+            "E33"
+          ],
+          "events": [
+            "FIRST_BYTES",
+            "HTTP_UPGRADE_VALID",
+            "JOIN_OK"
+          ]
+        },
+        "vacuous": false
+      },
+      "P2": {
+        "formula": "AG(authenticated -> ws_open)",
+        "holds": true,
+        "counterexample": null,
+        "vacuous": false
+      },
+      "P3": {
+        "formula": "AG(closed -> NOT(authenticated OR member OR ws_open))",
+        "holds": true,
+        "counterexample": null,
+        "vacuous": false
+      },
+      "P4": {
+        "formula": "AG(message_accepted -> (authenticated AND member AND in_room))",
+        "holds": false,
+        "counterexample": {
+          "states": [
+            "S0",
+            "S2",
+            "S3",
+            "S5",
+            "S9"
+          ],
+          "edge_ids": [
+            "E2",
+            "E7",
+            "E33",
+            "E111"
+          ],
+          "events": [
+            "FIRST_BYTES",
+            "HTTP_UPGRADE_VALID",
+            "JOIN_OK",
+            "MESSAGE_VALID"
+          ]
+        },
+        "vacuous": false
+      },
+      "P5": {
+        "formula": "AG(logged_out -> NOT(authenticated OR member OR in_room))",
+        "holds": true,
+        "counterexample": null,
+        "vacuous": false
+      },
+      "P6": {
+        "formula": "AG(member <-> in_room)",
+        "holds": true,
+        "counterexample": null
+      },
+      "P7": {
+        "formula": "AG(authenticated -> (phase_AUTHENTICATED OR phase_IN_ROOM))",
+        "holds": true,
+        "counterexample": null,
+        "vacuous": false
+      },
+      "R1": {
+        "formula": "EF authenticated",
+        "holds": true,
+        "witness": {
+          "states": [
+            "S0",
+            "S2",
+            "S3",
+            "S4"
+          ],
+          "edge_ids": [
+            "E2",
+            "E7",
+            "E26"
+          ],
+          "events": [
+            "FIRST_BYTES",
+            "HTTP_UPGRADE_VALID",
+            "LOGIN_OK"
+          ]
+        }
+      },
+      "R2": {
+        "formula": "EF in_room",
+        "holds": true,
+        "witness": {
+          "states": [
+            "S0",
+            "S2",
+            "S3",
+            "S5"
+          ],
+          "edge_ids": [
+            "E2",
+            "E7",
+            "E33"
+          ],
+          "events": [
+            "FIRST_BYTES",
+            "HTTP_UPGRADE_VALID",
+            "JOIN_OK"
+          ]
+        }
+      },
+      "R3": {
+        "formula": "EF message_accepted",
+        "holds": true,
+        "witness": {
+          "states": [
+            "S0",
+            "S2",
+            "S3",
+            "S5",
+            "S9"
+          ],
+          "edge_ids": [
+            "E2",
+            "E7",
+            "E33",
+            "E111"
+          ],
+          "events": [
+            "FIRST_BYTES",
+            "HTTP_UPGRADE_VALID",
+            "JOIN_OK",
+            "MESSAGE_VALID"
+          ]
+        }
+      },
+      "R4": {
+        "formula": "EF logged_out",
+        "holds": true,
+        "witness": {
+          "states": [
+            "S0",
+            "S2",
+            "S3",
+            "S4",
+            "S7"
+          ],
+          "edge_ids": [
+            "E2",
+            "E7",
+            "E26",
+            "E75"
+          ],
+          "events": [
+            "FIRST_BYTES",
+            "HTTP_UPGRADE_VALID",
+            "LOGIN_OK",
+            "LOGOUT"
+          ]
+        }
+      },
+      "R5": {
+        "formula": "EF closed",
+        "holds": true,
+        "witness": {
+          "states": [
+            "S0",
+            "S1"
+          ],
+          "edge_ids": [
+            "E0"
+          ],
+          "events": [
+            "TCP_DISCONNECT"
+          ]
+        }
+      },
+      "L1": {
+        "formula": "AG(ws_open -> EF(in_room OR closed))",
+        "holds": true,
+        "counterexample": null
+      },
+      "L2": {
+        "formula": "AG(in_room -> EF(authenticated AND NOT in_room))",
+        "holds": true,
+        "counterexample": null
+      }
+    },
+    "message_guard": {
+      "P1": {
+        "formula": "AG(in_room -> authenticated)",
+        "holds": true,
+        "counterexample": null,
+        "vacuous": false
+      },
+      "P2": {
+        "formula": "AG(authenticated -> ws_open)",
+        "holds": true,
+        "counterexample": null,
+        "vacuous": false
+      },
+      "P3": {
+        "formula": "AG(closed -> NOT(authenticated OR member OR ws_open))",
+        "holds": true,
+        "counterexample": null,
+        "vacuous": false
+      },
+      "P4": {
+        "formula": "AG(message_accepted -> (authenticated AND member AND in_room))",
+        "holds": false,
+        "counterexample": {
+          "states": [
+            "S0",
+            "S2",
+            "S3",
+            "S4",
+            "S7"
+          ],
+          "edge_ids": [
+            "E2",
+            "E7",
+            "E26",
+            "E76"
+          ],
+          "events": [
+            "FIRST_BYTES",
+            "HTTP_UPGRADE_VALID",
+            "LOGIN_OK",
+            "MESSAGE_VALID"
+          ]
+        },
+        "vacuous": false
+      },
+      "P5": {
+        "formula": "AG(logged_out -> NOT(authenticated OR member OR in_room))",
+        "holds": true,
+        "counterexample": null,
+        "vacuous": false
+      },
+      "P6": {
+        "formula": "AG(member <-> in_room)",
+        "holds": true,
+        "counterexample": null
+      },
+      "P7": {
+        "formula": "AG(authenticated -> (phase_AUTHENTICATED OR phase_IN_ROOM))",
+        "holds": true,
+        "counterexample": null,
+        "vacuous": false
+      },
+      "R1": {
+        "formula": "EF authenticated",
+        "holds": true,
+        "witness": {
+          "states": [
+            "S0",
+            "S2",
+            "S3",
+            "S4"
+          ],
+          "edge_ids": [
+            "E2",
+            "E7",
+            "E26"
+          ],
+          "events": [
+            "FIRST_BYTES",
+            "HTTP_UPGRADE_VALID",
+            "LOGIN_OK"
+          ]
+        }
+      },
+      "R2": {
+        "formula": "EF in_room",
+        "holds": true,
+        "witness": {
+          "states": [
+            "S0",
+            "S2",
+            "S3",
+            "S4",
+            "S5"
+          ],
+          "edge_ids": [
+            "E2",
+            "E7",
+            "E26",
+            "E68"
+          ],
+          "events": [
+            "FIRST_BYTES",
+            "HTTP_UPGRADE_VALID",
+            "LOGIN_OK",
+            "JOIN_OK"
+          ]
+        }
+      },
+      "R3": {
+        "formula": "EF message_accepted",
+        "holds": true,
+        "witness": {
+          "states": [
+            "S0",
+            "S2",
+            "S3",
+            "S4",
+            "S7"
+          ],
+          "edge_ids": [
+            "E2",
+            "E7",
+            "E26",
+            "E76"
+          ],
+          "events": [
+            "FIRST_BYTES",
+            "HTTP_UPGRADE_VALID",
+            "LOGIN_OK",
+            "MESSAGE_VALID"
+          ]
+        }
+      },
+      "R4": {
+        "formula": "EF logged_out",
+        "holds": true,
+        "witness": {
+          "states": [
+            "S0",
+            "S2",
+            "S3",
+            "S4",
+            "S6"
+          ],
+          "edge_ids": [
+            "E2",
+            "E7",
+            "E26",
+            "E75"
+          ],
+          "events": [
+            "FIRST_BYTES",
+            "HTTP_UPGRADE_VALID",
+            "LOGIN_OK",
+            "LOGOUT"
+          ]
+        }
+      },
+      "R5": {
+        "formula": "EF closed",
+        "holds": true,
+        "witness": {
+          "states": [
+            "S0",
+            "S1"
+          ],
+          "edge_ids": [
+            "E0"
+          ],
+          "events": [
+            "TCP_DISCONNECT"
+          ]
+        }
+      },
+      "L1": {
+        "formula": "AG(ws_open -> EF(in_room OR closed))",
+        "holds": true,
+        "counterexample": null
+      },
+      "L2": {
+        "formula": "AG(in_room -> EF(authenticated AND NOT in_room))",
+        "holds": true,
+        "counterexample": null
+      }
+    },
+    "stale_auth": {
+      "P1": {
+        "formula": "AG(in_room -> authenticated)",
+        "holds": true,
+        "counterexample": null,
+        "vacuous": false
+      },
+      "P2": {
+        "formula": "AG(authenticated -> ws_open)",
+        "holds": true,
+        "counterexample": null,
+        "vacuous": false
+      },
+      "P3": {
+        "formula": "AG(closed -> NOT(authenticated OR member OR ws_open))",
+        "holds": true,
+        "counterexample": null,
+        "vacuous": false
+      },
+      "P4": {
+        "formula": "AG(message_accepted -> (authenticated AND member AND in_room))",
+        "holds": true,
+        "counterexample": null,
+        "vacuous": false
+      },
+      "P5": {
+        "formula": "AG(logged_out -> NOT(authenticated OR member OR in_room))",
+        "holds": false,
+        "counterexample": {
+          "states": [
+            "S0",
+            "S2",
+            "S3",
+            "S4",
+            "S6"
+          ],
+          "edge_ids": [
+            "E2",
+            "E7",
+            "E26",
+            "E75"
+          ],
+          "events": [
+            "FIRST_BYTES",
+            "HTTP_UPGRADE_VALID",
+            "LOGIN_OK",
+            "LOGOUT"
+          ]
+        },
+        "vacuous": false
+      },
+      "P6": {
+        "formula": "AG(member <-> in_room)",
+        "holds": true,
+        "counterexample": null
+      },
+      "P7": {
+        "formula": "AG(authenticated -> (phase_AUTHENTICATED OR phase_IN_ROOM))",
+        "holds": false,
+        "counterexample": {
+          "states": [
+            "S0",
+            "S2",
+            "S3",
+            "S4",
+            "S6"
+          ],
+          "edge_ids": [
+            "E2",
+            "E7",
+            "E26",
+            "E75"
+          ],
+          "events": [
+            "FIRST_BYTES",
+            "HTTP_UPGRADE_VALID",
+            "LOGIN_OK",
+            "LOGOUT"
+          ]
+        },
+        "vacuous": false
+      },
+      "R1": {
+        "formula": "EF authenticated",
+        "holds": true,
+        "witness": {
+          "states": [
+            "S0",
+            "S2",
+            "S3",
+            "S4"
+          ],
+          "edge_ids": [
+            "E2",
+            "E7",
+            "E26"
+          ],
+          "events": [
+            "FIRST_BYTES",
+            "HTTP_UPGRADE_VALID",
+            "LOGIN_OK"
+          ]
+        }
+      },
+      "R2": {
+        "formula": "EF in_room",
+        "holds": true,
+        "witness": {
+          "states": [
+            "S0",
+            "S2",
+            "S3",
+            "S4",
+            "S5"
+          ],
+          "edge_ids": [
+            "E2",
+            "E7",
+            "E26",
+            "E68"
+          ],
+          "events": [
+            "FIRST_BYTES",
+            "HTTP_UPGRADE_VALID",
+            "LOGIN_OK",
+            "JOIN_OK"
+          ]
+        }
+      },
+      "R3": {
+        "formula": "EF message_accepted",
+        "holds": true,
+        "witness": {
+          "states": [
+            "S0",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S7"
+          ],
+          "edge_ids": [
+            "E2",
+            "E7",
+            "E26",
+            "E68",
+            "E111"
+          ],
+          "events": [
+            "FIRST_BYTES",
+            "HTTP_UPGRADE_VALID",
+            "LOGIN_OK",
+            "JOIN_OK",
+            "MESSAGE_VALID"
+          ]
+        }
+      },
+      "R4": {
+        "formula": "EF logged_out",
+        "holds": true,
+        "witness": {
+          "states": [
+            "S0",
+            "S2",
+            "S3",
+            "S4",
+            "S6"
+          ],
+          "edge_ids": [
+            "E2",
+            "E7",
+            "E26",
+            "E75"
+          ],
+          "events": [
+            "FIRST_BYTES",
+            "HTTP_UPGRADE_VALID",
+            "LOGIN_OK",
+            "LOGOUT"
+          ]
+        }
+      },
+      "R5": {
+        "formula": "EF closed",
+        "holds": true,
+        "witness": {
+          "states": [
+            "S0",
+            "S1"
+          ],
+          "edge_ids": [
+            "E0"
+          ],
+          "events": [
+            "TCP_DISCONNECT"
+          ]
+        }
+      },
+      "L1": {
+        "formula": "AG(ws_open -> EF(in_room OR closed))",
+        "holds": true,
+        "counterexample": null
+      },
+      "L2": {
+        "formula": "AG(in_room -> EF(authenticated AND NOT in_room))",
+        "holds": true,
+        "counterexample": null
+      }
+    }
+  },
+  "shared_models": {
+    "shared_same_account": {
+      "membership_consistent": {
+        "holds": true,
+        "counterexample": null
+      },
+      "members_authenticated": {
+        "holds": true,
+        "counterexample": null
+      },
+      "deleted_room_empty": {
+        "holds": true,
+        "counterexample": null,
+        "vacuous": false
+      },
+      "single_session": {
+        "holds": true,
+        "counterexample": null
+      }
+    },
+    "shared_distinct_accounts": {
+      "membership_consistent": {
+        "holds": true,
+        "counterexample": null
+      },
+      "members_authenticated": {
+        "holds": true,
+        "counterexample": null
+      },
+      "deleted_room_empty": {
+        "holds": true,
+        "counterexample": null,
+        "vacuous": false
+      },
+      "two_accounts_can_login": {
+        "holds": true,
+        "witness": {
+          "states": [
+            "G0",
+            "G1",
+            "G6",
+            "G16",
+            "G29",
+            "G43",
+            "G53"
+          ],
+          "edge_ids": [
+            "G_E0",
+            "G_E5",
+            "G_E26",
+            "G_E70",
+            "G_E133",
+            "G_E211"
+          ],
+          "events": [
+            "A:ACCEPT:ACCEPT",
+            "A:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK",
+            "A:LOGIN_OK:LOGIN_OK",
+            "B:ACCEPT:ACCEPT",
+            "B:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK",
+            "B:LOGIN_OK:LOGIN_OK"
+          ]
+        }
+      }
+    },
+    "shared_distinct_accounts_buggy_delete": {
+      "membership_consistent": {
+        "holds": true,
+        "counterexample": null
+      },
+      "members_authenticated": {
+        "holds": true,
+        "counterexample": null
+      },
+      "deleted_room_empty": {
+        "holds": false,
+        "counterexample": {
+          "states": [
+            "G0",
+            "G3",
+            "G13",
+            "G26",
+            "G39",
+            "G52"
+          ],
+          "edge_ids": [
+            "G_E2",
+            "G_E15",
+            "G_E54",
+            "G_E113",
+            "G_E191"
+          ],
+          "events": [
+            "B:ACCEPT:ACCEPT",
+            "B:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK",
+            "B:LOGIN_OK:LOGIN_OK",
+            "B:JOIN_OK:JOIN_OK",
+            "ADMIN_DELETE_ROOM"
+          ]
+        },
+        "vacuous": false
+      },
+      "two_accounts_can_login": {
+        "holds": true,
+        "witness": {
+          "states": [
+            "G0",
+            "G1",
+            "G6",
+            "G16",
+            "G29",
+            "G43",
+            "G54"
+          ],
+          "edge_ids": [
+            "G_E0",
+            "G_E5",
+            "G_E26",
+            "G_E70",
+            "G_E133",
+            "G_E211"
+          ],
+          "events": [
+            "A:ACCEPT:ACCEPT",
+            "A:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK",
+            "A:LOGIN_OK:LOGIN_OK",
+            "B:ACCEPT:ACCEPT",
+            "B:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK",
+            "B:LOGIN_OK:LOGIN_OK"
+          ]
+        }
+      }
+    }
+  },
+  "leave_diagnostic": {
+    "holds": true,
+    "witness": {
+      "states": [
+        "L0",
+        "L1"
+      ],
+      "edge_ids": [
+        "D0"
+      ],
+      "events": [
+        "room_leave"
+      ]
+    }
+  },
+  "tests_passed": 185
+}

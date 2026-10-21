@@ -1,0 +1,8 @@
+Chapter 4 evidence
+generated: 2026-10-21 18:48:51
+coverage after seeding: 12.16%
+black-box: 1500 tries, 45.7s -> none
+guided no seed: 300 tries, 9.3s -> none
+guided seeded: 17 tries, 0.7s -> crash
+white-box Z3: 100.75 ms; structural gate; oracle=ASan
+pytest: 5/5 passed

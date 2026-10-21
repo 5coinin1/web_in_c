@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-10-21T18:46:04.741866+07:00",
+  "head": "b45263b27624ae1e3488d149a382485b08515636",
+  "python": "3.12.5 (tags/v3.12.5:ff3bc82, Aug  6 2024, 20:45:27) [MSC v.1940 64 bit (AMD64)]",
+  "z3": "4.13.0",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "source_sha256": {
+    "src/server.c": "49476ca300299fc4c24cb7a692096e82dece054cef0a7dbd50d3e643fd68d003",
+    "src/connection.h": "2f86223959a360b2644a419be0883da509761e69d2ad2d13b05448c91844d2eb",
+    "src/common.h": "7f7bb59f360d63edd2b65004c31a1fcbeed5694383b7cae4afbfdfba5365d482",
+    "src/ws_frame.c": "034f53dc6dd95736f46bf36e724372e190f77714eeb7d65ce16530fd430cdd1f",
+    "src/ws_frame.h": "d19e17105e52d052a455c7fcf8bd72a3b6d9d787a44809901f079f8a05ed1a34",
+    "python/ch3_smt/append_smt.py": "c9f85272ec910b2e782f6e04b93322b4db6100e849053e9985833efd708dc8b2",
+    "test/ch3_append_harness.c": "d2e21fb3c8ec35101bd27e9f8114cd1dbe76cb69b18003962468e4ed00a300a4",
+    "src/read_buffer.h": "e394acf34767bf738832d5430fa79d8a060e6809527e48fc0bc36defe9989e17"
+  }
+}

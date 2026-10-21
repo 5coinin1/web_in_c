@@ -1,0 +1,30 @@
+CH3-A Verification Log
+Date: 2026-10-21T18:46:04.741866+07:00
+HEAD: b45263b27624ae1e3488d149a382485b08515636
+Z3: 4.13.0
+Python: 3.12.5
+
+[PASS] before_violation: SAT (expected SAT)
+         witness: {'L': 4096, 'N': 4096, 'index': 8192}
+[PASS] fixed_violation: UNSAT (expected UNSAT)
+[PASS] non_vacuity: SAT (expected SAT)
+         witness: {'N': 1, 'L': 8190, 'index': 8191}
+[PASS] signed_overflow: UNSAT (expected UNSAT)
+[PASS] invariant_base: UNSAT (expected UNSAT)
+[PASS] invariant_step: UNSAT (expected UNSAT)
+[PASS] bmc_k1_before: UNSAT (expected UNSAT)
+[PASS] bmc_k1_fixed: UNSAT (expected UNSAT)
+[PASS] bmc_k2_before: SAT (expected SAT)
+         witness: {'N_0': 4096, 'N_1': 4096}
+[PASS] bmc_k2_fixed: UNSAT (expected UNSAT)
+[PASS] bmc_k3_before: SAT (expected SAT)
+         witness: {'N_0': 2727, 'N_1': 4096, 'N_2': 1369}
+[PASS] bmc_k3_fixed: UNSAT (expected UNSAT)
+  before_L4096_N4096: rc=0 SMT witness: total=8192, BAD INDEX
+  fixed_L4096_N4096: rc=0 Fixed rejects: total would be 8192
+  before_L4095_N4096: rc=0 Valid: total=8191, last safe index
+  fixed_L4095_N4096: rc=0 Fixed accepts: total=8191
+  fixed_L8191_N1: rc=0 Fixed rejects: total would be 8192
+  fixed_L0_N4096: rc=0 Fixed accepts from empty
+  abi: rc=0 ABI layout
+  self_test: rc=0 Fixed self-test

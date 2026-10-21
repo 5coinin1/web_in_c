@@ -1,0 +1,13 @@
+{
+  "platform": "Windows-11-10.0.26300-SP0",
+  "python": "3.14.7 (main, Aug  9 2026, 02:08:46)  [MINGW GCC 16.2.0 64 bit (AMD64)]",
+  "source_sha256": {
+    "src/state_machine.c": "fd4619cbfd3fdf2cdfbeca6aec6a3fc841da3bf5f5dec98e4977bd93cf91a97b",
+    "src/state_machine.h": "78c2e92a9e0b428bebbadbfaebcfbe666bc44c5a1cc6dc05238a82abc444601a",
+    "src/connection.c": "3843d754a741b540bfc66070688c518cf6a96347bcd0718212e3237dad23e6f9",
+    "src/room.c": "51bf37022fa9adbeaf3100c6c8597a72ca5a24fb361c0f55c4b3e3250d697122",
+    "src/session.c": "97d3d911eba8053bed0270a9f457268583f2d0ba0c94e7a15fe5fd54ba4287e2",
+    "src/server.c": "62f642f402403f4121ce45f32c452e5a51c9ac02d5d4adb18f58d914bc82a597"
+  },
+  "boundary": "C core table executed; command/shared policies manually reviewed abstraction"
+}

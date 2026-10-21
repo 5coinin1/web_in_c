@@ -195,6 +195,26 @@ The pipeline runs cppcheck + the project pattern scanner, builds
 Expected: 3/3 ASan reports on `-DVULN` and 0 on the fixed build. See
 `python/ch2_memory_safety/README.md` for details.
 
+### Chapter 1 / 3 / 4 evidence
+
+The Chapter-1/3/4 analyses already have their reports and evidence:
+
+```sh
+py -3 python/ch1_kripke/report.py                 # results/ch1 + docs/findings_ch1.md
+py -3 python/ch3_smt/run.py --output results/ch3  # SMT + BMC + C harness
+py -3 python/ch3_smt/report.py                    # docs/findings_ch3.md
+wsl -d Ubuntu -e bash -lc "cd /mnt/c/Users/lenovo/Desktop/temp/web_in_c/python && python3 run_fuzzing_demo.py && python3 tests/test_ch4_fuzzing.py"
+py -3 python/ch4_fuzzing/report.py                # docs/findings_ch4.md
+py -3 tools/build_evidence.py                     # regenerate all chapter reports
+```
+
+Cross-chapter documents:
+
+- `docs/README.md` — index of all evidence/report files;
+- `docs/cwe_cve_summary.md` — 12 findings, 6 CWE families, CWE/CVE mapping;
+- `docs/before_after_all.md` — the consolidated before/after table;
+- `docs/evidence_index.md` — map of every log/JSON/artifact.
+
 ### Suggested module mapping
 
 - **Ch2**: run `cppcheck` / the memory-safety scanner on `src/auth.c`, then

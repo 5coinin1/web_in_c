@@ -1,0 +1,153 @@
+{
+  "before_violation": {
+    "result": "SAT",
+    "expected": "SAT",
+    "ok": true,
+    "witness": {
+      "L": 4096,
+      "N": 4096,
+      "index": 8192
+    }
+  },
+  "fixed_violation": {
+    "result": "UNSAT",
+    "expected": "UNSAT",
+    "ok": true,
+    "witness": null
+  },
+  "non_vacuity": {
+    "result": "SAT",
+    "expected": "SAT",
+    "ok": true,
+    "witness": {
+      "N": 1,
+      "L": 8190,
+      "index": 8191
+    }
+  },
+  "signed_overflow": {
+    "result": "UNSAT",
+    "expected": "UNSAT",
+    "ok": true,
+    "witness": null
+  },
+  "invariant_base": {
+    "result": "UNSAT",
+    "expected": "UNSAT",
+    "ok": true,
+    "witness": null
+  },
+  "invariant_step": {
+    "result": "UNSAT",
+    "expected": "UNSAT",
+    "ok": true,
+    "witness": null
+  },
+  "bmc_k1_before": {
+    "result": "UNSAT",
+    "expected": "UNSAT",
+    "ok": true,
+    "witness": null
+  },
+  "bmc_k1_fixed": {
+    "result": "UNSAT",
+    "expected": "UNSAT",
+    "ok": true,
+    "witness": null
+  },
+  "bmc_k2_before": {
+    "result": "SAT",
+    "expected": "SAT",
+    "ok": true,
+    "witness": {
+      "N_0": 4096,
+      "N_1": 4096
+    }
+  },
+  "bmc_k2_fixed": {
+    "result": "UNSAT",
+    "expected": "UNSAT",
+    "ok": true,
+    "witness": null
+  },
+  "bmc_k3_before": {
+    "result": "SAT",
+    "expected": "SAT",
+    "ok": true,
+    "witness": {
+      "N_0": 2727,
+      "N_1": 4096,
+      "N_2": 1369
+    }
+  },
+  "bmc_k3_fixed": {
+    "result": "UNSAT",
+    "expected": "UNSAT",
+    "ok": true,
+    "witness": null
+  },
+  "c_compile": {
+    "returncode": 0,
+    "stdout": "",
+    "stderr": "",
+    "command": "C:/msys64/mingw64/bin/gcc.exe -std=gnu11 -Wall -Wextra -fsanitize=bounds -fsanitize-trap=bounds -DCH3_WITH_BASELINE -I C:\\Users\\lenovo\\Desktop\\temp\\web_in_c\\src C:\\Users\\lenovo\\Desktop\\temp\\web_in_c\\test\\ch3_append_harness.c C:\\Users\\lenovo\\Desktop\\temp\\web_in_c\\src\\ws_frame.c C:\\Users\\lenovo\\Desktop\\temp\\web_in_c\\src\\state_machine.c -o results\\ch3\\ch3_harness.exe -lws2_32 -lssl -lcrypto"
+  },
+  "c_cases": [
+    {
+      "label": "before_L4096_N4096",
+      "desc": "SMT witness: total=8192, BAD INDEX",
+      "returncode": 0,
+      "stdout": "{\"variant\":\"before\",\"L\":4096,\"N\":4096,\"accepted\":true,\"index\":8192,\"bad_index\":true,\"executed_write\":false,\"oracle\":\"subobject_index\"}",
+      "stderr": ""
+    },
+    {
+      "label": "fixed_L4096_N4096",
+      "desc": "Fixed rejects: total would be 8192",
+      "returncode": 0,
+      "stdout": "{\"variant\":\"fixed\",\"L\":4096,\"N\":4096,\"accepted\":false,\"index\":8192,\"bad_index\":false,\"unchanged\":true,\"terminated\":false,\"copied\":false,\"read_len\":4096}",
+      "stderr": ""
+    },
+    {
+      "label": "before_L4095_N4096",
+      "desc": "Valid: total=8191, last safe index",
+      "returncode": 0,
+      "stdout": "{\"variant\":\"before\",\"L\":4095,\"N\":4096,\"accepted\":true,\"index\":8191,\"bad_index\":false,\"unchanged\":false,\"terminated\":true,\"copied\":true,\"read_len\":8191}",
+      "stderr": ""
+    },
+    {
+      "label": "fixed_L4095_N4096",
+      "desc": "Fixed accepts: total=8191",
+      "returncode": 0,
+      "stdout": "{\"variant\":\"fixed\",\"L\":4095,\"N\":4096,\"accepted\":true,\"index\":8191,\"bad_index\":false,\"unchanged\":false,\"terminated\":true,\"copied\":true,\"read_len\":8191}",
+      "stderr": ""
+    },
+    {
+      "label": "fixed_L8191_N1",
+      "desc": "Fixed rejects: total would be 8192",
+      "returncode": 0,
+      "stdout": "{\"variant\":\"fixed\",\"L\":8191,\"N\":1,\"accepted\":false,\"index\":8192,\"bad_index\":false,\"unchanged\":true,\"terminated\":false,\"copied\":false,\"read_len\":8191}",
+      "stderr": ""
+    },
+    {
+      "label": "fixed_L0_N4096",
+      "desc": "Fixed accepts from empty",
+      "returncode": 0,
+      "stdout": "{\"variant\":\"fixed\",\"L\":0,\"N\":4096,\"accepted\":true,\"index\":4096,\"bad_index\":false,\"unchanged\":false,\"terminated\":true,\"copied\":true,\"read_len\":4096}",
+      "stderr": ""
+    },
+    {
+      "label": "abi",
+      "desc": "ABI layout",
+      "returncode": 0,
+      "stdout": "{\"int_bytes\":4,\"size_t_bytes\":8,\"pointer_bytes\":8,\"capacity\":8192,\"recv_capacity\":4096,\"offset_buf\":72,\"offset_len\":8264}",
+      "stderr": ""
+    },
+    {
+      "label": "self_test",
+      "desc": "Fixed self-test",
+      "returncode": 0,
+      "stdout": "{\"self_test_failures\":0}",
+      "stderr": ""
+    }
+  ]
+}

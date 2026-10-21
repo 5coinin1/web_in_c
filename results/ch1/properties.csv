@@ -1,0 +1,15 @@
+id,formula,description,safe_result
+P1,AG(in_room -> authenticated),Vào phòng bắt buộc đã đăng nhập,PASS
+P2,AG(authenticated -> ws_open),Đã đăng nhập bắt buộc WebSocket đã mở,PASS
+P3,AG(closed -> NOT(authenticated OR member OR ws_open)),CLOSED không còn giữ bất kỳ trạng thái sống,PASS
+P4,AG(message_accepted -> (authenticated AND member AND in_room)),Chỉ nhận MESSAGE khi đã login + ở trong phòng,PASS
+P5,AG(logged_out -> NOT(authenticated OR member OR in_room)),Sau LOGOUT không còn authenticated/member/in_room,PASS
+P6,AG(member <-> in_room),member và in_room luôn tương đương,PASS
+P7,AG(authenticated -> (phase_AUTHENTICATED OR phase_IN_ROOM)),authenticated phải ở phase AUTHENTICATED hoặc IN_ROOM,PASS
+R1,EF authenticated,Có thể đạt authenticated,PASS
+R2,EF in_room,Có thể đạt in_room,PASS
+R3,EF message_accepted,Có thể đạt message_accepted,PASS
+R4,EF logged_out,Có thể đạt logged_out,PASS
+R5,EF closed,Có thể đạt closed,PASS
+L1,AG(ws_open -> EF(in_room OR closed)),Từ ws_open luôn có đường tới in_room hoặc closed,PASS
+L2,AG(in_room -> EF(authenticated AND NOT in_room)),Từ in_room luôn có đường quay lại authenticated,PASS

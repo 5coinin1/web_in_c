@@ -1,7 +1,7 @@
         -:    0:Source:/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/bytes.h
         -:    0:Graph:auth.gcno
         -:    0:Data:auth.gcda
-        -:    0:Runs:10
+        -:    0:Runs:8
         -:    1:#ifndef BYTES_H
         -:    2:#define BYTES_H
         -:    3:
@@ -34,10 +34,10 @@
         3:   30:           ((uint32_t)p[2] << 16) | ((uint32_t)p[3] << 24);
         -:   31:}
         -:   32:
-        6:   33:static inline int64_t get_i64(const uint8_t *p) {
-        6:   34:    uint64_t v = 0;
-       54:   35:    for (int i = 0; i < 8; i++) v |= (uint64_t)p[i] << (8 * i);
-        6:   36:    return (int64_t)v;
+        3:   33:static inline int64_t get_i64(const uint8_t *p) {
+        3:   34:    uint64_t v = 0;
+       27:   35:    for (int i = 0; i < 8; i++) v |= (uint64_t)p[i] << (8 * i);
+        3:   36:    return (int64_t)v;
         -:   37:}
         -:   38:
         -:   39:#endif

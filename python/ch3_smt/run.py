@@ -63,7 +63,8 @@ def _run(cmd, cwd=None, timeout=30):
 def main():
     ap = argparse.ArgumentParser(description="Reproduce CH3-A: SMT + C replay.")
     ap.add_argument("--output", required=True)
-    ap.add_argument("--cc", default="C:/msys64/mingw64/bin/gcc.exe")
+    ap.add_argument("--cc", default=None,
+                    help="default: C:/msys64/mingw64/bin/gcc.exe on Windows, gcc otherwise")
     args = ap.parse_args()
 
     out = pathlib.Path(args.output)
@@ -135,19 +136,19 @@ def main():
     print("C harness (offline boundary tests):")
 
     harness_src = _ROOT / "test" / "ch3_append_harness.c"
-    harness_exe = out / "ch3_harness.exe"
-    cc = args.cc
+    harness_exe = out / ("ch3_harness.exe" if platform.system() == "Windows" else "ch3_harness")
+    cc = args.cc or ("C:/msys64/mingw64/bin/gcc.exe" if platform.system() == "Windows" else "gcc")
 
     if not harness_src.exists():
         print(f"  [SKIP] Harness source not found: {harness_src}")
         results["c_harness"] = {"status": "SKIP", "reason": "source not found"}
-    elif not pathlib.Path(cc).exists():
+    elif shutil.which(cc) is None and not pathlib.Path(cc).exists():
         print(f"  [SKIP] Compiler not found: {cc}")
         results["c_harness"] = {"status": "SKIP", "reason": "compiler not found"}
     else:
         # Compile with bounds sanitizer
         compile_cmd = [
-            cc, "-std=c11", "-Wall", "-Wextra",
+            cc, "-std=gnu11", "-Wall", "-Wextra",
             "-fsanitize=bounds", "-fsanitize-trap=bounds",
             "-DCH3_WITH_BASELINE",
             "-I", str(_ROOT / "src"),
@@ -155,8 +156,18 @@ def main():
             str(_ROOT / "src" / "ws_frame.c"),
             str(_ROOT / "src" / "state_machine.c"),
             "-o", str(harness_exe),
-            "-lws2_32", "-lssl", "-lcrypto",
         ]
+        if platform.system() == "Windows":
+            compile_cmd += ["-lws2_32", "-lssl", "-lcrypto"]
+        else:
+            # ws_frame.c includes OpenSSL headers, but the harness never uses
+            # crypto.  Reuse the tiny stubs from the Chapter-4 target.
+            stubs = _ROOT / "python" / "ch4_fuzzing" / "stubs"
+            compile_cmd += [
+                "-I", str(stubs),
+                str(stubs / "stub_openssl.c"),
+                "-pthread",
+            ]
         rc, stdout, stderr = _run(compile_cmd)
         results["c_compile"] = {"returncode": rc, "stdout": stdout, "stderr": stderr,
                                 "command": " ".join(compile_cmd)}

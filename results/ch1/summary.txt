@@ -1,0 +1,5 @@
+Chapter 1 evidence
+tests_passed: 185
+command_models: none, join_bypass, message_guard, stale_auth
+shared_models: shared_same_account, shared_distinct_accounts, shared_distinct_accounts_buggy_delete
+threshold (Python): 5

@@ -1,0 +1,30 @@
+======================================================================
+ CHAPTER 4 - FUZZING: black-box vs white-box (account-store parser)
+======================================================================
+ASan available : True
+target         : /mnt/c/Users/lenovo/Desktop/temp/web_in_c/python/ch4_fuzzing/_work/target_vuln
+seed corpus    : 10 seeds -> /mnt/c/Users/lenovo/Desktop/temp/web_in_c/python/ch4_fuzzing/_work/seeds
+coverage after seeding: 12.16%
+
+[1] BLACK-BOX (pure random, no feedback) -> pass the magic gate
+    found=none     tries=1500   time=45.7s   (P(WSAC) ~ 2^-32, +version 2^-16)
+
+[2] COVERAGE-GUIDED, NO seeds -> pass the magic gate
+    found=none     tries=300    time=9.3s   (a single memcmp gives no per-byte gradient)
+
+[3] COVERAGE-GUIDED, seeded -> aim at the injected bug
+    found=crash    tries=17     time=0.7s   coverage 12.16% (seed-only 12.16%)
+
+[4] WHITE-BOX: solve the gate, then trigger the bug
+    Z3 solved header = b'WSAC\x01\x00' in 100.75 ms
+    structural gate -> rc=0 accepted=True (1 try)
+    11-byte off-by-one -> oracle=ASan
+      ==6193==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x748e8cde001b at pc 0x62219448
+
+======================================================================
+ SUMMARY
+  black-box, no seed      : 1500 tries -> none
+  guided, no seed         : 300 tries -> none
+  guided, seeded          : 17 tries -> crash, cov 12.16%
+  white-box (Z3/struct)   : gate in 100.8 ms; bug via ASan
+======================================================================

@@ -1,0 +1,278 @@
+[TEST PASS] C export succeeds
+WEB SOCKET KRIPKE VERIFICATION Windows 3.14.7
+[TEST PASS] C initial state is IDLE
+[TEST PASS] six C states match reviewed contract
+[TEST PASS] ten C events match reviewed contract
+[TEST PASS] complete matrix without duplicate pairs
+[TEST PASS] core contract IDLE/ACCEPT
+[TEST PASS] C replay IDLE/ACCEPT
+[TEST PASS] core contract IDLE/HTTP_UPGRADE_OK
+[TEST PASS] C replay IDLE/HTTP_UPGRADE_OK
+[TEST PASS] core contract IDLE/LOGIN_OK
+[TEST PASS] C replay IDLE/LOGIN_OK
+[TEST PASS] core contract IDLE/LOGIN_FAIL
+[TEST PASS] C replay IDLE/LOGIN_FAIL
+[TEST PASS] core contract IDLE/JOIN_OK
+[TEST PASS] C replay IDLE/JOIN_OK
+[TEST PASS] core contract IDLE/JOIN_FAIL
+[TEST PASS] C replay IDLE/JOIN_FAIL
+[TEST PASS] core contract IDLE/LEAVE_OK
+[TEST PASS] C replay IDLE/LEAVE_OK
+[TEST PASS] core contract IDLE/ROOM_CLOSED
+[TEST PASS] C replay IDLE/ROOM_CLOSED
+[TEST PASS] core contract IDLE/LOGOUT
+[TEST PASS] C replay IDLE/LOGOUT
+[TEST PASS] core contract IDLE/DISCONNECT
+[TEST PASS] C replay IDLE/DISCONNECT
+[TEST PASS] core contract HTTP_HANDSHAKE/ACCEPT
+[TEST PASS] C replay HTTP_HANDSHAKE/ACCEPT
+[TEST PASS] core contract HTTP_HANDSHAKE/HTTP_UPGRADE_OK
+[TEST PASS] C replay HTTP_HANDSHAKE/HTTP_UPGRADE_OK
+[TEST PASS] core contract HTTP_HANDSHAKE/LOGIN_OK
+[TEST PASS] C replay HTTP_HANDSHAKE/LOGIN_OK
+[TEST PASS] core contract HTTP_HANDSHAKE/LOGIN_FAIL
+[TEST PASS] C replay HTTP_HANDSHAKE/LOGIN_FAIL
+[TEST PASS] core contract HTTP_HANDSHAKE/JOIN_OK
+[TEST PASS] C replay HTTP_HANDSHAKE/JOIN_OK
+[TEST PASS] core contract HTTP_HANDSHAKE/JOIN_FAIL
+[TEST PASS] C replay HTTP_HANDSHAKE/JOIN_FAIL
+[TEST PASS] core contract HTTP_HANDSHAKE/LEAVE_OK
+[TEST PASS] C replay HTTP_HANDSHAKE/LEAVE_OK
+[TEST PASS] core contract HTTP_HANDSHAKE/ROOM_CLOSED
+[TEST PASS] C replay HTTP_HANDSHAKE/ROOM_CLOSED
+[TEST PASS] core contract HTTP_HANDSHAKE/LOGOUT
+[TEST PASS] C replay HTTP_HANDSHAKE/LOGOUT
+[TEST PASS] core contract HTTP_HANDSHAKE/DISCONNECT
+[TEST PASS] C replay HTTP_HANDSHAKE/DISCONNECT
+[TEST PASS] core contract WS_CONNECTED/ACCEPT
+[TEST PASS] C replay WS_CONNECTED/ACCEPT
+[TEST PASS] core contract WS_CONNECTED/HTTP_UPGRADE_OK
+[TEST PASS] C replay WS_CONNECTED/HTTP_UPGRADE_OK
+[TEST PASS] core contract WS_CONNECTED/LOGIN_OK
+[TEST PASS] C replay WS_CONNECTED/LOGIN_OK
+[TEST PASS] core contract WS_CONNECTED/LOGIN_FAIL
+[TEST PASS] C replay WS_CONNECTED/LOGIN_FAIL
+[TEST PASS] core contract WS_CONNECTED/JOIN_OK
+[TEST PASS] C replay WS_CONNECTED/JOIN_OK
+[TEST PASS] core contract WS_CONNECTED/JOIN_FAIL
+[TEST PASS] C replay WS_CONNECTED/JOIN_FAIL
+[TEST PASS] core contract WS_CONNECTED/LEAVE_OK
+[TEST PASS] C replay WS_CONNECTED/LEAVE_OK
+[TEST PASS] core contract WS_CONNECTED/ROOM_CLOSED
+[TEST PASS] C replay WS_CONNECTED/ROOM_CLOSED
+[TEST PASS] core contract WS_CONNECTED/LOGOUT
+[TEST PASS] C replay WS_CONNECTED/LOGOUT
+[TEST PASS] core contract WS_CONNECTED/DISCONNECT
+[TEST PASS] C replay WS_CONNECTED/DISCONNECT
+[TEST PASS] core contract AUTHENTICATED/ACCEPT
+[TEST PASS] C replay AUTHENTICATED/ACCEPT
+[TEST PASS] core contract AUTHENTICATED/HTTP_UPGRADE_OK
+[TEST PASS] C replay AUTHENTICATED/HTTP_UPGRADE_OK
+[TEST PASS] core contract AUTHENTICATED/LOGIN_OK
+[TEST PASS] C replay AUTHENTICATED/LOGIN_OK
+[TEST PASS] core contract AUTHENTICATED/LOGIN_FAIL
+[TEST PASS] C replay AUTHENTICATED/LOGIN_FAIL
+[TEST PASS] core contract AUTHENTICATED/JOIN_OK
+[TEST PASS] C replay AUTHENTICATED/JOIN_OK
+[TEST PASS] core contract AUTHENTICATED/JOIN_FAIL
+[TEST PASS] C replay AUTHENTICATED/JOIN_FAIL
+[TEST PASS] core contract AUTHENTICATED/LEAVE_OK
+[TEST PASS] C replay AUTHENTICATED/LEAVE_OK
+[TEST PASS] core contract AUTHENTICATED/ROOM_CLOSED
+[TEST PASS] C replay AUTHENTICATED/ROOM_CLOSED
+[TEST PASS] core contract AUTHENTICATED/LOGOUT
+[TEST PASS] C replay AUTHENTICATED/LOGOUT
+[TEST PASS] core contract AUTHENTICATED/DISCONNECT
+[TEST PASS] C replay AUTHENTICATED/DISCONNECT
+[TEST PASS] core contract IN_ROOM/ACCEPT
+[TEST PASS] C replay IN_ROOM/ACCEPT
+[TEST PASS] core contract IN_ROOM/HTTP_UPGRADE_OK
+[TEST PASS] C replay IN_ROOM/HTTP_UPGRADE_OK
+[TEST PASS] core contract IN_ROOM/LOGIN_OK
+[TEST PASS] C replay IN_ROOM/LOGIN_OK
+[TEST PASS] core contract IN_ROOM/LOGIN_FAIL
+[TEST PASS] C replay IN_ROOM/LOGIN_FAIL
+[TEST PASS] core contract IN_ROOM/JOIN_OK
+[TEST PASS] C replay IN_ROOM/JOIN_OK
+[TEST PASS] core contract IN_ROOM/JOIN_FAIL
+[TEST PASS] C replay IN_ROOM/JOIN_FAIL
+[TEST PASS] core contract IN_ROOM/LEAVE_OK
+[TEST PASS] C replay IN_ROOM/LEAVE_OK
+[TEST PASS] core contract IN_ROOM/ROOM_CLOSED
+[TEST PASS] C replay IN_ROOM/ROOM_CLOSED
+[TEST PASS] core contract IN_ROOM/LOGOUT
+[TEST PASS] C replay IN_ROOM/LOGOUT
+[TEST PASS] core contract IN_ROOM/DISCONNECT
+[TEST PASS] C replay IN_ROOM/DISCONNECT
+[TEST PASS] core contract CLOSED/ACCEPT
+[TEST PASS] C replay CLOSED/ACCEPT
+[TEST PASS] core contract CLOSED/HTTP_UPGRADE_OK
+[TEST PASS] C replay CLOSED/HTTP_UPGRADE_OK
+[TEST PASS] core contract CLOSED/LOGIN_OK
+[TEST PASS] C replay CLOSED/LOGIN_OK
+[TEST PASS] core contract CLOSED/LOGIN_FAIL
+[TEST PASS] C replay CLOSED/LOGIN_FAIL
+[TEST PASS] core contract CLOSED/JOIN_OK
+[TEST PASS] C replay CLOSED/JOIN_OK
+[TEST PASS] core contract CLOSED/JOIN_FAIL
+[TEST PASS] C replay CLOSED/JOIN_FAIL
+[TEST PASS] core contract CLOSED/LEAVE_OK
+[TEST PASS] C replay CLOSED/LEAVE_OK
+[TEST PASS] core contract CLOSED/ROOM_CLOSED
+[TEST PASS] C replay CLOSED/ROOM_CLOSED
+[TEST PASS] core contract CLOSED/LOGOUT
+[TEST PASS] C replay CLOSED/LOGOUT
+[TEST PASS] core contract CLOSED/DISCONNECT
+[TEST PASS] C replay CLOSED/DISCONNECT
+
+MODEL none states= 8 edges= 186
+P1 AG(in_room -> authenticated) PASS 
+P2 AG(authenticated -> ws_open) PASS 
+P3 AG(closed -> NOT(authenticated OR member OR ws_open)) PASS 
+P4 AG(message_accepted -> (authenticated AND member AND in_room)) PASS 
+P5 AG(logged_out -> NOT(authenticated OR member OR in_room)) PASS 
+P6 AG(member <-> in_room) PASS 
+P7 AG(authenticated -> (phase_AUTHENTICATED OR phase_IN_ROOM)) PASS 
+R1 EF authenticated PASS {'states': ['S0', 'S2', 'S3', 'S4'], 'edge_ids': ['E2', 'E7', 'E26'], 'events': ['FIRST_BYTES', 'HTTP_UPGRADE_VALID', 'LOGIN_OK']}
+R2 EF in_room PASS {'states': ['S0', 'S2', 'S3', 'S4', 'S5'], 'edge_ids': ['E2', 'E7', 'E26', 'E68'], 'events': ['FIRST_BYTES', 'HTTP_UPGRADE_VALID', 'LOGIN_OK', 'JOIN_OK']}
+R3 EF message_accepted PASS {'states': ['S0', 'S2', 'S3', 'S4', 'S5', 'S7'], 'edge_ids': ['E2', 'E7', 'E26', 'E68', 'E111'], 'events': ['FIRST_BYTES', 'HTTP_UPGRADE_VALID', 'LOGIN_OK', 'JOIN_OK', 'MESSAGE_VALID']}
+R4 EF logged_out PASS {'states': ['S0', 'S2', 'S3', 'S4', 'S6'], 'edge_ids': ['E2', 'E7', 'E26', 'E75'], 'events': ['FIRST_BYTES', 'HTTP_UPGRADE_VALID', 'LOGIN_OK', 'LOGOUT']}
+R5 EF closed PASS {'states': ['S0', 'S1'], 'edge_ids': ['E0'], 'events': ['TCP_DISCONNECT']}
+L1 AG(ws_open -> EF(in_room OR closed)) PASS 
+L2 AG(in_room -> EF(authenticated AND NOT in_room)) PASS 
+[TEST PASS] SAFE satisfies all required properties
+[TEST PASS] SAFE implications are nonvacuous
+[TEST PASS] bounded helper agrees with BFS none
+Completeness threshold for state invariants: 5
+
+MODEL join_bypass states= 11 edges= 293
+P1 AG(in_room -> authenticated) FAIL {'states': ['S0', 'S2', 'S3', 'S5'], 'edge_ids': ['E2', 'E7', 'E33'], 'events': ['FIRST_BYTES', 'HTTP_UPGRADE_VALID', 'JOIN_OK']}
+P2 AG(authenticated -> ws_open) PASS 
+P3 AG(closed -> NOT(authenticated OR member OR ws_open)) PASS 
+P4 AG(message_accepted -> (authenticated AND member AND in_room)) FAIL {'states': ['S0', 'S2', 'S3', 'S5', 'S9'], 'edge_ids': ['E2', 'E7', 'E33', 'E111'], 'events': ['FIRST_BYTES', 'HTTP_UPGRADE_VALID', 'JOIN_OK', 'MESSAGE_VALID']}
+P5 AG(logged_out -> NOT(authenticated OR member OR in_room)) PASS 
+P6 AG(member <-> in_room) PASS 
+P7 AG(authenticated -> (phase_AUTHENTICATED OR phase_IN_ROOM)) PASS 
+R1 EF authenticated PASS {'states': ['S0', 'S2', 'S3', 'S4'], 'edge_ids': ['E2', 'E7', 'E26'], 'events': ['FIRST_BYTES', 'HTTP_UPGRADE_VALID', 'LOGIN_OK']}
+R2 EF in_room PASS {'states': ['S0', 'S2', 'S3', 'S5'], 'edge_ids': ['E2', 'E7', 'E33'], 'events': ['FIRST_BYTES', 'HTTP_UPGRADE_VALID', 'JOIN_OK']}
+R3 EF message_accepted PASS {'states': ['S0', 'S2', 'S3', 'S5', 'S9'], 'edge_ids': ['E2', 'E7', 'E33', 'E111'], 'events': ['FIRST_BYTES', 'HTTP_UPGRADE_VALID', 'JOIN_OK', 'MESSAGE_VALID']}
+R4 EF logged_out PASS {'states': ['S0', 'S2', 'S3', 'S4', 'S7'], 'edge_ids': ['E2', 'E7', 'E26', 'E75'], 'events': ['FIRST_BYTES', 'HTTP_UPGRADE_VALID', 'LOGIN_OK', 'LOGOUT']}
+R5 EF closed PASS {'states': ['S0', 'S1'], 'edge_ids': ['E0'], 'events': ['TCP_DISCONNECT']}
+L1 AG(ws_open -> EF(in_room OR closed)) PASS 
+L2 AG(in_room -> EF(authenticated AND NOT in_room)) PASS 
+[TEST PASS] mutation detected join_bypass
+[TEST PASS] bounded helper agrees with BFS join_bypass
+Completeness threshold for state invariants: 5
+
+MODEL message_guard states= 9 edges= 221
+P1 AG(in_room -> authenticated) PASS 
+P2 AG(authenticated -> ws_open) PASS 
+P3 AG(closed -> NOT(authenticated OR member OR ws_open)) PASS 
+P4 AG(message_accepted -> (authenticated AND member AND in_room)) FAIL {'states': ['S0', 'S2', 'S3', 'S4', 'S7'], 'edge_ids': ['E2', 'E7', 'E26', 'E76'], 'events': ['FIRST_BYTES', 'HTTP_UPGRADE_VALID', 'LOGIN_OK', 'MESSAGE_VALID']}
+P5 AG(logged_out -> NOT(authenticated OR member OR in_room)) PASS 
+P6 AG(member <-> in_room) PASS 
+P7 AG(authenticated -> (phase_AUTHENTICATED OR phase_IN_ROOM)) PASS 
+R1 EF authenticated PASS {'states': ['S0', 'S2', 'S3', 'S4'], 'edge_ids': ['E2', 'E7', 'E26'], 'events': ['FIRST_BYTES', 'HTTP_UPGRADE_VALID', 'LOGIN_OK']}
+R2 EF in_room PASS {'states': ['S0', 'S2', 'S3', 'S4', 'S5'], 'edge_ids': ['E2', 'E7', 'E26', 'E68'], 'events': ['FIRST_BYTES', 'HTTP_UPGRADE_VALID', 'LOGIN_OK', 'JOIN_OK']}
+R3 EF message_accepted PASS {'states': ['S0', 'S2', 'S3', 'S4', 'S7'], 'edge_ids': ['E2', 'E7', 'E26', 'E76'], 'events': ['FIRST_BYTES', 'HTTP_UPGRADE_VALID', 'LOGIN_OK', 'MESSAGE_VALID']}
+R4 EF logged_out PASS {'states': ['S0', 'S2', 'S3', 'S4', 'S6'], 'edge_ids': ['E2', 'E7', 'E26', 'E75'], 'events': ['FIRST_BYTES', 'HTTP_UPGRADE_VALID', 'LOGIN_OK', 'LOGOUT']}
+R5 EF closed PASS {'states': ['S0', 'S1'], 'edge_ids': ['E0'], 'events': ['TCP_DISCONNECT']}
+L1 AG(ws_open -> EF(in_room OR closed)) PASS 
+L2 AG(in_room -> EF(authenticated AND NOT in_room)) PASS 
+[TEST PASS] mutation detected message_guard
+[TEST PASS] bounded helper agrees with BFS message_guard
+Completeness threshold for state invariants: 5
+
+MODEL stale_auth states= 9 edges= 221
+P1 AG(in_room -> authenticated) PASS 
+P2 AG(authenticated -> ws_open) PASS 
+P3 AG(closed -> NOT(authenticated OR member OR ws_open)) PASS 
+P4 AG(message_accepted -> (authenticated AND member AND in_room)) PASS 
+P5 AG(logged_out -> NOT(authenticated OR member OR in_room)) FAIL {'states': ['S0', 'S2', 'S3', 'S4', 'S6'], 'edge_ids': ['E2', 'E7', 'E26', 'E75'], 'events': ['FIRST_BYTES', 'HTTP_UPGRADE_VALID', 'LOGIN_OK', 'LOGOUT']}
+P6 AG(member <-> in_room) PASS 
+P7 AG(authenticated -> (phase_AUTHENTICATED OR phase_IN_ROOM)) FAIL {'states': ['S0', 'S2', 'S3', 'S4', 'S6'], 'edge_ids': ['E2', 'E7', 'E26', 'E75'], 'events': ['FIRST_BYTES', 'HTTP_UPGRADE_VALID', 'LOGIN_OK', 'LOGOUT']}
+R1 EF authenticated PASS {'states': ['S0', 'S2', 'S3', 'S4'], 'edge_ids': ['E2', 'E7', 'E26'], 'events': ['FIRST_BYTES', 'HTTP_UPGRADE_VALID', 'LOGIN_OK']}
+R2 EF in_room PASS {'states': ['S0', 'S2', 'S3', 'S4', 'S5'], 'edge_ids': ['E2', 'E7', 'E26', 'E68'], 'events': ['FIRST_BYTES', 'HTTP_UPGRADE_VALID', 'LOGIN_OK', 'JOIN_OK']}
+R3 EF message_accepted PASS {'states': ['S0', 'S2', 'S3', 'S4', 'S5', 'S7'], 'edge_ids': ['E2', 'E7', 'E26', 'E68', 'E111'], 'events': ['FIRST_BYTES', 'HTTP_UPGRADE_VALID', 'LOGIN_OK', 'JOIN_OK', 'MESSAGE_VALID']}
+R4 EF logged_out PASS {'states': ['S0', 'S2', 'S3', 'S4', 'S6'], 'edge_ids': ['E2', 'E7', 'E26', 'E75'], 'events': ['FIRST_BYTES', 'HTTP_UPGRADE_VALID', 'LOGIN_OK', 'LOGOUT']}
+R5 EF closed PASS {'states': ['S0', 'S1'], 'edge_ids': ['E0'], 'events': ['TCP_DISCONNECT']}
+L1 AG(ws_open -> EF(in_room OR closed)) PASS 
+L2 AG(in_room -> EF(authenticated AND NOT in_room)) PASS 
+[TEST PASS] mutation detected stale_auth
+[TEST PASS] bounded helper agrees with BFS stale_auth
+Completeness threshold for state invariants: 5
+[TEST PASS] register does not authenticate
+[TEST PASS] bad password stays unauthenticated
+[TEST PASS] duplicate session denied
+[TEST PASS] join requires login
+[TEST PASS] message requires room
+[TEST PASS] list requires room
+[TEST PASS] rooms requires login
+[TEST PASS] wrong room code rejected
+[TEST PASS] switch room requires leave
+[TEST PASS] message accepted in room
+[TEST PASS] missing message ignored
+[TEST PASS] logout in room composes leave then logout
+[TEST PASS] room deletion evicts member
+[TEST PASS] leave does not logout
+[TEST PASS] leave before login is idempotent
+[TEST PASS] ping before login allowed
+[TEST PASS] websocket ping keeps room
+[TEST PASS] close clears session and membership
+[TEST PASS] invalid handshake closes
+[TEST PASS] partial handshake waits
+[TEST PASS] composed lifecycle replay 1
+[TEST PASS] composed lifecycle replay 2
+[TEST PASS] composed lifecycle replay 3
+[TEST PASS] composed lifecycle replay 4
+[TEST PASS] composed lifecycle replay 5
+[TEST PASS] composed lifecycle replay 6
+[TEST PASS] composed lifecycle replay 7
+[TEST PASS] composed lifecycle replay 8
+[TEST PASS] composed lifecycle replay 9
+[TEST PASS] composed lifecycle replay 10
+[TEST PASS] composed lifecycle replay 11
+[TEST PASS] composed lifecycle replay 12
+[TEST PASS] composed lifecycle replay 13
+[TEST PASS] composed lifecycle replay 14
+[TEST PASS] composed lifecycle replay 15
+[TEST PASS] composed lifecycle replay 16
+[TEST PASS] composed lifecycle replay 17
+[TEST PASS] composed lifecycle replay 18
+[TEST PASS] shortest login bypass
+[TEST PASS] C injected bypass reproduces P1
+[TEST PASS] C original refuses bypass
+[TEST PASS] bound two misses three-step bypass
+
+SHARED MODEL shared_same_account states 56
+membership_consistent {'holds': True, 'counterexample': None}
+members_authenticated {'holds': True, 'counterexample': None}
+deleted_room_empty {'holds': True, 'counterexample': None, 'vacuous': False}
+single_session {'holds': True, 'counterexample': None}
+[TEST PASS] shared model expectation shared_same_account
+
+SHARED MODEL shared_distinct_accounts states 61
+membership_consistent {'holds': True, 'counterexample': None}
+members_authenticated {'holds': True, 'counterexample': None}
+deleted_room_empty {'holds': True, 'counterexample': None, 'vacuous': False}
+two_accounts_can_login {'holds': True, 'witness': {'states': ['G0', 'G1', 'G6', 'G16', 'G29', 'G43', 'G53'], 'edge_ids': ['G_E0', 'G_E5', 'G_E26', 'G_E70', 'G_E133', 'G_E211'], 'events': ['A:ACCEPT:ACCEPT', 'A:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK', 'A:LOGIN_OK:LOGIN_OK', 'B:ACCEPT:ACCEPT', 'B:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK', 'B:LOGIN_OK:LOGIN_OK']}}
+[TEST PASS] shared model expectation shared_distinct_accounts
+
+SHARED MODEL shared_distinct_accounts_buggy_delete states 66
+membership_consistent {'holds': True, 'counterexample': None}
+members_authenticated {'holds': True, 'counterexample': None}
+deleted_room_empty {'holds': False, 'counterexample': {'states': ['G0', 'G3', 'G13', 'G26', 'G39', 'G52'], 'edge_ids': ['G_E2', 'G_E15', 'G_E54', 'G_E113', 'G_E191'], 'events': ['B:ACCEPT:ACCEPT', 'B:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK', 'B:LOGIN_OK:LOGIN_OK', 'B:JOIN_OK:JOIN_OK', 'ADMIN_DELETE_ROOM']}, 'vacuous': False}
+two_accounts_can_login {'holds': True, 'witness': {'states': ['G0', 'G1', 'G6', 'G16', 'G29', 'G43', 'G54'], 'edge_ids': ['G_E0', 'G_E5', 'G_E26', 'G_E70', 'G_E133', 'G_E211'], 'events': ['A:ACCEPT:ACCEPT', 'A:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK', 'A:LOGIN_OK:LOGIN_OK', 'B:ACCEPT:ACCEPT', 'B:HTTP_UPGRADE_OK:HTTP_UPGRADE_OK', 'B:LOGIN_OK:LOGIN_OK']}}
+[TEST PASS] shared model expectation shared_distinct_accounts_buggy_delete
+[TEST PASS] non-atomic leave diagnostic is reachable
+
+DIAGNOSTIC: atomic-command membership invariant does not hold between LEAVE implementation steps: {'holds': True, 'witness': {'states': ['L0', 'L1'], 'edge_ids': ['D0'], 'events': ['room_leave']}}
+[TEST PASS] BFS multiple initial shortest trace
+[TEST PASS] unreachable bad state excluded
+[TEST PASS] AG EF detects impossible goal
+[TEST PASS] EF false has no witness
+[TEST PASS] implication detects vacuity
+
+TOTAL: 185 tests PASS
+Only WebSocket models. Injected-model FAIL and LEAVE diagnostic are expected findings.
+No claim of complete end-to-end network, scheduling, password or memory-safety verification.

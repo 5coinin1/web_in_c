@@ -1,7 +1,7 @@
 # Chương 2 — Kiểm toán an toàn bộ nhớ cho parser account-store
 
 > Sinh viên: _điền tên/MSSV_ — Môn: An toàn phần mềm (CSE703093)
-> Ngày sinh báo cáo: 2026-10-21 — Git HEAD: `4cb173f`
+> Ngày sinh báo cáo: 2026-10-21 — Git HEAD: `b45263b`
 > Toolchain: gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0; Python 3.14.4
 
 ## 1. Phạm vi và attack surface

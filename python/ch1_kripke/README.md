@@ -39,6 +39,7 @@ vẫn cần chạy lại trên Windows; không coi kết quả cũ là xác nh�
 | c/chat_bridge.c | Xuất state machine C thật, replay lifecycle và mutation bypass riêng trong test |
 | handoff.py | Sinh JSON/CSV/DOT, test vectors và code C regression |
 | verify.py | Test, đối chiếu C, xuất kết quả và dấu vết nguồn |
+| report.py | Sinh `results/ch1/` + `docs/findings_ch1.md` + bảng before/after |
 | generated/ | Đầu ra có thể sinh lại, dùng làm bằng chứng/bàn giao |
 
 

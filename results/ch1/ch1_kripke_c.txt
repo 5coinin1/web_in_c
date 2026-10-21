@@ -1,0 +1,158 @@
+=====================================================
+ CHAPTER 1 - KRIPKE STRUCTURE / BMC
+ WebSocket Chat Connection State Verification
+=====================================================
+
+Shared runtime state machine:
+
+ STATE_IDLE
+          | ACCEPT
+          v
+ STATE_HTTP_HANDSHAKE
+          | HTTP_UPGRADE_OK
+          v
+ STATE_WS_CONNECTED
+          | LOGIN_OK
+          v
+ STATE_AUTHENTICATED
+          | JOIN_OK
+          v
+ STATE_IN_ROOM
+          | LEAVE_OK / ROOM_CLOSED
+          v
+ STATE_AUTHENTICATED
+
+ (switch rooms: LEAVE then JOIN - JOIN is only valid from
+  AUTHENTICATED, i.e. a client must leave before joining another)
+ (single session: a 2nd LOGIN for the same account fails -> LOGIN_FAIL,
+  the connection stays in WS_CONNECTED)
+
+ (any live state) --DISCONNECT--> STATE_CLOSED  (terminal)
+
+Kripke model:
+
+ K = (S, S0, R, L)
+
+ S  = 6 connection states (IDLE..CLOSED)
+ S0 = STATE_IDLE
+ R  = client_state_next()
+ L  = {WS_OPEN, AUTHENTICATED, IN_ROOM, CLOSED}
+
+Safety properties:
+
+ P1: AG(IN_ROOM -> AUTHENTICATED)
+ P2: AG(AUTHENTICATED -> WS_OPEN)
+ P3: AG(CLOSED -> !(WS_OPEN | AUTHENTICATED | IN_ROOM))
+
+Liveness (EF reachability):
+
+ L1: from every connected state, IN_ROOM or CLOSED is reachable
+ L2: from IN_ROOM, AUTHENTICATED is reachable (leave possible)
+
+============================================
+ CHAPTER 1 - STATE MACHINE / KRIPKE TESTS
+============================================
+
+--- Normal connection flow ---
+[PASS] Accept -> HTTP handshake
+[PASS] HTTP handshake -> WebSocket
+[PASS] Successful login -> authenticated
+[PASS] Successful join -> in room
+[PASS] Leave room -> authenticated
+[PASS] Room closed -> authenticated
+[PASS] Logout -> WebSocket (still connected)
+
+--- Authentication failure ---
+[PASS] Failed login remains WS_CONNECTED
+
+--- Room failure ---
+[PASS] Failed JOIN remains authenticated
+
+--- Forbidden transitions ---
+[PASS] Cannot LOGIN before WebSocket handshake
+[PASS] Cannot JOIN before LOGIN
+[PASS] Must LEAVE before joining another room
+[PASS] Cannot send LOGIN_OK while already in room
+[PASS] CLOSED is terminal (no outgoing edges)
+
+--- Disconnect ---
+[PASS] Disconnect authenticated client
+[PASS] Disconnect room client
+
+--- Kripke properties ---
+[PASS] properties(IDLE)
+[PASS] properties(HTTP_HANDSHAKE)
+[PASS] properties(WS_CONNECTED)
+[PASS] properties(AUTHENTICATED)
+[PASS] properties(IN_ROOM)
+[PASS] properties(CLOSED)
+
+--- Liveness (EF reachability) ---
+[PASS] progress reachable from every connected state
+[INFO] completeness threshold k* = 4
+
+--- Tier-2: single session (product A x B) ---
+[PASS] AG(!(session_A & session_B)) holds
+[SESSION] counterexample: (A_logged=1, B_logged=1) -> both sessions active
+[PASS] buggy variant: counterexample found (as expected)
+
+--- Tier-3: room product (2 roles + shared room, 216 states) ---
+[PASS] I1/I2/I3 hold on every reachable state
+       I1 room ref and state machine agree (no stranded client)
+       I2 num_clients matches the real member count
+       I3 room capacity respected
+      counterexample path (4 steps):
+      (initial)             A=HTTP_HANDSHAKE   B=HTTP_HANDSHAKE   inRoom=(0,0) members=0
+      A.HTTP_UPGRADE_OK     A=WS_CONNECTED     B=HTTP_HANDSHAKE   inRoom=(0,0) members=0
+      A.LOGIN_OK            A=AUTHENTICATED    B=HTTP_HANDSHAKE   inRoom=(0,0) members=0
+      A.JOIN_OK             A=IN_ROOM          B=HTTP_HANDSHAKE   inRoom=(1,0) members=1
+      DELETE_ROOM           A=IN_ROOM          B=HTTP_HANDSHAKE   inRoom=(0,0) members=0
+      violated: I1 stranded client: room reference and state machine disagree
+      bad state:  A=IN_ROOM          B=HTTP_HANDSHAKE   inRoom=(0,0) members=0
+[PASS] buggy variant caught: clears room ref, keeps STATE_IN_ROOM
+      counterexample path (7 steps):
+      (initial)             A=HTTP_HANDSHAKE   B=HTTP_HANDSHAKE   inRoom=(0,0) members=0
+      A.HTTP_UPGRADE_OK     A=WS_CONNECTED     B=HTTP_HANDSHAKE   inRoom=(0,0) members=0
+      A.LOGIN_OK            A=AUTHENTICATED    B=HTTP_HANDSHAKE   inRoom=(0,0) members=0
+      A.JOIN_OK             A=IN_ROOM          B=HTTP_HANDSHAKE   inRoom=(1,0) members=1
+      B.HTTP_UPGRADE_OK     A=IN_ROOM          B=WS_CONNECTED     inRoom=(1,0) members=1
+      B.LOGIN_OK            A=IN_ROOM          B=AUTHENTICATED    inRoom=(1,0) members=1
+      B.JOIN_OK             A=IN_ROOM          B=IN_ROOM          inRoom=(1,1) members=2
+      DELETE_ROOM           A=AUTHENTICATED    B=IN_ROOM          inRoom=(0,1) members=0
+      violated: I2 num_clients does not match the real member count
+      bad state:  A=AUTHENTICATED    B=IN_ROOM          inRoom=(0,1) members=0
+[PASS] buggy variant caught: evict loop stops at first member
+      counterexample path (4 steps):
+      (initial)             A=HTTP_HANDSHAKE   B=HTTP_HANDSHAKE   inRoom=(0,0) members=0
+      A.HTTP_UPGRADE_OK     A=WS_CONNECTED     B=HTTP_HANDSHAKE   inRoom=(0,0) members=0
+      A.LOGIN_OK            A=AUTHENTICATED    B=HTTP_HANDSHAKE   inRoom=(0,0) members=0
+      A.JOIN_OK             A=IN_ROOM          B=HTTP_HANDSHAKE   inRoom=(1,0) members=1
+      DELETE_ROOM           A=AUTHENTICATED    B=HTTP_HANDSHAKE   inRoom=(0,0) members=1
+      violated: I2 num_clients does not match the real member count
+      bad state:  A=AUTHENTICATED    B=HTTP_HANDSHAKE   inRoom=(0,0) members=1
+[PASS] buggy variant caught: forgets num_clients = 0
+
+--- Tier-3b: code-faithful LEAVE (window check) ---
+[INFO] the code's non-atomic LEAVE exposes a window where the
+       room membership flag disagrees with STATE_IN_ROOM:
+       (IN_ROOM, not-in-array, [room name maybe empty]).
+       This is the SAME shape as bug B, but on the LEAVE path.
+       The Tier-3 (atomic LEAVE) model does NOT capture it.
+
+============================================
+ Passed : 30
+ Failed : 0
+============================================
+
+Running bounded model checking...
+Initial state : IDLE
+Bound k       : 8
+[BMC PASS] No safety-property counterexample found up to k=8
+
+=====================================================
+ CHAPTER 1 RESULT: VERIFIED
+ Shared state machine verified up to bound k=8
+ (completeness threshold k* = 4)
+=====================================================
+
+Press Enter to exit...

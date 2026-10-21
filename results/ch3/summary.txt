@@ -1,0 +1,15 @@
+Chapter 3 evidence
+generated: 2026-10-21 18:48:51
+SMT queries OK: 12/12
+C harness cases OK: 8/8
+C compile rc: 0
+
+before_violation: SAT (expected SAT)
+fixed_violation: UNSAT (expected UNSAT)
+non_vacuity: SAT (expected SAT)
+signed_overflow: UNSAT (expected UNSAT)
+invariant_base: UNSAT (expected UNSAT)
+invariant_step: UNSAT (expected UNSAT)
+bmc_k1_before: UNSAT (expected UNSAT)
+bmc_k2_before: SAT (expected SAT)
+bmc_k3_before: SAT (expected SAT)

@@ -9,9 +9,11 @@
  *                     raw=1 runs through the buggy path under instrumentation
  *
  * Compile with:
- *   gcc -std=c11 -Wall -Wextra -fsanitize=bounds -fsanitize-trap=bounds \
+ *   gcc -std=gnu11 -Wall -Wextra -fsanitize=bounds -fsanitize-trap=bounds \
  *       -DCH3_WITH_BASELINE -I src/ test/ch3_append_harness.c \
- *       src/ws_frame.c src/state_machine.c -o ch3_harness -lws2_32 -lssl -lcrypto
+ *       src/ws_frame.c src/state_machine.c -o ch3_harness \
+ *       [-lws2_32 -lssl -lcrypto]   # Windows/MinGW
+ *       [-pthread]                  # Linux/WSL
  */
 #include "read_buffer.h"
 #include <stddef.h>

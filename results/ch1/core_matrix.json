@@ -1,0 +1,385 @@
+{
+  "initial": "IDLE",
+  "states": [
+    "IDLE",
+    "HTTP_HANDSHAKE",
+    "WS_CONNECTED",
+    "AUTHENTICATED",
+    "IN_ROOM",
+    "CLOSED"
+  ],
+  "events": [
+    "ACCEPT",
+    "HTTP_UPGRADE_OK",
+    "LOGIN_OK",
+    "LOGIN_FAIL",
+    "JOIN_OK",
+    "JOIN_FAIL",
+    "LEAVE_OK",
+    "ROOM_CLOSED",
+    "LOGOUT",
+    "DISCONNECT"
+  ],
+  "matrix": [
+    {
+      "from": "IDLE",
+      "event": "ACCEPT",
+      "accepted": true,
+      "to": "HTTP_HANDSHAKE"
+    },
+    {
+      "from": "IDLE",
+      "event": "HTTP_UPGRADE_OK",
+      "accepted": false,
+      "to": "IDLE"
+    },
+    {
+      "from": "IDLE",
+      "event": "LOGIN_OK",
+      "accepted": false,
+      "to": "IDLE"
+    },
+    {
+      "from": "IDLE",
+      "event": "LOGIN_FAIL",
+      "accepted": false,
+      "to": "IDLE"
+    },
+    {
+      "from": "IDLE",
+      "event": "JOIN_OK",
+      "accepted": false,
+      "to": "IDLE"
+    },
+    {
+      "from": "IDLE",
+      "event": "JOIN_FAIL",
+      "accepted": false,
+      "to": "IDLE"
+    },
+    {
+      "from": "IDLE",
+      "event": "LEAVE_OK",
+      "accepted": false,
+      "to": "IDLE"
+    },
+    {
+      "from": "IDLE",
+      "event": "ROOM_CLOSED",
+      "accepted": false,
+      "to": "IDLE"
+    },
+    {
+      "from": "IDLE",
+      "event": "LOGOUT",
+      "accepted": false,
+      "to": "IDLE"
+    },
+    {
+      "from": "IDLE",
+      "event": "DISCONNECT",
+      "accepted": true,
+      "to": "CLOSED"
+    },
+    {
+      "from": "HTTP_HANDSHAKE",
+      "event": "ACCEPT",
+      "accepted": false,
+      "to": "HTTP_HANDSHAKE"
+    },
+    {
+      "from": "HTTP_HANDSHAKE",
+      "event": "HTTP_UPGRADE_OK",
+      "accepted": true,
+      "to": "WS_CONNECTED"
+    },
+    {
+      "from": "HTTP_HANDSHAKE",
+      "event": "LOGIN_OK",
+      "accepted": false,
+      "to": "HTTP_HANDSHAKE"
+    },
+    {
+      "from": "HTTP_HANDSHAKE",
+      "event": "LOGIN_FAIL",
+      "accepted": false,
+      "to": "HTTP_HANDSHAKE"
+    },
+    {
+      "from": "HTTP_HANDSHAKE",
+      "event": "JOIN_OK",
+      "accepted": false,
+      "to": "HTTP_HANDSHAKE"
+    },
+    {
+      "from": "HTTP_HANDSHAKE",
+      "event": "JOIN_FAIL",
+      "accepted": false,
+      "to": "HTTP_HANDSHAKE"
+    },
+    {
+      "from": "HTTP_HANDSHAKE",
+      "event": "LEAVE_OK",
+      "accepted": false,
+      "to": "HTTP_HANDSHAKE"
+    },
+    {
+      "from": "HTTP_HANDSHAKE",
+      "event": "ROOM_CLOSED",
+      "accepted": false,
+      "to": "HTTP_HANDSHAKE"
+    },
+    {
+      "from": "HTTP_HANDSHAKE",
+      "event": "LOGOUT",
+      "accepted": false,
+      "to": "HTTP_HANDSHAKE"
+    },
+    {
+      "from": "HTTP_HANDSHAKE",
+      "event": "DISCONNECT",
+      "accepted": true,
+      "to": "CLOSED"
+    },
+    {
+      "from": "WS_CONNECTED",
+      "event": "ACCEPT",
+      "accepted": false,
+      "to": "WS_CONNECTED"
+    },
+    {
+      "from": "WS_CONNECTED",
+      "event": "HTTP_UPGRADE_OK",
+      "accepted": false,
+      "to": "WS_CONNECTED"
+    },
+    {
+      "from": "WS_CONNECTED",
+      "event": "LOGIN_OK",
+      "accepted": true,
+      "to": "AUTHENTICATED"
+    },
+    {
+      "from": "WS_CONNECTED",
+      "event": "LOGIN_FAIL",
+      "accepted": true,
+      "to": "WS_CONNECTED"
+    },
+    {
+      "from": "WS_CONNECTED",
+      "event": "JOIN_OK",
+      "accepted": false,
+      "to": "WS_CONNECTED"
+    },
+    {
+      "from": "WS_CONNECTED",
+      "event": "JOIN_FAIL",
+      "accepted": false,
+      "to": "WS_CONNECTED"
+    },
+    {
+      "from": "WS_CONNECTED",
+      "event": "LEAVE_OK",
+      "accepted": false,
+      "to": "WS_CONNECTED"
+    },
+    {
+      "from": "WS_CONNECTED",
+      "event": "ROOM_CLOSED",
+      "accepted": false,
+      "to": "WS_CONNECTED"
+    },
+    {
+      "from": "WS_CONNECTED",
+      "event": "LOGOUT",
+      "accepted": false,
+      "to": "WS_CONNECTED"
+    },
+    {
+      "from": "WS_CONNECTED",
+      "event": "DISCONNECT",
+      "accepted": true,
+      "to": "CLOSED"
+    },
+    {
+      "from": "AUTHENTICATED",
+      "event": "ACCEPT",
+      "accepted": false,
+      "to": "AUTHENTICATED"
+    },
+    {
+      "from": "AUTHENTICATED",
+      "event": "HTTP_UPGRADE_OK",
+      "accepted": false,
+      "to": "AUTHENTICATED"
+    },
+    {
+      "from": "AUTHENTICATED",
+      "event": "LOGIN_OK",
+      "accepted": false,
+      "to": "AUTHENTICATED"
+    },
+    {
+      "from": "AUTHENTICATED",
+      "event": "LOGIN_FAIL",
+      "accepted": false,
+      "to": "AUTHENTICATED"
+    },
+    {
+      "from": "AUTHENTICATED",
+      "event": "JOIN_OK",
+      "accepted": true,
+      "to": "IN_ROOM"
+    },
+    {
+      "from": "AUTHENTICATED",
+      "event": "JOIN_FAIL",
+      "accepted": true,
+      "to": "AUTHENTICATED"
+    },
+    {
+      "from": "AUTHENTICATED",
+      "event": "LEAVE_OK",
+      "accepted": false,
+      "to": "AUTHENTICATED"
+    },
+    {
+      "from": "AUTHENTICATED",
+      "event": "ROOM_CLOSED",
+      "accepted": false,
+      "to": "AUTHENTICATED"
+    },
+    {
+      "from": "AUTHENTICATED",
+      "event": "LOGOUT",
+      "accepted": true,
+      "to": "WS_CONNECTED"
+    },
+    {
+      "from": "AUTHENTICATED",
+      "event": "DISCONNECT",
+      "accepted": true,
+      "to": "CLOSED"
+    },
+    {
+      "from": "IN_ROOM",
+      "event": "ACCEPT",
+      "accepted": false,
+      "to": "IN_ROOM"
+    },
+    {
+      "from": "IN_ROOM",
+      "event": "HTTP_UPGRADE_OK",
+      "accepted": false,
+      "to": "IN_ROOM"
+    },
+    {
+      "from": "IN_ROOM",
+      "event": "LOGIN_OK",
+      "accepted": false,
+      "to": "IN_ROOM"
+    },
+    {
+      "from": "IN_ROOM",
+      "event": "LOGIN_FAIL",
+      "accepted": false,
+      "to": "IN_ROOM"
+    },
+    {
+      "from": "IN_ROOM",
+      "event": "JOIN_OK",
+      "accepted": false,
+      "to": "IN_ROOM"
+    },
+    {
+      "from": "IN_ROOM",
+      "event": "JOIN_FAIL",
+      "accepted": false,
+      "to": "IN_ROOM"
+    },
+    {
+      "from": "IN_ROOM",
+      "event": "LEAVE_OK",
+      "accepted": true,
+      "to": "AUTHENTICATED"
+    },
+    {
+      "from": "IN_ROOM",
+      "event": "ROOM_CLOSED",
+      "accepted": true,
+      "to": "AUTHENTICATED"
+    },
+    {
+      "from": "IN_ROOM",
+      "event": "LOGOUT",
+      "accepted": false,
+      "to": "IN_ROOM"
+    },
+    {
+      "from": "IN_ROOM",
+      "event": "DISCONNECT",
+      "accepted": true,
+      "to": "CLOSED"
+    },
+    {
+      "from": "CLOSED",
+      "event": "ACCEPT",
+      "accepted": false,
+      "to": "CLOSED"
+    },
+    {
+      "from": "CLOSED",
+      "event": "HTTP_UPGRADE_OK",
+      "accepted": false,
+      "to": "CLOSED"
+    },
+    {
+      "from": "CLOSED",
+      "event": "LOGIN_OK",
+      "accepted": false,
+      "to": "CLOSED"
+    },
+    {
+      "from": "CLOSED",
+      "event": "LOGIN_FAIL",
+      "accepted": false,
+      "to": "CLOSED"
+    },
+    {
+      "from": "CLOSED",
+      "event": "JOIN_OK",
+      "accepted": false,
+      "to": "CLOSED"
+    },
+    {
+      "from": "CLOSED",
+      "event": "JOIN_FAIL",
+      "accepted": false,
+      "to": "CLOSED"
+    },
+    {
+      "from": "CLOSED",
+      "event": "LEAVE_OK",
+      "accepted": false,
+      "to": "CLOSED"
+    },
+    {
+      "from": "CLOSED",
+      "event": "ROOM_CLOSED",
+      "accepted": false,
+      "to": "CLOSED"
+    },
+    {
+      "from": "CLOSED",
+      "event": "LOGOUT",
+      "accepted": false,
+      "to": "CLOSED"
+    },
+    {
+      "from": "CLOSED",
+      "event": "DISCONNECT",
+      "accepted": false,
+      "to": "CLOSED"
+    }
+  ]
+}

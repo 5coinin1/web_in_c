@@ -1,0 +1,7 @@
+[PASS] test_black_box_fails_to_guess_magic
+[PASS] test_coverage_guided_reaches_at_least_seed_coverage
+[PASS] test_structural_crash_triggers_asan
+[PASS] test_structural_gate_is_accepted
+[PASS] test_z3_solves_the_magic
+
+5/5 passed

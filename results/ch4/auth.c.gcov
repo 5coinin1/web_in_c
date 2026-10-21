@@ -1,0 +1,296 @@
+        -:    0:Source:/mnt/c/Users/lenovo/Desktop/temp/web_in_c/src/auth.c
+        -:    0:Graph:auth.gcno
+        -:    0:Data:auth.gcda
+        -:    0:Runs:8
+        -:    1:#include "auth.h"
+        -:    2:#include "bytes.h"
+        -:    3:#include "path_util.h"
+        -:    4:#include <ctype.h>
+        -:    5:#include <time.h>
+        -:    6:#include <pthread.h>
+        -:    7:#include <openssl/sha.h>
+        -:    8:#include <openssl/rand.h>
+        -:    9:#include <openssl/crypto.h>
+        -:   10:
+        -:   11:#define MAX_ACCOUNTS  256
+        -:   12:#define USERNAME_MAX  31
+        -:   13:#define MIN_USERNAME  3
+        -:   14:#define MIN_PASSWORD  4
+        -:   15:#define SALT_LEN      16
+        -:   16:#define HASH_LEN      32
+        -:   17:#define RECORD_SIZE   (32 + SALT_LEN + HASH_LEN + 8)  // 88 bytes
+        -:   18:
+        -:   19:#define ACC_MAGIC     "WSAC"
+        -:   20:#define ACC_VERSION   1          /* v1: SHA-256(salt || password) */
+        -:   21:
+        -:   22:typedef struct {
+        -:   23:    char    username[32];
+        -:   24:    uint8_t salt[SALT_LEN];
+        -:   25:    uint8_t hash[HASH_LEN];
+        -:   26:    int64_t created_at;
+        -:   27:} account_t;
+        -:   28:
+        -:   29:static account_t g_accounts[MAX_ACCOUNTS];
+        -:   30:static int       g_num_accounts = 0;
+        -:   31:static char      g_db_path[256] = "server_data/accounts.dat";
+        -:   32:
+        -:   33:// ---- brute-force lockout (per username) ----
+        -:   34:#define MAX_LOGIN_FAILS 5
+        -:   35:#define LOCKOUT_SECONDS 30
+        -:   36:#define MAX_GUARDS      128
+        -:   37:
+        -:   38:typedef struct {
+        -:   39:    char   username[32];
+        -:   40:    int    fails;
+        -:   41:    time_t locked_until;
+        -:   42:} login_guard_t;
+        -:   43:
+        -:   44:static login_guard_t   g_guards[MAX_GUARDS];
+        -:   45:static int             g_num_guards = 0;
+        -:   46:static pthread_mutex_t g_guard_lock = PTHREAD_MUTEX_INITIALIZER;
+        -:   47:
+        -:   48:// Caller must hold g_guard_lock.
+    #####:   49:static login_guard_t *guard_for(const char *username) {
+    #####:   50:    for (int i = 0; i < g_num_guards; i++) {
+    #####:   51:        if (strcmp(g_guards[i].username, username) == 0) return &g_guards[i];
+        -:   52:    }
+    #####:   53:    if (g_num_guards >= MAX_GUARDS) return &g_guards[0];   // evict first (simple)
+    #####:   54:    login_guard_t *g = &g_guards[g_num_guards++];
+    #####:   55:    memset(g, 0, sizeof(*g));
+    #####:   56:    strncpy(g->username, username, sizeof(g->username) - 1);
+    #####:   57:    return g;
+        -:   58:}
+        -:   59:
+        -:   60:// Password hash: SHA-256(salt || password) with a per-account salt.
+    #####:   61:static void hash_password(const uint8_t *salt, const char *password,
+        -:   62:                          uint8_t out[HASH_LEN]) {
+    #####:   63:    uint8_t buf[SALT_LEN + 128];
+    #####:   64:    size_t plen = strlen(password);
+    #####:   65:    if (plen > 128) plen = 128;
+    #####:   66:    memcpy(buf, salt, SALT_LEN);
+    #####:   67:    memcpy(buf + SALT_LEN, password, plen);
+    #####:   68:    SHA256(buf, SALT_LEN + plen, out);
+    #####:   69:}
+        -:   70:
+    #####:   71:static int find_account(const char *username) {
+    #####:   72:    for (int i = 0; i < g_num_accounts; i++) {
+    #####:   73:        if (strcmp(g_accounts[i].username, username) == 0) return i;
+        -:   74:    }
+    #####:   75:    return -1;
+        -:   76:}
+        -:   77:
+    #####:   78:static bool valid_username(const char *u) {
+    #####:   79:    size_t len = strlen(u);
+    #####:   80:    if (len < MIN_USERNAME || len > USERNAME_MAX) return false;
+    #####:   81:    for (size_t i = 0; i < len; i++) {
+    #####:   82:        if (!isalnum((unsigned char)u[i]) && u[i] != '_') return false;
+        -:   83:    }
+    #####:   84:    return true;
+        -:   85:}
+        -:   86:
+    #####:   87:static bool valid_password(const char *p) {
+    #####:   88:    size_t len = strlen(p);
+    #####:   89:    if (len < MIN_PASSWORD || len > 63) return false;
+    #####:   90:    for (size_t i = 0; i < len; i++) {
+    #####:   91:        if (isspace((unsigned char)p[i])) return false;
+        -:   92:    }
+    #####:   93:    return true;
+        -:   94:}
+        -:   95:
+        -:   96:// ---- binary store I/O ----
+        -:   97:
+        -:   98:// Parse an account store from a memory buffer.
+        -:   99://
+        -:  100:// This is the single parser targeted by the analysis modules:
+        -:  101://   Ch2 (memory safety) - bounds / overflow bugs
+        -:  102://   Ch3 (SMT)           - the off = 12 + i*RECORD_SIZE / count arithmetic
+        -:  103://   Ch4 (fuzzing)       - the "WSAC" magic + count + records layout
+        -:  104://
+        -:  105:// A clean build performs every bounds check. Compiling with -DVULN removes
+        -:  106:// them on purpose; the injected bugs are marked [BUG x] below.
+        8:  107:int auth_store_parse(const uint8_t *buf, size_t len) {
+        8:  108:    g_num_accounts = 0;
+        -:  109:
+        -:  110:#ifdef VULN
+        -:  111:    // [BUG C - CWE-193 off-by-one] Header length check is one short: an
+        -:  112:    // 11-byte buffer is accepted and get_u32() then reads buf[8..11], one
+        -:  113:    // byte past the end. The fixed bound is len < 12.
+        8:  114:    if (!buf || len < 11) return -1;
+        -:  115:#else
+        -:  116:    if (!buf || len < 12) return -1;
+        -:  117:#endif
+        -:  118:
+       3*:  119:    if (memcmp(buf, ACC_MAGIC, 4) != 0) return -1;
+       3*:  120:    if (get_u16(buf + 4) != ACC_VERSION) return -1;
+        -:  121:
+        3:  122:    uint32_t count = get_u32(buf + 8);
+        -:  123:#ifndef VULN
+        -:  124:    // [FIX A - CWE-129] Bound the file-controlled count before it indexes the
+        -:  125:    // fixed g_accounts[] array.
+        -:  126:    if (count > MAX_ACCOUNTS) count = MAX_ACCOUNTS;
+        -:  127:#endif
+        -:  128:
+        6:  129:    for (uint32_t i = 0; i < count; i++) {
+        3:  130:        size_t off = 12 + (size_t)i * RECORD_SIZE;
+        -:  131:
+        -:  132:#ifndef VULN
+        -:  133:        // [FIX B - CWE-125/190] Overflow-safe bounds check. Uses subtraction,
+        -:  134:        // not "off + RECORD_SIZE <= len", so it cannot wrap around.
+        -:  135:        if (off > len || RECORD_SIZE > len - off) break;
+        -:  136:#endif
+        -:  137:        // [BUG A - CWE-787] With -DVULN, count is unbounded, so g_num_accounts
+        -:  138:        // can pass MAX_ACCOUNTS and the store below writes past g_accounts[].
+        -:  139:        // [BUG B - CWE-125] With -DVULN, off is unchecked, so these reads can
+        -:  140:        // go past the end of buf.
+        3:  141:        account_t *a = &g_accounts[g_num_accounts];
+        3:  142:        memcpy(a->username, buf + off, 32);
+        3:  143:        a->username[31] = '\0';
+        3:  144:        memcpy(a->salt, buf + off + 32, SALT_LEN);
+        3:  145:        memcpy(a->hash, buf + off + 32 + SALT_LEN, HASH_LEN);
+        3:  146:        a->created_at = get_i64(buf + off + 32 + SALT_LEN + HASH_LEN);
+        3:  147:        g_num_accounts++;
+        -:  148:    }
+        3:  149:    return 0;
+        -:  150:}
+        -:  151:
+    #####:  152:static int load_store(void) {
+    #####:  153:    FILE *f = fopen(g_db_path, "rb");
+    #####:  154:    if (!f) return -1;
+        -:  155:
+    #####:  156:    if (fseek(f, 0, SEEK_END) != 0) { fclose(f); return -1; }
+    #####:  157:    long sz = ftell(f);
+    #####:  158:    if (sz < 0) { fclose(f); return -1; }
+    #####:  159:    rewind(f);
+        -:  160:
+    #####:  161:    uint8_t *buf = (uint8_t *)malloc((size_t)sz);
+    #####:  162:    if (!buf) { fclose(f); return -1; }
+    #####:  163:    size_t rd = fread(buf, 1, (size_t)sz, f);
+    #####:  164:    int rc = auth_store_parse(buf, rd);
+    #####:  165:    free(buf);
+    #####:  166:    fclose(f);
+    #####:  167:    return rc;
+        -:  168:}
+        -:  169:
+    #####:  170:static bool save_store(void) {
+    #####:  171:    char tmp[300];
+    #####:  172:    FILE *f = atomic_open(g_db_path, tmp, sizeof(tmp));
+    #####:  173:    if (!f) {
+    #####:  174:        LOG_ERR("Cannot write account store '%s'", g_db_path);
+    #####:  175:        return false;
+        -:  176:    }
+        -:  177:
+    #####:  178:    uint8_t header[12];
+    #####:  179:    memcpy(header, ACC_MAGIC, 4);
+    #####:  180:    put_u16(header + 4, ACC_VERSION);
+    #####:  181:    put_u16(header + 6, 0);
+    #####:  182:    put_u32(header + 8, (uint32_t)g_num_accounts);
+    #####:  183:    fwrite(header, 1, sizeof(header), f);
+        -:  184:
+    #####:  185:    for (int i = 0; i < g_num_accounts; i++) {
+    #####:  186:        uint8_t rec[RECORD_SIZE];
+    #####:  187:        memset(rec, 0, sizeof(rec));
+    #####:  188:        memcpy(rec, g_accounts[i].username, strlen(g_accounts[i].username));
+    #####:  189:        memcpy(rec + 32, g_accounts[i].salt, SALT_LEN);
+    #####:  190:        memcpy(rec + 32 + SALT_LEN, g_accounts[i].hash, HASH_LEN);
+    #####:  191:        put_i64(rec + 32 + SALT_LEN + HASH_LEN, g_accounts[i].created_at);
+    #####:  192:        fwrite(rec, 1, sizeof(rec), f);
+        -:  193:    }
+        -:  194:
+    #####:  195:    if (ferror(f) != 0) { atomic_abort(tmp, f); return false; }
+    #####:  196:    if (atomic_commit(g_db_path, tmp, f) != 0) {
+    #####:  197:        LOG_ERR("Atomic save of account store '%s' failed", g_db_path);
+    #####:  198:        return false;
+        -:  199:    }
+    #####:  200:    return true;
+        -:  201:}
+        -:  202:
+    #####:  203:static void add_account(const char *username, const char *password) {
+    #####:  204:    if (g_num_accounts >= MAX_ACCOUNTS) return;
+    #####:  205:    account_t *a = &g_accounts[g_num_accounts++];
+    #####:  206:    memset(a, 0, sizeof(*a));
+    #####:  207:    strncpy(a->username, username, USERNAME_MAX);
+    #####:  208:    RAND_bytes(a->salt, SALT_LEN);
+    #####:  209:    hash_password(a->salt, password, a->hash);
+    #####:  210:    a->created_at = (int64_t)time(NULL);
+        -:  211:}
+        -:  212:
+    #####:  213:void auth_init(const char *data_dir) {
+    #####:  214:    if (data_dir && data_dir[0]) {
+    #####:  215:        snprintf(g_db_path, sizeof(g_db_path), "%s/accounts.dat", data_dir);
+    #####:  216:        ensure_dir(data_dir);
+        -:  217:    }
+    #####:  218:    g_num_accounts = 0;
+        -:  219:
+    #####:  220:    if (load_store() == 0 && g_num_accounts > 0) {
+    #####:  221:        LOG_INFO("Loaded %d account(s) from '%s'", g_num_accounts, g_db_path);
+    #####:  222:        return;
+        -:  223:    }
+        -:  224:
+        -:  225:    // Seed default accounts (stored as salted hashes, never plaintext)
+    #####:  226:    add_account("alice", "secret123");
+    #####:  227:    add_account("bob", "hunter2");
+    #####:  228:    save_store();
+    #####:  229:    LOG_INFO("Seeded %d default account(s) into '%s'", g_num_accounts, g_db_path);
+        -:  230:}
+        -:  231:
+    #####:  232:auth_result_t auth_check(const char *username, const char *password) {
+    #####:  233:    if (!username || !password) return AUTH_BAD;
+        -:  234:
+        -:  235:    // Reject early if this username is currently locked out.
+    #####:  236:    pthread_mutex_lock(&g_guard_lock);
+    #####:  237:    login_guard_t *guard = guard_for(username);
+    #####:  238:    time_t now = time(NULL);
+    #####:  239:    bool locked = (guard->locked_until > now);
+    #####:  240:    pthread_mutex_unlock(&g_guard_lock);
+    #####:  241:    if (locked) return AUTH_LOCKED;
+        -:  242:
+        -:  243:    // Verify. For an unknown user we still hash (with a dummy salt) so the
+        -:  244:    // response time does not reveal whether the account exists.
+    #####:  245:    bool ok = false;
+    #####:  246:    uint8_t computed[HASH_LEN];
+    #####:  247:    int idx = find_account(username);
+    #####:  248:    if (idx >= 0) {
+    #####:  249:        hash_password(g_accounts[idx].salt, password, computed);
+    #####:  250:        ok = CRYPTO_memcmp(computed, g_accounts[idx].hash, HASH_LEN) == 0;
+        -:  251:    } else {
+    #####:  252:        uint8_t dummy_salt[SALT_LEN] = {0};
+    #####:  253:        hash_password(dummy_salt, password, computed);
+        -:  254:    }
+        -:  255:
+        -:  256:    // Update the failure counter / lockout.
+    #####:  257:    pthread_mutex_lock(&g_guard_lock);
+    #####:  258:    guard = guard_for(username);
+    #####:  259:    if (ok) {
+    #####:  260:        guard->fails = 0;
+    #####:  261:        guard->locked_until = 0;
+        -:  262:    } else {
+    #####:  263:        guard->fails++;
+    #####:  264:        if (guard->fails >= MAX_LOGIN_FAILS) {
+    #####:  265:            guard->locked_until = now + LOCKOUT_SECONDS;
+    #####:  266:            guard->fails = 0;
+        -:  267:        }
+        -:  268:    }
+    #####:  269:    pthread_mutex_unlock(&g_guard_lock);
+        -:  270:
+    #####:  271:    return ok ? AUTH_OK : AUTH_BAD;
+        -:  272:}
+        -:  273:
+    #####:  274:auth_reg_result_t auth_register(const char *username, const char *password) {
+    #####:  275:    if (!username || !password) return AUTH_REG_INVALID;
+    #####:  276:    if (!valid_username(username) || !valid_password(password)) return AUTH_REG_INVALID;
+    #####:  277:    if (find_account(username) >= 0) return AUTH_REG_EXISTS;
+    #####:  278:    if (g_num_accounts >= MAX_ACCOUNTS) return AUTH_REG_INVALID;
+        -:  279:
+    #####:  280:    add_account(username, password);
+    #####:  281:    if (!save_store()) {
+    #####:  282:        g_num_accounts--;   // roll back: keep memory consistent with disk
+    #####:  283:        LOG_ERR("Failed to persist new account '%s'", username);
+    #####:  284:        return AUTH_REG_IO;
+        -:  285:    }
+    #####:  286:    LOG_INFO("Registered new user '%s'", username);
+    #####:  287:    return AUTH_REG_OK;
+        -:  288:}
+        -:  289:
+        8:  290:int auth_num_accounts(void) {
+        8:  291:    return g_num_accounts;
+        -:  292:}
